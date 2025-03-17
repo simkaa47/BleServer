@@ -1,4 +1,5 @@
 ﻿using Linux.Bluetooth;
+using Linux.Bluetooth.Extensions;
 
 if (OperatingSystem.IsLinux())
 {
@@ -9,6 +10,9 @@ if (OperatingSystem.IsLinux())
         var id = await adapter.GetAddressAsync();
         Console.WriteLine($"Adapter name is {name}");
         Console.WriteLine($"Adapter address is {id}");
+        await adapter.SetAliasAsync("MyDevice");
     }
 }
+Console.ReadKey();
+
 Console.WriteLine("End of the program!");

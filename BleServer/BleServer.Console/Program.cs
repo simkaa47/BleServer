@@ -6,7 +6,7 @@ if (OperatingSystem.IsLinux())
     if(adapter is not null)
     {
         var name = await adapter.GetNameAsync();
-        var id = adapter.GetAddressAsync();
+        var id = await adapter.GetAddressAsync();
         Console.WriteLine($"Adapter name is {name}");
         Console.WriteLine($"Adapter address is {id}");
     }

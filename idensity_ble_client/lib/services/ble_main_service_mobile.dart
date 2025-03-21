@@ -24,22 +24,17 @@ class BleMainServiceMobile implements BleMainService {
     final isSupported = await FlutterBluePlus.isSupported;
     if (isSupported == false) {
       log("Bluetooth not supported by this mobile device");
+       _stateController.add(BleMainState.notSupported);
       return;
     }
     final state = await FlutterBluePlus.adapterState.first;
     log(state.toString());
     if (state != BluetoothAdapterState.on) {
       log("Bluetooth off");
+      _stateController.add(BleMainState.off);
       return;
     }
-      _scanSubscription?.cancel();  
-      _scanSubscription = FlutterBluePlus.onScanResults.listen((results) {
-      scanResults = results;
-      if (results.isNotEmpty) {
-        ScanResult r = results.last; // the most recently found device
-        log('${r.device.remoteId}: "${r.advertisementData.advName}" found!');
-      }
-    },  onError: (e) => log(e.toString()));
+      
     await scanDevices();
   }
 
@@ -48,15 +43,28 @@ class BleMainServiceMobile implements BleMainService {
   BluetoothAdapterState adapterState = BluetoothAdapterState.unknown;
   
   @override
-  Future<void> scanDevices() async{
-    const timeout = Duration(seconds: 20);
+  Future<void> scanDevices() async{ 
     scanResults.clear();
-    final state = await FlutterBluePlus.adapterState.first;
-    if(state == BluetoothAdapterState.on){
-      log('Scanning for devices...');
-      _stateController.add(BleMainState.scanning);
-      await FlutterBluePlus.startScan(timeout: timeout);
-    }
+    const timeout = Duration(seconds: 20);
+    log('Scanning for devices...');
+    _stateController.add(BleMainState.scanning);
+    await FlutterBluePlus.startScan(timeout: timeout);
+    final sub = FlutterBluePlus.scanResults.expand((e) => e).listen((device) {
+      if (device.advertisementData.advName.isNotEmpty &&
+          !scanResults.any((result) {
+            return result.device.remoteId == device.device.remoteId;
+          })) {
+        scanResults.add(device);
+        _stateController.add(BleMainState.scanning);
+        log(
+          '${device.device.remoteId}: "${device.advertisementData.advName}" found!',
+        );
+      }
+    });
+    await Future.delayed(timeout);
+    sub.cancel();
+    log('Found ${scanResults.length} devices');
+    _stateController.add(BleMainState.on);
     
   }
 

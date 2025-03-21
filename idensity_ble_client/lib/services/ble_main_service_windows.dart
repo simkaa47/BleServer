@@ -29,9 +29,7 @@ class BleMainServiceWindows implements BleMainService {
       return;
     }
     await scanDevices();    
-  }
-
-  
+  }  
 
   @override
   List<ScanResult> scanResults = [];
@@ -40,7 +38,7 @@ class BleMainServiceWindows implements BleMainService {
   @override
   Future<void> scanDevices() async {
     scanResults.clear();
-    const timeout = Duration(seconds: 20);
+    const timeout = Duration(seconds: 10);
     log('Scanning for devices...');
     _stateController.add(BleMainState.scanning);
     await FlutterBluePlus.startScan(timeout: timeout);

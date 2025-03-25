@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
@@ -13,11 +14,15 @@ class DeviceScreen extends StatefulWidget {
 }
 
 class _DeviceScreenState extends State<DeviceScreen> {
-  static const String _serviceUuid = "12345678-1234-5678-1234-56789abcdef0";
-  static const String _characteristicUuid =
-      "12345678-1234-5678-1234-56789abcdef1";
+  String? _readValue;
+  static const String _serviceUuid = "d973f2e0-b19e-11e2-9e96-0800200c9a66";
+  static const String _characteristicWriteUuid =
+      "d973f2e2-b19e-11e2-9e96-0800200c9a66";
+  static const String _characteristicReadUuid =
+      "d973f2e1-b19e-11e2-9e96-0800200c9a66";
 
-  BluetoothCharacteristic? _characteristic;
+  BluetoothCharacteristic? _characteristicRead;
+  BluetoothCharacteristic? _characteristicWrite;
 
   StreamSubscription<BluetoothConnectionState>? _stateSubscription;
 
@@ -46,7 +51,9 @@ class _DeviceScreenState extends State<DeviceScreen> {
     services.forEach((service) {
       log('Service: ${service.uuid}');
       service.characteristics.forEach((characteristic) {
-        log('Characteristic: ${characteristic.uuid}');
+        log(
+          'Characteristic: ${characteristic.uuid} with flags ${characteristic.properties}',
+        );
       });
     });
     final service =
@@ -57,20 +64,36 @@ class _DeviceScreenState extends State<DeviceScreen> {
       log('Service not found');
       return;
     }
-    _characteristic =
+    _characteristicWrite =
         service.characteristics
             .where(
               (characteristic) =>
-                  characteristic.uuid.toString() == _characteristicUuid,
+                  characteristic.uuid.toString() == _characteristicWriteUuid,
             )
             .firstOrNull;
-    if (_characteristic == null) {
-      log('Characteristic not found');
+    if (_characteristicWrite == null) {
+      log('Characteristic for writing is not found');
       return;
     }
-    log('Characteristic found');
-    final subscription = _characteristic?.onValueReceived.listen((value) {
+    _characteristicRead =
+        service.characteristics
+            .where(
+              (characteristic) =>
+                  characteristic.uuid.toString() == _characteristicReadUuid,
+            )
+            .firstOrNull;
+    if (_characteristicRead == null) {
+      log('Characteristic for reading is not found');
+      return;
+    }
+    log('Characteristic for reading found');
+    log('Characteristic for writing found');
+    final subscription = _characteristicRead?.lastValueStream.listen((value) {
       log('We have gotten a value: ${value.toString()}');
+      setState(() {
+        _readValue = utf8.decode(value);
+        log(_readValue!);
+      });
     });
 
     // cleanup: cancel subscription when disconnected
@@ -79,21 +102,19 @@ class _DeviceScreenState extends State<DeviceScreen> {
     // subscribe
     // Note: If a characteristic supports both **notifications** and **indications**,
     // it will default to **notifications**. This matches how CoreBluetooth works on iOS.
-    //await _characteristic?.setNotifyValue(true);
+    await _characteristicRead?.setNotifyValue(true);
   }
 
   Future<void> _read() async {
-    await _characteristic?.read();
+    await _characteristicRead?.read();
   }
 
   Future<void> _send() async {
     try {
-      _characteristic?.setNotifyValue(true);
-      await _characteristic?.write([1, 2, 3, 3, 5]);
+      await _characteristicWrite?.write([1, 2, 3, 3, 5]);
     } catch (e) {
       log(e.toString());
     }
-    
   }
 
   @override
@@ -112,7 +133,14 @@ class _DeviceScreenState extends State<DeviceScreen> {
       ),
 
       appBar: AppBar(title: const Text('Idensity Bluetooth Client')),
-      body: Center(child: Text(widget.device.advName.toString())),
+      body: Center(
+        child: Column(
+          children: [
+            Text(widget.device.advName.toString()),
+            Text(_readValue ?? ""),
+          ],
+        ),
+      ),
     );
   }
 }

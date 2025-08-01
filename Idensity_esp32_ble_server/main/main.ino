@@ -1,8 +1,11 @@
 #include <BLEDevice.h>
+#include <BLE2901.h>
 
 /**Defines*/
 #define DEVICE_NAME "Idensity_BLE"
 #define SERVICE_1_UUID "d973f2e0-b19e-11e2-9e96-0800200c9a66"
+#define CHARACTERISTIC_1_UUID "d973f2e2-b19e-11e2-9e96-0800200c9a66"
+#define CHARACTERISTIC_2_UUID "d973f2e1-b19e-11e2-9e96-0800200c9a66"
 
 /*Callbacks*/
 class MyServerCallbacks : public BLEServerCallbacks {
@@ -18,10 +21,25 @@ class MyServerCallbacks : public BLEServerCallbacks {
   }
 };
 
+class MyCharacteristicsCallbacksRw : public BLECharacteristicCallbacks {
+  void onWrite(BLECharacteristic *pCharacteristic){
+      uint32_t currentMilis = millis() / 1000;
+      pCharacteristic->setValue(currentMilis);
+      pCharacteristic->notify();
+  }
+
+
+  void onRead(BLECharacteristic *pCharacteristic) {
+    uint32_t currentMilis = millis() / 1000;
+    pCharacteristic->setValue(currentMilis);   
+    Serial.println(currentMilis);
+  }
+};
+BLECharacteristic *pCharacteristic;
 
 
 void setup() {
-  pinMode(2, OUTPUT);  
+  pinMode(2, OUTPUT);
   // put your setup code here, to run once:
   Serial.begin(9600);
   Serial.print("ESP32 BLE Server beginning...");
@@ -35,13 +53,37 @@ void setup() {
 
   //Services
   BLEService *pService = pServer->createService(SERVICE_1_UUID);
+
+  //Characteristics
+  BLECharacteristic *pCharacteristicRead = pService->createCharacteristic(
+    CHARACTERISTIC_2_UUID,
+    BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE | BLECharacteristic::PROPERTY_NOTIFY);
+
+  BLECharacteristic *pCharacteristicWrite = pService->createCharacteristic(
+    CHARACTERISTIC_1_UUID,
+    BLECharacteristic::PROPERTY_WRITE);
+
+  pCharacteristic = pCharacteristicRead;
+
+  pCharacteristicRead->setCallbacks(new MyCharacteristicsCallbacksRw());
+
+  // Descriptors
+  BLE2901 *descriptor_2901 = new BLE2901();
+  descriptor_2901->setDescription("Time");
+  pCharacteristicRead->addDescriptor(descriptor_2901);
+
+
   pService->start();
 
   //Start advertising
   BLEDevice::startAdvertising();
 }
-
+uint32_t currentMilis1 = 0;
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  // delay(2000);
+  // currentMilis1 = millis() / 1000;
+  // pCharacteristic->setValue(currentMilis1);
+  // pCharacteristic->notify();
+  // // put your main code here, to run repeatedly:
 }

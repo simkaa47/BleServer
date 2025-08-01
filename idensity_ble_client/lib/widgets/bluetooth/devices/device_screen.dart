@@ -1,8 +1,8 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:developer';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:flutter_blue_plus_windows/flutter_blue_plus_windows.dart';
 
 class DeviceScreen extends StatefulWidget {
   const DeviceScreen({super.key, required this.device});
@@ -88,30 +88,40 @@ class _DeviceScreenState extends State<DeviceScreen> {
     }
     log('Characteristic for reading found');
     log('Characteristic for writing found');
-    final subscription = _characteristicRead?.lastValueStream.listen((value) {
-      log('We have gotten a value: ${value.toString()}');
-      setState(() {
-        _readValue = utf8.decode(value);
-        log(_readValue!);
-      });
-    });
-
-    // cleanup: cancel subscription when disconnected
-    widget.device.cancelWhenDisconnected(subscription!);
 
     // subscribe
     // Note: If a characteristic supports both **notifications** and **indications**,
     // it will default to **notifications**. This matches how CoreBluetooth works on iOS.
-    await _characteristicRead?.setNotifyValue(true);
   }
 
   Future<void> _read() async {
-    await _characteristicRead?.read();
+    // if (!await WinBle.isPaired(
+    //   widget.device.remoteId.str.toLowerCase(),
+    //   forceRefresh: true,
+    // )) {
+    //   await WinBle.pair(widget.device.remoteId.str.toLowerCase());
+    // }    
+    // var value = await WinBle.read(
+    //   address: widget.device.remoteId.str.toLowerCase(),
+    //   serviceId: "d973f2e0-b19e-11e2-9e96-0800200c9a66",
+    //   characteristicId: _characteristicReadUuid,
+    // );
+    var value = await _characteristicRead?.read();
+
+    log('We have gotten a value: ${value.toString()}');
+    setState(() {
+      Uint8List uint8List2 = Uint8List.fromList(value!);
+      ByteData byteData2 = ByteData.view(uint8List2.buffer);
+      int result2 = byteData2.getInt32(0, Endian.little);
+      _readValue = result2.toString();
+    });
+    _characteristicRead?.setNotifyValue(false);
+    
   }
 
   Future<void> _send() async {
     try {
-      await _characteristicWrite?.write([1, 2, 3, 3, 5]);
+      await _characteristicRead?.write([1, 2, 3, 3, 5]);
     } catch (e) {
       log(e.toString());
     }

@@ -2,10 +2,10 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:idensity_ble_client/models/scan_state.dart';
 import 'package:idensity_ble_client/services/ble_main_service.dart';
 import 'package:idensity_ble_client/services/ble_main_service_mobile.dart';
 import 'package:idensity_ble_client/services/ble_main_service_windows.dart';
-import 'package:idensity_ble_client/services/ble_main_state.dart';
 import 'package:idensity_ble_client/widgets/bluetooth/devices/device_screen.dart';
 
 class BleDevicesListScreen extends StatefulWidget {
@@ -24,7 +24,7 @@ class _BleDevicesListScreenState extends State<BleDevicesListScreen> {
     widget._bleMainService.setLogLevel();
     super.initState();
     widget._bleMainService.bleMainState.listen((state) {
-      if (state == BleMainState.on) {
+      if (state == ScanState.on) {
         setState(() {
           _enableScanning = true;
         });
@@ -60,11 +60,11 @@ class _BleDevicesListScreenState extends State<BleDevicesListScreen> {
           if (snapshot.connectionState == ConnectionState.active ||
               snapshot.connectionState == ConnectionState.done) {
             final state = snapshot.data;
-            if (state == BleMainState.notSupported) {
+            if (state == ScanState.notSupported) {
               return Center(
                 child: Text('Bluetooth не поддерживается на этом устройстве'),
               );
-            } else if (state == BleMainState.off) {
+            } else if (state == ScanState.off) {
               return Center(child: Text('Bluetooth выключен'));
             } else {
               return ListView.builder(

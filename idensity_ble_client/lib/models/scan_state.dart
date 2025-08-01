@@ -1,4 +1,4 @@
-enum BleMainState {
+enum ScanState {
   notSupported,
   unknown,
   off,

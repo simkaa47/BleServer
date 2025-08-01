@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:idensity_ble_client/widgets/bluetooth/devices/ble_devices_list_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:idensity_ble_client/widgets/scanning.dart/scan_list.dart';
 
 void main() {
-  runApp(const MyApp());
+   runApp(
+    const ProviderScope(
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -16,7 +21,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: BleDevicesListScreen(),
+      //home: BleDevicesListScreen(),
+      home: ScanList(),
     );
   }
 }

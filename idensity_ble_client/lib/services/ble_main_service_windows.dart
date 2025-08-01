@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:developer';
 import 'package:flutter_blue_plus_windows/flutter_blue_plus_windows.dart';
+import 'package:idensity_ble_client/models/scan_state.dart';
 import 'package:idensity_ble_client/services/ble_main_service.dart';
-import 'package:idensity_ble_client/services/ble_main_state.dart';
 
 class BleMainServiceWindows implements BleMainService {
 
@@ -19,13 +19,13 @@ class BleMainServiceWindows implements BleMainService {
   Future<void> enableBle() async {
     if (await FlutterBluePlus.isSupported == false) {
       log("Bluetooth not supported by this windows device");
-      _stateController.add(BleMainState.notSupported);
+      _stateController.add(ScanState.notSupported);
       return;
     }
     final state = await FlutterBluePlus.adapterState.first;
     if(state != BluetoothAdapterState.on){
       log("Bluetooth is turned off");
-      _stateController.add(BleMainState.off);
+      _stateController.add(ScanState.off);
       return;
     }
     await scanDevices();    
@@ -40,7 +40,7 @@ class BleMainServiceWindows implements BleMainService {
     scanResults.clear();
     const timeout = Duration(seconds: 10);
     log('Scanning for devices...');
-    _stateController.add(BleMainState.scanning);
+    _stateController.add(ScanState.scanning);
     await FlutterBluePlus.startScan(timeout: timeout);
     final sub = FlutterBluePlus.scanResults.expand((e) => e).listen((device) {
       if (device.advertisementData.advName.isNotEmpty && 
@@ -48,7 +48,7 @@ class BleMainServiceWindows implements BleMainService {
         return result.device.remoteId == device.device.remoteId;
       })) {
         scanResults.add(device);
-        _stateController.add(BleMainState.scanning);
+        _stateController.add(ScanState.scanning);
         log(
           '${device.device.remoteId}: "${device.advertisementData.advName}" found!',
         );
@@ -57,7 +57,7 @@ class BleMainServiceWindows implements BleMainService {
     await Future.delayed(timeout);
     sub.cancel();
     log('Found ${scanResults.length} devices');
-    _stateController.add(BleMainState.on);
+    _stateController.add(ScanState.on);
   }
 
   void _subsribe(){
@@ -66,16 +66,16 @@ class BleMainServiceWindows implements BleMainService {
       log(state.toString());
       if (state == BluetoothAdapterState.on) {
         await scanDevices();
-        _stateController.add(BleMainState.on);
+        _stateController.add(ScanState.on);
       }else{
-        _stateController.add(BleMainState.off);
+        _stateController.add(ScanState.off);
       }
     });    
   }
 
   @override  
-  Stream<BleMainState> get bleMainState => _stateController.stream;
-  final StreamController<BleMainState> _stateController =
-      StreamController<BleMainState>.broadcast();
+  Stream<ScanState> get bleMainState => _stateController.stream;
+  final StreamController<ScanState> _stateController =
+      StreamController<ScanState>.broadcast();
 
 }

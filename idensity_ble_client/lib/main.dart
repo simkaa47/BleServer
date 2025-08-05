@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:idensity_ble_client/widgets/scanning.dart/scan_list.dart';
+import 'package:idensity_ble_client/widgets/scanning.dart/scan_main.dart';
 
 void main() {
    runApp(
@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
       //home: BleDevicesListScreen(),
-      home: ScanList(),
+      home: ScanMainWidget(),
     );
   }
 }

@@ -4,10 +4,11 @@ import 'package:idensity_ble_client/models/ethernet/ethernet_settings.dart';
 import 'package:idensity_ble_client/models/indication.dart';
 
 class Device {
-  bool connected = false;
+  bool connected = false; 
   IndicationData indicationData = IndicationData();
   ConnectionType connectionType = ConnectionType.bluetooth;
   EthernetSettings ethernetSettings = EthernetSettings();
   BluetoothSettings bluetoothSettings = BluetoothSettings();
+  String name  = "";
 
 }

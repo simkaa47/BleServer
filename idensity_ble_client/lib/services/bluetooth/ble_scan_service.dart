@@ -2,14 +2,19 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter_blue_plus_windows/flutter_blue_plus_windows.dart';
+import 'package:idensity_ble_client/models/bluetooth/bluetooth_connection.dart';
+import 'package:idensity_ble_client/models/device.dart';
 import 'package:idensity_ble_client/models/scan_result.dart';
 import 'package:idensity_ble_client/models/scan_state.dart';
+import 'package:idensity_ble_client/services/device_service.dart';
 import 'package:idensity_ble_client/services/scan_service.dart';
 
 class BleScanService implements ScanService {
-  BleScanService() {
+  BleScanService({required this.deviceService}) {
     _subsribe();
   }
+
+  final DeviceService deviceService;
 
   List<BlueScanResult> results = [];
   @override
@@ -29,7 +34,8 @@ class BleScanService implements ScanService {
     _stateController.add(ScanState.scanning);
     final timeout = Duration(seconds: duration);
     log('Scanning for devices...');
-    await FlutterBluePlus.startScan(timeout: timeout);
+    var services =  [Guid(BluetoothConnection.serviceUuid)];
+    await FlutterBluePlus.startScan(timeout: timeout, withServices: services);
     subscription = FlutterBluePlus.scanResults.expand((e) => e).listen((
       device,
     ) {
@@ -67,10 +73,18 @@ class BleScanService implements ScanService {
     adapterStateSubscription?.cancel();
   }
 
+
   @override
-  Future<void> saveDevice(IdensityScanResult result) {
-    // TODO: implement saveDevice
-    throw UnimplementedError();
+  Future<void> saveDevices(List<IdensityScanResult> results) async{    
+    List<Device> devices = results.map((result){
+      final device =  Device();
+      if(result is BlueScanResult){       
+        device.bluetoothSettings.deviceName = result.advName;
+        device.bluetoothSettings.macAddress = result.macAddress;
+      }
+      return device;
+    }).toList();
+    await deviceService.addDevices(devices);
   }
 
   void _subsribe() {

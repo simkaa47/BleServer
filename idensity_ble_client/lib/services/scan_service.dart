@@ -18,7 +18,7 @@ class ScanService {
     throw Exception("Needs to be implemented");
   }
 
-  Future<void> saveDevice(IdensityScanResult result) {
+  Future<void> saveDevices(List<IdensityScanResult> results) {
     throw Exception("Needs to be implemented");
   }
 }

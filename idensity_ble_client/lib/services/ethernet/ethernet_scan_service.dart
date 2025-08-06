@@ -1,8 +1,14 @@
 import 'package:idensity_ble_client/models/scan_result.dart';
 import 'package:idensity_ble_client/models/scan_state.dart';
+import 'package:idensity_ble_client/services/device_service.dart';
 import 'package:idensity_ble_client/services/scan_service.dart';
 
 class EthernetScanService implements ScanService {
+
+  EthernetScanService({required this.deviceService});
+
+  final DeviceService deviceService;
+
   @override
   // TODO: implement bleMainState
   Stream<ScanState> get scanState => throw UnimplementedError();
@@ -26,7 +32,7 @@ class EthernetScanService implements ScanService {
   }
   
   @override
-  Future<void> saveDevice(IdensityScanResult result) {
+  Future<void> saveDevices(List<IdensityScanResult> results) {
     // TODO: implement saveDevice
     throw UnimplementedError();
   }

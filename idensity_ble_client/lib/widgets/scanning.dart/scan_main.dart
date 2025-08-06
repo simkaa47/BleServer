@@ -6,8 +6,7 @@ import 'package:idensity_ble_client/models/scan_result.dart';
 import 'package:idensity_ble_client/widgets/scanning.dart/scan_buttons_widget.dart';
 import 'package:idensity_ble_client/widgets/scanning.dart/scan_list.dart';
 
-
-class  ScanMainWidget extends ConsumerStatefulWidget {
+class ScanMainWidget extends ConsumerStatefulWidget {
   const ScanMainWidget({super.key});
 
   @override
@@ -17,7 +16,7 @@ class  ScanMainWidget extends ConsumerStatefulWidget {
 }
 
 class _ScanMainState extends ConsumerState<ScanMainWidget> {
-  bool _selectedResultsIsNotEmpty  = false;
+  bool _selectedResultsIsNotEmpty = false;
   final List<IdensityScanResult> selectedResults = [];
   @override
   Widget build(BuildContext context) {
@@ -65,17 +64,28 @@ class _ScanMainState extends ConsumerState<ScanMainWidget> {
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          ScanButtonsWidget(scanService: scanService, selectedResults: selectedResults),
-          const SizedBox(width: 16),  
-                 
+          ScanButtonsWidget(
+            scanService: scanService,
+            selectedResults: selectedResults,
+            onStartScan: () {
+              setState(() {
+                _selectedResultsIsNotEmpty = selectedResults.isNotEmpty;
+              });
+            },
+          ),
+          const SizedBox(width: 16),
+
           Opacity(
             opacity: _selectedResultsIsNotEmpty ? 1 : 0.4,
-            child: FloatingActionButton(            
-              heroTag: 'save device',   
-                       
-              onPressed: _selectedResultsIsNotEmpty ? (){
+            child: FloatingActionButton(
+              heroTag: 'save device',
 
-              } : null,
+              onPressed:
+                  _selectedResultsIsNotEmpty
+                      ? () {
+                        scanService.saveDevices(selectedResults);
+                      }
+                      : null,
               child: const Icon(Icons.save),
             ),
           ),

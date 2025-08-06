@@ -22,16 +22,16 @@ class MyServerCallbacks : public BLEServerCallbacks {
 };
 
 class MyCharacteristicsCallbacksRw : public BLECharacteristicCallbacks {
-  void onWrite(BLECharacteristic *pCharacteristic){
-      uint32_t currentMilis = millis() / 1000;
-      pCharacteristic->setValue(currentMilis);
-      pCharacteristic->notify();
+  void onWrite(BLECharacteristic *pCharacteristic) {
+    uint32_t currentMilis = millis() / 1000;
+    pCharacteristic->setValue(currentMilis);
+    pCharacteristic->notify();
   }
 
 
   void onRead(BLECharacteristic *pCharacteristic) {
     uint32_t currentMilis = millis() / 1000;
-    pCharacteristic->setValue(currentMilis);   
+    pCharacteristic->setValue(currentMilis);
     Serial.println(currentMilis);
   }
 };
@@ -46,10 +46,14 @@ void setup() {
 
   //initialize device
   BLEDevice::init(DEVICE_NAME);
+  
 
-  // Create server
+    // Create server
   BLEServer *pServer = BLEDevice::createServer();
   pServer->setCallbacks(new MyServerCallbacks());
+
+  BLEAdvertising *pAdvertising = pServer->getAdvertising();
+  pAdvertising->addServiceUUID(BLEUUID(SERVICE_1_UUID));
 
   //Services
   BLEService *pService = pServer->createService(SERVICE_1_UUID);
@@ -76,7 +80,7 @@ void setup() {
   pService->start();
 
   //Start advertising
-  BLEDevice::startAdvertising();
+  pAdvertising->start();
 }
 uint32_t currentMilis1 = 0;
 

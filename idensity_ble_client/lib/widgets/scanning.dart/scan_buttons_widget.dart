@@ -4,10 +4,17 @@ import 'package:idensity_ble_client/models/scan_state.dart';
 import 'package:idensity_ble_client/services/scan_service.dart';
 
 class ScanButtonsWidget extends StatelessWidget {
-  const ScanButtonsWidget({super.key, required this.scanService, required this.selectedResults});
+  const ScanButtonsWidget({
+    super.key,
+    required this.scanService,
+    required this.selectedResults,
+    required this.onStartScan,
+  });
 
   final ScanService scanService;
   final List<IdensityScanResult> selectedResults;
+
+  final Function() onStartScan;
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +32,7 @@ class ScanButtonsWidget extends StatelessWidget {
               heroTag: 'start_scan',
               onPressed: () async {
                 selectedResults.clear();
+                onStartScan();
                 await scanService.startScan(duration: 10);
               },
               child: const Icon(Icons.play_arrow),

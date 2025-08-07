@@ -23,10 +23,30 @@ class MyServerCallbacks : public BLEServerCallbacks {
 
 class MyCharacteristicsCallbacksRw : public BLECharacteristicCallbacks {
   void onWrite(BLECharacteristic *pCharacteristic) {
-    uint32_t currentMilis = millis() / 1000;
-    Serial.println("Got some value");
-    pCharacteristic->setValue(currentMilis);
-    pCharacteristic->notify();
+    // Получаем длину этих данных
+    size_t receivedLength = pCharacteristic->getLength();
+    uint8_t *receivedData = pCharacteristic->getData();
+    // Проверяем, что данные не пустые
+    if (receivedData != nullptr && receivedLength > 0) {
+      Serial.print("Received data of length: ");
+      Serial.println(receivedLength);
+
+      // Вы можете распечатать данные для отладки
+      Serial.print("Received bytes: ");
+      for (int i = 0; i < receivedLength; i++) {
+        Serial.print(receivedData[i], HEX);
+        Serial.print(" ");
+      }
+      Serial.println();
+
+      // Устанавливаем полученные данные в качестве ответа
+      pCharacteristic->setValue(receivedData, receivedLength);
+
+      // Отправляем уведомление
+      pCharacteristic->notify();
+    } else {
+      Serial.println("Received empty data.");
+    }
   }
 
 
@@ -47,9 +67,9 @@ void setup() {
 
   //initialize device
   BLEDevice::init(DEVICE_NAME);
-  
 
-    // Create server
+
+  // Create server
   BLEServer *pServer = BLEDevice::createServer();
   pServer->setCallbacks(new MyServerCallbacks());
 

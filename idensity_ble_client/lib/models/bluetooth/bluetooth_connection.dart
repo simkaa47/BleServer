@@ -29,6 +29,7 @@ class BluetoothConnection {
     try {
       await _characteristicRead!.write(request);
       if(Platform.isWindows){
+        await Future.delayed(Duration(milliseconds: 100));
         await _characteristicRead?.read();
       }
       final response = await _readCompleter!.future.timeout(duration);

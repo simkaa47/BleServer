@@ -38,7 +38,7 @@ class BleScanService implements ScanService {
     await FlutterBluePlus.startScan(timeout: timeout, withServices: services);
     subscription = FlutterBluePlus.scanResults.expand((e) => e).listen((
       device,
-    ) {
+    ) async{
       if (device.advertisementData.advName.isNotEmpty &&
           !results.any((result) {
             return result.advName == device.device.advName;
@@ -46,7 +46,8 @@ class BleScanService implements ScanService {
         final BlueScanResult result = BlueScanResult();
         result.advName = device.device.advName;
         result.macAddress = device.device.remoteId.str;
-        results.add(result);
+        results.add(result);      
+        
         _stateController.add(ScanState.scanning);
         log(
           '${device.device.remoteId}: "${device.advertisementData.advName}" found!',

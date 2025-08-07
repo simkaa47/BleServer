@@ -24,6 +24,7 @@ class MyServerCallbacks : public BLEServerCallbacks {
 class MyCharacteristicsCallbacksRw : public BLECharacteristicCallbacks {
   void onWrite(BLECharacteristic *pCharacteristic) {
     uint32_t currentMilis = millis() / 1000;
+    Serial.println("Got some value");
     pCharacteristic->setValue(currentMilis);
     pCharacteristic->notify();
   }

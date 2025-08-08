@@ -875,8 +875,7 @@ uint16_t modBusRTUinpRegRead(uint16_t address) {
       result = meas_proc_data->ndx;
       break;
     // Измерение 0 - счетчик
-    case 2:
-      meas_proc_data->counter = 123;
+    case 2:     
     case 3:
       memcpy(&result, (uint8_t *)&meas_proc_data->counter + (reg - 2) * sizeof result, sizeof result);
       break;

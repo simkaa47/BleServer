@@ -1,11 +1,14 @@
 #include <BLEDevice.h>
 #include <BLE2901.h>
+#include "modbus.h"
 
 /**Defines*/
 #define DEVICE_NAME "Idensity_BLE"
 #define SERVICE_1_UUID "d973f2e0-b19e-11e2-9e96-0800200c9a66"
 #define CHARACTERISTIC_1_UUID "d973f2e2-b19e-11e2-9e96-0800200c9a66"
 #define CHARACTERISTIC_2_UUID "d973f2e1-b19e-11e2-9e96-0800200c9a66"
+
+extern uint8_t modbus_response_buffer[250];
 
 /*Callbacks*/
 class MyServerCallbacks : public BLEServerCallbacks {
@@ -30,7 +33,6 @@ class MyCharacteristicsCallbacksRw : public BLECharacteristicCallbacks {
     if (receivedData != nullptr && receivedLength > 0) {
       Serial.print("Received data of length: ");
       Serial.println(receivedLength);
-
       // Вы можете распечатать данные для отладки
       Serial.print("Received bytes: ");
       for (int i = 0; i < receivedLength; i++) {
@@ -38,9 +40,18 @@ class MyCharacteristicsCallbacksRw : public BLECharacteristicCallbacks {
         Serial.print(" ");
       }
       Serial.println();
+      int result = modBusRTUincomingPacketParse(receivedData, receivedLength);
+      if(result>=0){
+        result = modBusRTUoutgoingPacketProcess(result);
+        Serial.print("Modbus result: ");
+        Serial.print(result);
+        Serial.println(" bytes");
+        pCharacteristic->setValue(modbus_response_buffer, result);
+      }
+      
 
       // Устанавливаем полученные данные в качестве ответа
-      pCharacteristic->setValue(receivedData, receivedLength);
+      
 
       // Отправляем уведомление
       pCharacteristic->notify();

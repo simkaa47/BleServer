@@ -5,9 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:idensity_ble_client/models/connection_type.dart';
 import 'package:idensity_ble_client/models/device.dart';
 import 'package:idensity_ble_client/models/indication.dart';
+import 'package:idensity_ble_client/services/modbus/modbus_service.dart';
 
 class DeviceService {
-
+  final modbusService = ModbusService();
   DeviceService(){
     askDevices();
   }
@@ -68,7 +69,7 @@ class DeviceService {
   }
 
   Future<IndicationData> getIndicationData(Device device) async {
-    var response = await device.readBytes([1, 2, 3]);
+    await modbusService.getIndicationData(device);
     return device.indicationData;
   }
 

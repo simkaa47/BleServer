@@ -1,6 +1,7 @@
 #include <BLEDevice.h>
 #include <BLE2901.h>
 #include "modbus.h"
+#include "adc_module.h"
 
 /**Defines*/
 #define DEVICE_NAME "Idensity_BLE"
@@ -9,6 +10,7 @@
 #define CHARACTERISTIC_2_UUID "d973f2e1-b19e-11e2-9e96-0800200c9a66"
 
 extern uint8_t modbus_response_buffer[250];
+extern TMeas_Proc_Data_Struct meas_proc_data_ready_strct[2];
 
 /*Callbacks*/
 class MyServerCallbacks : public BLEServerCallbacks {
@@ -117,9 +119,7 @@ void setup() {
 uint32_t currentMilis1 = 0;
 
 void loop() {
-  // delay(2000);
-  // currentMilis1 = millis() / 1000;
-  // pCharacteristic->setValue(currentMilis1);
-  // pCharacteristic->notify();
-  // // put your main code here, to run repeatedly:
+  delay(100);
+  currentMilis1 = millis() / 1000;
+  meas_proc_data_ready_strct[0].counter = 23748.7 + currentMilis1%12 + (float(currentMilis1%7)/10);
 }

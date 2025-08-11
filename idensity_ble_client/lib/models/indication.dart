@@ -1,5 +1,5 @@
-class IndicationData{
-  final double temperature = 0;
-  final double hv = 0;
-  final counters = 0;
+class IndicationData {
+  double temperature = 0;
+  double hv = 0;
+  double counters = 0;
 }

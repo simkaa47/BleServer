@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:idensity_ble_client/models/connection_type.dart';
 import 'package:idensity_ble_client/models/device.dart';
 import 'package:idensity_ble_client/models/modbus/modbus_commands.dart';
+import 'package:idensity_ble_client/services/modbus/extensions/data_indication_extensions.dart';
 
 class ModbusService {
   static const int maxRegisterSize = 100;
@@ -11,7 +12,8 @@ class ModbusService {
 
   Future<void> getIndicationData(Device device) async {
     if (device.connectionType == ConnectionType.bluetooth) {
-      await _readInputRegisters(device: device, startAddr: 0, count: 60);      
+      await _readInputRegisters(device: device, startAddr: 0, count: 60);   
+      device.indicationData.updateDataFromModbus(inputBuffer);
     } else {
       throw Exception(
         "Modbus service: ethernet interface is not implemented yet",

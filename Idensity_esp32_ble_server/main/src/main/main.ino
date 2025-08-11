@@ -11,6 +11,8 @@
 
 extern uint8_t modbus_response_buffer[250];
 extern TMeas_Proc_Data_Struct meas_proc_data_ready_strct[2];
+extern THV_Module_Telemetry_Struct hv_module_telemetry_strct;
+extern TTemp_Module_Telemetry_Struct temp_module_telemetry_strct;
 
 /*Callbacks*/
 class MyServerCallbacks : public BLEServerCallbacks {
@@ -120,6 +122,8 @@ uint32_t currentMilis1 = 0;
 
 void loop() {
   delay(100);
-  currentMilis1 = millis() / 1000;
+  currentMilis1 = millis();
   meas_proc_data_ready_strct[0].counter = 23748.7 + currentMilis1%12 + (float(currentMilis1%7)/10);
+  hv_module_telemetry_strct.v_out = 900.0 + float(currentMilis1%13)/10;
+  temp_module_telemetry_strct.t_int = 31.4 + float(currentMilis1%13)/10;
 }

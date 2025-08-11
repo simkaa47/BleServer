@@ -69,12 +69,15 @@ class DeviceService {
   }
 
   Future<IndicationData> getIndicationData(Device device) async {
-    await modbusService.getIndicationData(device);
+    await device.updateIndicationData(modbusService);
     return device.indicationData;
   }
 
   void dispose() {
     _devicesController.close();
+    for (var device in devices) {
+      device.dispose();
+    }
   }
 
   bool isEqual(Device first, Device second) {

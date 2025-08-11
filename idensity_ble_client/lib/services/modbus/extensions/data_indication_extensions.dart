@@ -6,6 +6,7 @@ import 'package:idensity_ble_client/services/modbus/extensions/common_extensions
 extension DataIndicationArrayExtensions on IndicationData{
   void updateDataFromModbus(List<int> registers){
     counters = registers.getFloat(2);
-    log("Counters = $counters");
+    hv = registers.getFloat(30);
+    temperature = registers.getFloat(24);
   }
 }

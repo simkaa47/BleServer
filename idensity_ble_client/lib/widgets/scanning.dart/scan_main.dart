@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idensity_ble_client/models/connection_type.dart';
 import 'package:idensity_ble_client/models/providers/services_registration.dart';
 import 'package:idensity_ble_client/models/scan_result.dart';
+import 'package:idensity_ble_client/widgets/routes.dart';
 import 'package:idensity_ble_client/widgets/scanning.dart/scan_buttons_widget.dart';
 import 'package:idensity_ble_client/widgets/scanning.dart/scan_list.dart';
 
@@ -74,20 +75,26 @@ class _ScanMainState extends ConsumerState<ScanMainWidget> {
             },
           ),
           const SizedBox(width: 16),
-
           Opacity(
             opacity: _selectedResultsIsNotEmpty ? 1 : 0.4,
             child: FloatingActionButton(
               heroTag: 'save device',
-
               onPressed:
                   _selectedResultsIsNotEmpty
                       ? () {
                         scanService.saveDevices(selectedResults);
                       }
                       : null,
-              child: const Icon(Icons.save),
+              child: const Icon(Icons.add),
             ),
+          ),
+          const SizedBox(width: 16),
+          FloatingActionButton(
+            heroTag: 'next',
+            onPressed: () {
+              Navigator.of(context).pushNamed(Routes.home);
+            },
+            child: const Icon(Icons.skip_next),
           ),
         ],
       ),

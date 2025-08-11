@@ -28,7 +28,7 @@ class BluetoothConnection {
     _readCompleter = Completer<List<int>>();
     try {
       await _characteristicRead!.write(request);
-      if(Platform.isWindows){
+      if (Platform.isWindows) {
         await Future.delayed(Duration(milliseconds: 100));
         await _characteristicRead?.read();
       }
@@ -51,15 +51,17 @@ class BluetoothConnection {
         _bleDevice = BluetoothDevice.fromId(remoteId);
       } else {
         await FlutterBluePlus.startScan(
-          timeout: Duration(seconds: 1),
+          timeout: Duration(seconds: 12),
           withServices: [Guid(serviceUuid)],
         );
         _subscription = FlutterBluePlus.scanResults.expand((e) => e).listen((
           result,
         ) async {
-          _bleDevice = result.device;
-          await FlutterBluePlus.stopScan();
-          _subscription?.cancel();
+          if (result.device.remoteId.str == remoteId) {
+            _bleDevice = result.device;
+            await FlutterBluePlus.stopScan();
+            _subscription?.cancel();
+          }
         });
         await FlutterBluePlus.isScanning.where((val) => val == false).first;
         _subscription?.cancel();

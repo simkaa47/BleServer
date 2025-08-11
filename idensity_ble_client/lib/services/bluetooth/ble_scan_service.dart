@@ -34,11 +34,11 @@ class BleScanService implements ScanService {
     _stateController.add(ScanState.scanning);
     final timeout = Duration(seconds: duration);
     log('Scanning for devices...');
-    var services =  [Guid(BluetoothConnection.serviceUuid)];
+    var services = [Guid(BluetoothConnection.serviceUuid)];
     await FlutterBluePlus.startScan(timeout: timeout, withServices: services);
     subscription = FlutterBluePlus.scanResults.expand((e) => e).listen((
       device,
-    ) async{
+    ) async {
       if (device.advertisementData.advName.isNotEmpty &&
           !results.any((result) {
             return result.advName == device.device.advName;
@@ -46,23 +46,23 @@ class BleScanService implements ScanService {
         final BlueScanResult result = BlueScanResult();
         result.advName = device.device.advName;
         result.macAddress = device.device.remoteId.str;
-        results.add(result);      
-        
+        results.add(result);
+
         _stateController.add(ScanState.scanning);
         log(
           '${device.device.remoteId}: "${device.advertisementData.advName}" found!',
         );
       }
     });
-    await Future.delayed(timeout);
+    await FlutterBluePlus.isScanning.where((val) => val == false).first;
     subscription?.cancel();
-
     log('Found ${results.length} devices');
     _stateController.add(ScanState.on);
   }
 
   @override
   Future<void> stopScan() async {
+    await FlutterBluePlus.stopScan();
     _stateController.add(ScanState.on);
     subscription?.cancel();
   }
@@ -74,22 +74,25 @@ class BleScanService implements ScanService {
     adapterStateSubscription?.cancel();
   }
 
-
   @override
-  Future<void> saveDevices(List<IdensityScanResult> results) async{    
-    List<Device> devices = results.map((result){
-      final device =  Device();
-      if(result is BlueScanResult){       
-        device.bluetoothSettings.deviceName = result.advName;
-        device.bluetoothSettings.macAddress = result.macAddress;
-      }
-      return device;
-    }).toList();
+  Future<void> saveDevices(List<IdensityScanResult> results) async {
+    List<Device> devices =
+        results.map((result) {
+          final device = Device();
+          if (result is BlueScanResult) {
+            device.bluetoothSettings.deviceName = result.advName;
+            device.bluetoothSettings.macAddress = result.macAddress;
+            device.name = result.advName;
+          }
+          return device;
+        }).toList();
     await deviceService.addDevices(devices);
   }
 
   void _subsribe() {
-    adapterStateSubscription = FlutterBluePlus.adapterState.listen((state) async {
+    adapterStateSubscription = FlutterBluePlus.adapterState.listen((
+      state,
+    ) async {
       log(state.toString());
       if (state == BluetoothAdapterState.on) {
         _stateController.add(ScanState.on);

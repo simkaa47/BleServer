@@ -80,8 +80,8 @@ class BleScanService implements ScanService {
         results.map((result) {
           final device = Device();
           if (result is BlueScanResult) {
-            device.bluetoothSettings.deviceName = result.advName;
-            device.bluetoothSettings.macAddress = result.macAddress;
+            device.connectionSettings.bluetoothSettings.deviceName = result.advName;
+            device.connectionSettings.bluetoothSettings.macAddress = result.macAddress;
             device.name = result.advName;
           }
           return device;
@@ -90,6 +90,7 @@ class BleScanService implements ScanService {
   }
 
   void _subsribe() {
+    
     adapterStateSubscription = FlutterBluePlus.adapterState.listen((
       state,
     ) async {

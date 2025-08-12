@@ -18,7 +18,7 @@ class ScanButtonsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
+    
     return StreamBuilder(
       stream: scanService.scanState,
       builder: (context, snapshot) {

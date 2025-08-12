@@ -22,8 +22,8 @@ class _ScanMainState extends ConsumerState<ScanMainWidget> {
   @override
   Widget build(BuildContext context) {
     final currentScanType = ref.watch(connectionTypeProvider);
-    final scanTypeController = ref.read(connectionTypeProvider.notifier);
-    final scanService = ref.read(scanServiceProvider(currentScanType));
+    final scanTypeController = ref.watch(connectionTypeProvider.notifier);
+    final scanService = ref.watch(scanServiceProvider(currentScanType));
 
     return Scaffold(
       appBar: AppBar(
@@ -91,8 +91,10 @@ class _ScanMainState extends ConsumerState<ScanMainWidget> {
           const SizedBox(width: 16),
           FloatingActionButton(
             heroTag: 'next',
-            onPressed: () {
-              Navigator.of(context).pushNamed(Routes.home);
+            onPressed: () async{
+              await scanService.stopScan();
+              if (!context.mounted) return;
+              Navigator.of(context).popAndPushNamed(Routes.home);
             },
             child: const Icon(Icons.skip_next),
           ),

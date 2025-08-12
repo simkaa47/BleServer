@@ -1,8 +1,9 @@
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:idensity_ble_client/models/connection.dart';
 import 'package:idensity_ble_client/models/connection_type.dart';
-import 'package:idensity_ble_client/models/device.dart';
+import 'package:idensity_ble_client/models/indication.dart';
 import 'package:idensity_ble_client/models/modbus/modbus_commands.dart';
 import 'package:idensity_ble_client/services/modbus/extensions/data_indication_extensions.dart';
 
@@ -10,10 +11,12 @@ class ModbusService {
   static const int maxRegisterSize = 100;
   final List<int> inputBuffer = List.filled(1000, 0);
 
-  Future<void> getIndicationData(Device device) async {
-    if (device.connectionType == ConnectionType.bluetooth) {
-      await _readInputRegisters(device: device, startAddr: 0, count: 60);   
-      device.indicationData.updateDataFromModbus(inputBuffer);
+  Future<IndicationData> getIndicationData(Connection connection) async {
+    if (connection.connectionSettings.connectionType == ConnectionType.bluetooth) {
+      await _readInputRegisters(connection: connection, startAddr: 0, count: 60); 
+      final IndicationData indicationData = IndicationData();  
+      indicationData.updateDataFromModbus(inputBuffer);
+      return indicationData;
     } else {
       throw Exception(
         "Modbus service: ethernet interface is not implemented yet",
@@ -22,13 +25,13 @@ class ModbusService {
   }
 
   Future<void> _readInputRegisters({
-    required Device device,
+    required Connection connection,
     required int startAddr,
     required int count,
     int unitId = 1,
   }) async {
     await _readRegsitersCommon(
-      device: device,
+      connection: connection,
       command: ModbusReadCommands.readInputRegisters,
       startAddr: startAddr,
       count: count,
@@ -37,13 +40,13 @@ class ModbusService {
   }
 
   Future<void> _readHoldingRegisters({
-    required Device device,
+    required Connection connection,
     required int startAddr,
     required int count,
     int unitId = 1,
   }) async {
     await _readRegsitersCommon(
-      device: device,
+      connection: connection,
       command: ModbusReadCommands.readHoldingRegisters,
       startAddr: startAddr,
       count: count,
@@ -52,7 +55,7 @@ class ModbusService {
   }
 
   Future<void> _readRegisters({
-    required Device device,
+    required Connection connection,
     required ModbusReadCommands command,
     required int startAddr,
     required int count,
@@ -67,7 +70,7 @@ class ModbusService {
     final crc = calculateCrc16(request, 6);
     view.setUint16(6, crc, Endian.little);
 
-    var responce = await device.readBytes(request);
+    var responce = await connection.readBytes(request);
     if (responce.length != (count * 2 + 5)) {
       throw Exception("Invalid response length");
     }
@@ -89,7 +92,7 @@ class ModbusService {
   }
 
   Future<void> _writeHoldingRegisters({
-    required Device device,
+    required Connection connection,
     required List<int> registers,
     required int startAddr,
     required int count,
@@ -108,7 +111,7 @@ class ModbusService {
     final crc = calculateCrc16(request, 7 + count * 2);
     view.setUint16(7 + count * 2, crc, Endian.little);
 
-    var responce = await device.readBytes(request);
+    var responce = await connection.readBytes(request);
     if (responce.length != 8) throw Exception("Invalid response length");
     if (responce[1] != 16) {
       throw Exception("Write error to write data for modbusId = $unitId");
@@ -142,7 +145,7 @@ class ModbusService {
   }
 
   Future<void> _readRegsitersCommon({
-    required Device device,
+    required Connection connection,
     required ModbusReadCommands command,
     required int startAddr,
     required int count,
@@ -156,7 +159,7 @@ class ModbusService {
     for (var i = 0; i < steps; i++) {
       int tmpCnt = min(maxRegisterSize, count - (i * maxRegisterSize));
       await _readRegisters(
-        device: device,
+        connection: connection,
         command: command,
         startAddr: start,
         count: tmpCnt,

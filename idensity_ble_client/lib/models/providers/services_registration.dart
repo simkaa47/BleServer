@@ -6,7 +6,7 @@ import 'package:idensity_ble_client/services/ethernet/ethernet_scan_service.dart
 import 'package:idensity_ble_client/services/modbus/modbus_service.dart';
 import 'package:idensity_ble_client/services/scan_service.dart';
 
-final scanServiceProvider = Provider.family<ScanService, ConnectionType>((
+final scanServiceProvider = Provider.family.autoDispose<ScanService, ConnectionType>((
   ref,
   conType,
 ) {
@@ -18,7 +18,9 @@ final scanServiceProvider = Provider.family<ScanService, ConnectionType>((
     default:
       service = EthernetScanService(deviceService: deviceService);
   }
-  ref.onDispose(() => service?.dispose());
+  ref.onDispose(() {
+    service?.dispose();
+  });
   return service;
 });
 

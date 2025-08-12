@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:core';
-
 import 'package:flutter/material.dart';
+import 'package:idensity_ble_client/models/connection.dart';
 import 'package:idensity_ble_client/models/connection_type.dart';
 import 'package:idensity_ble_client/models/device.dart';
 import 'package:idensity_ble_client/models/indication.dart';
@@ -9,9 +9,11 @@ import 'package:idensity_ble_client/services/modbus/modbus_service.dart';
 
 class DeviceService {
   final modbusService = ModbusService();
-  DeviceService(){
+  DeviceService() {
     askDevices();
   }
+
+  final List<Connection> _connections = [];
 
   final StreamController<List<Device>> _devicesController =
       StreamController<List<Device>>.broadcast();
@@ -24,6 +26,7 @@ class DeviceService {
       if (!_currentDevices.any((d) => isEqual(d, newDevice))) {
         _currentDevices.add(newDevice);
         _devicesController.add(List.from(_currentDevices));
+        _connections.add(Connection(newDevice.connectionSettings));
         debugPrint(
           'Устройство добавлено: ${newDevice.name}. Текущих устройств: ${_currentDevices.length}',
         );
@@ -31,10 +34,14 @@ class DeviceService {
     }
   }
 
-
-
   Future<void> removeDevice(Device device) async {
     await device.dispose();
+    var connection =
+        _connections.where((c) => c.name == device.name).firstOrNull;
+    if (connection != null) {
+      _connections.remove(connection);
+      await connection.dispose();
+    }
     _currentDevices.remove(device);
     _devicesController.add(
       List.from(_currentDevices),
@@ -53,11 +60,15 @@ class DeviceService {
 
         for (var i = 0; i < devicesToUpdate.length; i++) {
           final device = devicesToUpdate[i];
-          // Получаем новые данные для устройства
-          final newIndicationData = await getIndicationData(device);
-          // Обновляем данные устройства
-          device.indicationData = newIndicationData;
-          debugPrint('Обновлены данные для ${device.name}');
+          var connection =
+              _connections.where((c) => c.name == c.name).firstOrNull;
+          if (connection != null) {
+            // Получаем новые данные для устройства
+            final newIndicationData = await getIndicationData(connection);
+            // Обновляем данные устройства
+            device.updateIndicationData(newIndicationData);
+            debugPrint('Обновлены данные для ${device.name}');
+          }
         }
         _devicesController.add(List.from(_currentDevices));
       } catch (e) {
@@ -68,9 +79,8 @@ class DeviceService {
     }
   }
 
-  Future<IndicationData> getIndicationData(Device device) async {
-    await device.updateIndicationData(modbusService);
-    return device.indicationData;
+  Future<IndicationData> getIndicationData(Connection connection) async {
+    return await modbusService.getIndicationData(connection);
   }
 
   void dispose() {
@@ -81,11 +91,11 @@ class DeviceService {
   }
 
   bool isEqual(Device first, Device second) {
-    return first.connectionType == second.connectionType &&
-            (first.connectionType == ConnectionType.bluetooth &&
-                first.bluetoothSettings.macAddress ==
-                    second.bluetoothSettings.macAddress) ||
-        (first.connectionType == ConnectionType.ethernet &&
-            first.ethernetSettings.ip == second.ethernetSettings.ip);
+    return first.connectionSettings.connectionType == second.connectionSettings.connectionType &&
+            (first.connectionSettings.connectionType == ConnectionType.bluetooth &&
+                first.connectionSettings.bluetoothSettings.macAddress ==
+                    second.connectionSettings.bluetoothSettings.macAddress) ||
+        (first.connectionSettings.connectionType == ConnectionType.ethernet &&
+            first.connectionSettings.ethernetSettings.ip == second.connectionSettings.ethernetSettings.ip);
   }
 }

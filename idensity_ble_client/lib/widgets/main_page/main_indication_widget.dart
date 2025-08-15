@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idensity_ble_client/models/device.dart';
 import 'package:idensity_ble_client/models/indication.dart';
 import 'package:idensity_ble_client/models/providers/services_registration.dart';
+import 'package:idensity_ble_client/widgets/main_page/indication_item_widget.dart';
 import 'package:idensity_ble_client/widgets/routes.dart';
 
 class MainIndicationWidget extends ConsumerWidget {
@@ -28,7 +29,7 @@ class MainIndicationWidget extends ConsumerWidget {
                     iconSize: 100,
                     icon: Icon(Icons.add_circle_rounded),
                   ),
-                  Text("Добавьте устройство для получения данных")
+                  Text("Добавьте устройство для получения данных"),
                 ],
               ),
             );
@@ -38,20 +39,56 @@ class MainIndicationWidget extends ConsumerWidget {
             itemCount: deviceService.devices.length,
             itemBuilder: (context, index) {
               final device = deviceService.devices[index];
-              return Center(
+              return Container(
+                alignment: Alignment.bottomCenter,
                 child: StreamBuilder<IndicationData>(
                   stream: device.dataStream,
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       final data = snapshot.data!;
+
                       return Column(
                         children: [
-                          Text('Device ID: ${device.name}'),
-                          Text(
-                            'Temperature: ${data.temperature.toStringAsFixed(2)}',
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: IndicationItemWidget(
+                                    paramName: "ID",
+                                    value: device.name,
+                                    icon: Icons.perm_identity,
+                                  ),
+                                ),
+                                Expanded(
+                                  child: IndicationItemWidget(
+                                    paramName: "T, °C, ",
+                                    value: data.temperature.toStringAsFixed(1),
+                                    icon: Icons.device_thermostat,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                          Text('HV: ${data.hv.toStringAsFixed(2)}'),
-                          Text('Counters: ${data.counters.toStringAsFixed(1)}'),
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: IndicationItemWidget(
+                                    paramName: "HV, В, ",
+                                    value: data.hv.toStringAsFixed(1),
+                                    icon: Icons.electric_bolt,
+                                  ),
+                                ),
+                                Expanded(
+                                  child: IndicationItemWidget(
+                                    paramName: "ИНТЕНСИВНОСТЬ, ИМП/C, ",
+                                    value: data.counters.toStringAsFixed(1),
+                                    icon: Icons.monitor_heart,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ],
                       );
                     } else {

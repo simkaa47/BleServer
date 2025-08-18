@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idensity_ble_client/models/charts/chart_state.dart';
 import 'package:idensity_ble_client/models/connection_type.dart';
-import 'package:idensity_ble_client/models/indication.dart';
 import 'package:idensity_ble_client/services/bluetooth/ble_scan_service.dart';
 import 'package:idensity_ble_client/services/device_service.dart';
 import 'package:idensity_ble_client/services/ethernet/ethernet_scan_service.dart';

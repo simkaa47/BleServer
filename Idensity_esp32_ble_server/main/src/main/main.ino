@@ -126,4 +126,10 @@ void loop() {
   meas_proc_data_ready_strct[0].counter = 23748.7 + currentMilis1%12 + (float(currentMilis1%7)/10);
   hv_module_telemetry_strct.v_out = 900.0 + float(currentMilis1%13)/10;
   temp_module_telemetry_strct.t_int = 31.4 + float(currentMilis1%13)/10;
+  meas_proc_data_ready_strct[0].phys_vals[0] = 1.23 + (float(currentMilis1%2)/3) + (float(currentMilis1%2)/10);
+  meas_proc_data_ready_strct[0].phys_val_complete_aver = 1.23 + (currentMilis1%2)/10;
+  meas_proc_data_ready_strct[1].phys_vals[0] = 1.46 + (currentMilis1%2)/3 + (currentMilis1%2)/10;
+  meas_proc_data_ready_strct[1].phys_val_complete_aver = 1.46 + (currentMilis1%2)/10;
+
+
 }

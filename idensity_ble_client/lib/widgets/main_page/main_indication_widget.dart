@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idensity_ble_client/models/device.dart';
-import 'package:idensity_ble_client/models/indication.dart';
+import 'package:idensity_ble_client/models/indication/indication.dart';
 import 'package:idensity_ble_client/models/providers/services_registration.dart';
 import 'package:idensity_ble_client/widgets/main_page/indication_item_widget.dart';
 import 'package:idensity_ble_client/widgets/routes.dart';

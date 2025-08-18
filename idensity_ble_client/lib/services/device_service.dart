@@ -7,7 +7,7 @@ import 'package:idensity_ble_client/models/charts/curbe_data.dart';
 import 'package:idensity_ble_client/models/connection.dart';
 import 'package:idensity_ble_client/models/connection_type.dart';
 import 'package:idensity_ble_client/models/device.dart';
-import 'package:idensity_ble_client/models/indication.dart';
+import 'package:idensity_ble_client/models/indication/indication.dart';
 import 'package:idensity_ble_client/services/modbus/modbus_service.dart';
 
 class DeviceService {

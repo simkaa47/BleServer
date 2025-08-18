@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:idensity_ble_client/models/connection_settings.dart';
-import 'package:idensity_ble_client/models/indication.dart';
+import 'package:idensity_ble_client/models/indication/indication.dart';
 
 class Device {
   bool connected = false;

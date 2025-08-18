@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 import 'package:idensity_ble_client/models/connection.dart';
 import 'package:idensity_ble_client/models/connection_type.dart';
-import 'package:idensity_ble_client/models/indication.dart';
+import 'package:idensity_ble_client/models/indication/indication.dart';
 import 'package:idensity_ble_client/models/modbus/modbus_commands.dart';
 import 'package:idensity_ble_client/services/modbus/extensions/data_indication_extensions.dart';
 

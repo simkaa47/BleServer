@@ -4,6 +4,7 @@ import 'package:idensity_ble_client/models/connection_type.dart';
 import 'package:idensity_ble_client/services/bluetooth/ble_scan_service.dart';
 import 'package:idensity_ble_client/services/device_service.dart';
 import 'package:idensity_ble_client/services/ethernet/ethernet_scan_service.dart';
+import 'package:idensity_ble_client/services/meas_units/meas_unit_service.dart';
 import 'package:idensity_ble_client/services/modbus/modbus_service.dart';
 import 'package:idensity_ble_client/services/scan_service.dart';
 import 'package:idensity_ble_client/viewModels/main_chart_view_model.dart';
@@ -49,3 +50,16 @@ final deviceUpdateProvider = StreamProvider<void>((ref) {
 final chartViewModelProvider = NotifierProvider<MainChartViewModel, ChartState>(
   () => MainChartViewModel(),
 );
+
+final measUnitServiceProvider = FutureProvider<MeasUnitService>((ref) async {
+  final service = MeasUnitService();
+
+  // Регистрация метода dispose() для автоматического вызова
+  // когда провайдер будет уничтожен
+  ref.onDispose(() {
+    service.dispose();
+  });
+
+  await service.init();
+  return service;
+});

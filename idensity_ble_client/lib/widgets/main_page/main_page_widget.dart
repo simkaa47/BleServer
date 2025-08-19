@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:idensity_ble_client/widgets/main_page/charts/example/line_charts_sample12.dart';
-import 'package:idensity_ble_client/widgets/main_page/main_drawer_widget.dart';
+import 'package:idensity_ble_client/widgets/drawer/main_drawer_widget.dart';
 import 'package:idensity_ble_client/widgets/main_page/main_indication_widget.dart';
 
 class MainPageWidget extends StatelessWidget {
@@ -9,7 +9,7 @@ class MainPageWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(title: const Text("Главная"),),
       drawer: const MainDrawerWidget(),
       body: SafeArea(
         child: OrientationBuilder(

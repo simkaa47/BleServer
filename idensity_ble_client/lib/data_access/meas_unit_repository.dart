@@ -3,49 +3,59 @@ import 'package:idensity_ble_client/models/meas_units/meas_unit.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 class MeasUnitRepository extends Repository {
-  Future<Database> _openDatabase() async {
-    return await databaseFactory.openDatabase(
-      path,
-      options: OpenDatabaseOptions(
-        version: 1,
-        onCreate: (db, version) async {
-          await db.execute('''
-    CREATE TABLE $tableName (
-        id INTEGER PRIMARY KEY,
-        name TEXT,
-        coeff REAL,
-        offset REAL,
-        deviceMode INTEGER,
-        measMode INTEGER,
-        userCantDelete INTEGER
-    )
-    ''');
-        },
-      ),
-    );
-  }
-
-  final String tableName = "MeasUnits";
   Future<void> loadMeasUnits(List<MeasUnit> measUnits) async {
-    final db = await _openDatabase();
+    final db = await getDatabase();
 
     for (final unit in measUnits) {
-      await db.insert(
-        'MeasUnit',
-        unit.toMap(),
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
+      try {
+        await db.insert(
+          measUnitsTableName,
+          unit.toMap(),
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+      } catch (e) {
+        print('Произошла ошибка при вставке: $e');
+      }
     }
+    await db.close();
+  }
 
+  Future<void> addMeasUnit(MeasUnit unit) async {
+    final db = await getDatabase();
+    await db.insert(
+      measUnitsTableName,
+      unit.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
     await db.close();
   }
 
   Future<List<MeasUnit>> getMeasUnits() async {
-    final db = await _openDatabase();
-    final List<Map<String, dynamic>> maps = await db.query(tableName);
+    try {
+      final db = await getDatabase();
+      final List<Map<String, dynamic>> maps = await db.query(
+        measUnitsTableName,
+      );
+      await db.close();
+      return List.generate(maps.length, (i) {
+        return MeasUnit.fromMap(maps[i]);
+      });
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> deleteMeasUnit(MeasUnit unit) async {
+    if (unit.id == null) return false;
+    final db = await getDatabase();
+    await db.delete(
+      measUnitsTableName,
+      // Используем 'where' для указания условия удаления
+      where: 'id = ?',
+      // Передаем значение id в качестве аргумента, чтобы предотвратить SQL-инъекции
+      whereArgs: [unit.id],
+    );
     await db.close();
-    return List.generate(maps.length, (i) {
-      return MeasUnit.fromMap(maps[i]);
-    });
+    return true;
   }
 }

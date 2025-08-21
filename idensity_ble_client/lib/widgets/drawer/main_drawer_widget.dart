@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:idensity_ble_client/widgets/drawer/drawer_item_widget.dart';
+import 'package:idensity_ble_client/widgets/routes.dart';
 
 class MainDrawerWidget extends StatelessWidget {
   const MainDrawerWidget({super.key});
@@ -13,7 +15,7 @@ class MainDrawerWidget extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Color(0xFF28BCBA),
+                  const Color(0xFF28BCBA),
                   Color(0xFF28BCBA).withOpacity(0.8),
                 ],
                 begin: Alignment.topLeft,
@@ -29,6 +31,8 @@ class MainDrawerWidget extends StatelessWidget {
               ),
             ),
           ),
+          const DrawerItem(title: 'Главная', routeName: Routes.home),
+          const DrawerItem(title: 'Единицы измерения', routeName: Routes.measUnits),
         ],
       ),
     );

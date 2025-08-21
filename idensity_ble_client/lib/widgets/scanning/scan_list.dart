@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:idensity_ble_client/models/scan_result.dart';
 import 'package:idensity_ble_client/models/scan_state.dart';
 import 'package:idensity_ble_client/services/scan_service.dart';
-import 'package:idensity_ble_client/widgets/scanning.dart/scan_result_item.dart';
+import 'package:idensity_ble_client/widgets/scanning/scan_result_item.dart';
 
 class ScanList extends StatelessWidget {
   const ScanList({

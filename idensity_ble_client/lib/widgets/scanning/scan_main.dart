@@ -4,8 +4,8 @@ import 'package:idensity_ble_client/models/connection_type.dart';
 import 'package:idensity_ble_client/models/providers/services_registration.dart';
 import 'package:idensity_ble_client/models/scan_result.dart';
 import 'package:idensity_ble_client/widgets/routes.dart';
-import 'package:idensity_ble_client/widgets/scanning.dart/scan_buttons_widget.dart';
-import 'package:idensity_ble_client/widgets/scanning.dart/scan_list.dart';
+import 'package:idensity_ble_client/widgets/scanning/scan_buttons_widget.dart';
+import 'package:idensity_ble_client/widgets/scanning/scan_list.dart';
 
 class ScanMainWidget extends ConsumerStatefulWidget {
   const ScanMainWidget({super.key});

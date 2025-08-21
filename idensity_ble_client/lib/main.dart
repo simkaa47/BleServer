@@ -1,13 +1,17 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idensity_ble_client/widgets/main_page/main_page_widget.dart';
 import 'package:idensity_ble_client/widgets/meas_units/meas_units_widget.dart';
 import 'package:idensity_ble_client/widgets/routes.dart';
-import 'package:idensity_ble_client/widgets/scanning.dart/scan_main.dart';
+import 'package:idensity_ble_client/widgets/scanning/scan_main.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() {
-  sqfliteFfiInit();
+  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {   
+    sqfliteFfiInit();
+  }
    runApp(
     const ProviderScope(
       child: MyApp(),

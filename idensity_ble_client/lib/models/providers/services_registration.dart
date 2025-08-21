@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idensity_ble_client/models/charts/chart_state.dart';
 import 'package:idensity_ble_client/models/connection_type.dart';
+import 'package:idensity_ble_client/models/meas_units/meas_unit.dart';
 import 'package:idensity_ble_client/services/bluetooth/ble_scan_service.dart';
 import 'package:idensity_ble_client/services/device_service.dart';
 import 'package:idensity_ble_client/services/ethernet/ethernet_scan_service.dart';
@@ -62,4 +63,22 @@ final measUnitServiceProvider = FutureProvider<MeasUnitService>((ref) async {
 
   await service.init();
   return service;
+});
+
+final measUnitsStreamProvider = StreamProvider<List<MeasUnit>>((ref) {
+  final serviceAsyncValue = ref.watch(measUnitServiceProvider);
+
+  // Проверяем, что значение готово
+  if (serviceAsyncValue.hasValue) {
+    final service = serviceAsyncValue.value!;
+    return service.measUnitsStream;
+  }
+  
+  // Если еще не готово, то остаемся в состоянии загрузки
+  // (или ошибки)
+  if (serviceAsyncValue.isLoading) {
+    return const Stream.empty();
+  } else {
+    throw Exception('Error loading service');
+  }
 });

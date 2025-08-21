@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class DrawerItem extends StatelessWidget {
   final String title;
@@ -16,12 +17,12 @@ class DrawerItem extends StatelessWidget {
 
     return ListTile(
       title: Text(title),
-      selectedTileColor: Color(0xFF28BCBA).withAlpha(80),
+      selectedTileColor: const Color(0xFF28BCBA).withAlpha(80),
       selected: currentRouteName == routeName,
-      onTap: () {        
-        Navigator.pop(context);        
+      onTap: () {                        
         if (currentRouteName != routeName) {
-          Navigator.pushNamed(context, routeName);
+           Navigator.of(context).pop();
+          context.go(routeName);
         }
       },
     );

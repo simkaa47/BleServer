@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:idensity_ble_client/models/device.dart';
 import 'package:idensity_ble_client/models/indication/indication.dart';
 import 'package:idensity_ble_client/models/providers/services_registration.dart';
@@ -24,12 +25,12 @@ class MainIndicationWidget extends ConsumerWidget {
                 children: [
                   IconButton(
                     onPressed: () {
-                      Navigator.of(context).popAndPushNamed(Routes.scanning);
+                      context.go(Routes.scanning);
                     },
                     iconSize: 100,
-                    icon: Icon(Icons.add_circle_rounded),
+                    icon: const Icon(Icons.add_circle_rounded),
                   ),
-                  Text("Добавьте устройство для получения данных"),
+                  const Text("Добавьте устройство для получения данных"),
                 ],
               ),
             );

@@ -16,7 +16,7 @@ class MainDrawerWidget extends StatelessWidget {
               gradient: LinearGradient(
                 colors: [
                   const Color(0xFF28BCBA),
-                  Color(0xFF28BCBA).withOpacity(0.8),
+                  const Color(0xFF28BCBA).withOpacity(0.8),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight
@@ -32,6 +32,7 @@ class MainDrawerWidget extends StatelessWidget {
             ),
           ),
           const DrawerItem(title: 'Главная', routeName: Routes.home),
+          const DrawerItem(title: 'Настройки прибора', routeName: Routes.deviceSettings),
           const DrawerItem(title: 'Единицы измерения', routeName: Routes.measUnits),
         ],
       ),

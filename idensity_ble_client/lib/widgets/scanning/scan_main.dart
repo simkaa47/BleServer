@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:idensity_ble_client/models/connection_type.dart';
 import 'package:idensity_ble_client/models/providers/services_registration.dart';
 import 'package:idensity_ble_client/models/scan_result.dart';
@@ -94,7 +95,7 @@ class _ScanMainState extends ConsumerState<ScanMainWidget> {
             onPressed: () async{
               await scanService.stopScan();
               if (!context.mounted) return;
-              Navigator.of(context).popAndPushNamed(Routes.home);
+              context.go(Routes.home);
             },
             child: const Icon(Icons.skip_next),
           ),

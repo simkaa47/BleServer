@@ -16,7 +16,7 @@ class MainIndicationWidget extends ConsumerWidget {
     return StreamBuilder<List<Device>>(
       stream: deviceService.devicesStream,
       builder: (context, snapshot) {
-        if (snapshot.hasData) {
+         if (snapshot.hasData){
           final data = snapshot.data!;
           if (data.isEmpty) {
             return Center(

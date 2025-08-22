@@ -8,6 +8,7 @@ import 'package:idensity_ble_client/models/connection.dart';
 import 'package:idensity_ble_client/models/connection_type.dart';
 import 'package:idensity_ble_client/models/device.dart';
 import 'package:idensity_ble_client/models/indication/indication.dart';
+import 'package:idensity_ble_client/models/settings/device_settings.dart';
 import 'package:idensity_ble_client/services/modbus/modbus_service.dart';
 
 class DeviceService {
@@ -74,9 +75,11 @@ class DeviceService {
               _connections.where((c) => c.name == c.name).firstOrNull;
           if (connection != null) {
             // Получаем новые данные для устройства
-            final newIndicationData = await getIndicationData(connection);
+            final newIndicationData = await _getIndicationData(connection);
+            final newSettings = await _getDeviceSettings(connection);
             // Обновляем данные устройства
             device.updateIndicationData(newIndicationData);
+            device.updateDeviceSettings(newSettings);
             debugPrint('Обновлены данные для ${device.name}');
           }
         }
@@ -90,9 +93,15 @@ class DeviceService {
     }
   }
 
-  Future<IndicationData> getIndicationData(Connection connection) async {
+  Future<IndicationData> _getIndicationData(Connection connection) async {
     return await modbusService.getIndicationData(connection);
   }
+
+  Future<DeviceSettings> _getDeviceSettings(Connection connection)async{
+    return await modbusService.getDeviceSettings(connection);
+  }
+
+
 
   void _updateChartData() {
     final time = DateTime.now();

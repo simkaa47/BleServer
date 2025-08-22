@@ -5,18 +5,44 @@ import 'package:idensity_ble_client/models/connection.dart';
 import 'package:idensity_ble_client/models/connection_type.dart';
 import 'package:idensity_ble_client/models/indication/indication.dart';
 import 'package:idensity_ble_client/models/modbus/modbus_commands.dart';
+import 'package:idensity_ble_client/models/settings/device_settings.dart';
 import 'package:idensity_ble_client/services/modbus/extensions/data_indication_extensions.dart';
+import 'package:idensity_ble_client/services/modbus/extensions/device_settings_extensions.dart';
 
 class ModbusService {
   static const int maxRegisterSize = 100;
   final List<int> inputBuffer = List.filled(1000, 0);
 
   Future<IndicationData> getIndicationData(Connection connection) async {
-    if (connection.connectionSettings.connectionType == ConnectionType.bluetooth) {
-      await _readInputRegisters(connection: connection, startAddr: 0, count: 60); 
-      final IndicationData indicationData = IndicationData();  
-      indicationData.updateDataFromModbus(inputBuffer);
+    if (connection.connectionSettings.connectionType ==
+        ConnectionType.bluetooth) {
+      await _readInputRegisters(
+        connection: connection,
+        startAddr: 0,
+        count: 60,
+      );
+      final IndicationData indicationData = IndicationData();
+      indicationData.updateDataFromModbus(inputBuffer);      
       return indicationData;
+    } else {
+      throw Exception(
+        "Modbus service: ethernet interface is not implemented yet",
+      );
+    }
+  }
+
+  Future<DeviceSettings> getDeviceSettings(Connection connection) async {
+    if (connection.connectionSettings.connectionType ==
+        ConnectionType.bluetooth) {      
+      await _readHoldingRegisters(
+        connection: connection,
+        startAddr: 0,
+        count: 400,
+      );
+      final DeviceSettings deviceSettings = DeviceSettings();
+      deviceSettings.updateDataFromModbus(inputBuffer);
+      return deviceSettings;
+      
     } else {
       throw Exception(
         "Modbus service: ethernet interface is not implemented yet",
@@ -151,10 +177,11 @@ class ModbusService {
     required int count,
     int unitId = 1,
   }) async {
-    final  steps =
+    final steps =
         (count % maxRegisterSize == 0
-            ? count / maxRegisterSize
-            : count / maxRegisterSize + 1).toInt();
+                ? count / maxRegisterSize
+                : count / maxRegisterSize + 1)
+            .toInt();
     int start = startAddr;
     for (var i = 0; i < steps; i++) {
       int tmpCnt = min(maxRegisterSize, count - (i * maxRegisterSize));
@@ -163,9 +190,9 @@ class ModbusService {
         command: command,
         startAddr: start,
         count: tmpCnt,
-        unitId: unitId
+        unitId: unitId,
       );
-      start+=tmpCnt;
+      start += tmpCnt;
     }
   }
 }

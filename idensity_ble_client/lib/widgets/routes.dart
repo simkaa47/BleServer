@@ -3,4 +3,5 @@ class Routes {
   static const String scanning = '/scanning';
   static const String measUnits = '/home/measUnits';
   static const String deviceSettings = '/home/deviceSettings';
+  static const String commonDeviceSettings = '/home/deviceSettings/common';
 }

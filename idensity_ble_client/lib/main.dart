@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:idensity_ble_client/widgets/device_settings/common/common_settings_widget.dart';
 import 'package:idensity_ble_client/widgets/device_settings/device_settings_main_widget.dart';
+import 'package:idensity_ble_client/widgets/device_settings/device_settings_navigation_widget.dart';
 import 'package:idensity_ble_client/widgets/drawer/main_drawer_widget.dart';
 import 'package:idensity_ble_client/widgets/main_page/main_page_widget.dart';
 import 'package:idensity_ble_client/widgets/meas_units/meas_units_widget.dart';
@@ -41,10 +43,14 @@ final _router = GoRouter(
       path: Routes.scanning,
       builder: (context, state) => const ScanMainWidget(),
     ),
+
     ShellRoute(
       builder: (context, state, child) {
         final Locale currentLocale = Localizations.localeOf(context);
-        final String currentTitle = _getTitleForName(state.matchedLocation, currentLocale);
+        final String currentTitle = _getTitleForName(
+          state.matchedLocation,
+          currentLocale,
+        );
         return Scaffold(
           appBar: AppBar(title: Text(currentTitle)),
           drawer: const MainDrawerWidget(),
@@ -60,13 +66,25 @@ final _router = GoRouter(
           routes: [
             GoRoute(
               path: "measUnits",
-              name: "measUnits",
               builder: (context, state) => const MeasUnitsWidget(),
             ),
-            GoRoute(
-              path: "deviceSettings",
-              name: "deviceSettings",
-              builder: (context, state) => const DeviceSettingsMainWidget(),
+            ShellRoute(
+              builder:
+                  (context, state, child) => DeviceSettingsMainWidget(child),
+              routes: [
+                GoRoute(
+                  path: "deviceSettings",
+                  builder:
+                      (context, state) =>
+                          const DeviceSettingsNavigationWidget(),
+                  routes: [
+                    GoRoute(
+                      path: "common",
+                      builder: (context, state) => const CommonSettingsWidget(),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ],
         ),
@@ -76,14 +94,13 @@ final _router = GoRouter(
   errorBuilder: (context, state) => const MainPageWidget(),
 );
 
-
-final Map<String, Map<String, String>> _localizedTitles  = {
-  'ru': {
+final Map<String, Map<String, String>> _localizedTitles = {
+  'en': {
     Routes.home: 'Главная',
     Routes.measUnits: 'Единицы измерения',
     Routes.deviceSettings: 'Настройки прибора',
   },
-  'en': {
+  'ru': {
     Routes.home: 'Home',
     Routes.measUnits: 'Meas Units',
     Routes.deviceSettings: 'Device Settings',
@@ -95,7 +112,5 @@ String _getTitleForName(String name, Locale locale) {
   if (titles != null && titles.containsKey(name)) {
     return titles[name]!;
   }
-  return 'Приложение'; 
+  return 'Приложение';
 }
-
-

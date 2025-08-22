@@ -13,12 +13,12 @@ class DrawerItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {    
-    final currentRouteName = ModalRoute.of(context)?.settings.name;
+    final currentRouteName = GoRouter.of(context).state.matchedLocation;
 
     return ListTile(
       title: Text(title),
       selectedTileColor: const Color(0xFF28BCBA).withAlpha(80),
-      selected: currentRouteName == routeName,
+      selected: currentRouteName == routeName || (routeName != "/home" && currentRouteName.startsWith(routeName)),
       onTap: () {                        
         if (currentRouteName != routeName) {
            Navigator.of(context).pop();

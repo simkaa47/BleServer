@@ -191,7 +191,7 @@ class LineChartSample12 extends ConsumerWidget {
               child: Container(
                 width: 100,
                 height: 100,
-                margin: EdgeInsets.symmetric(horizontal: 10),
+                margin: const EdgeInsets.symmetric(horizontal: 10),
                 child:
                     dateMax.hour != dateMin.hour                    
                         ? Text(

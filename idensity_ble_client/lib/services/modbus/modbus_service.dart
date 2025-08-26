@@ -13,6 +13,15 @@ class ModbusService {
   static const int maxRegisterSize = 100;
   final List<int> inputBuffer = List.filled(1000, 0);
 
+  Future<void> writeDeviceType(int value, Connection connection) async {
+    await _writeHoldingRegisters(
+      connection: connection,
+      registers: [value],
+      startAddr: 102,
+      count: 1,
+    );
+  }
+
   Future<IndicationData> getIndicationData(Connection connection) async {
     if (connection.connectionSettings.connectionType ==
         ConnectionType.bluetooth) {
@@ -22,7 +31,7 @@ class ModbusService {
         count: 60,
       );
       final IndicationData indicationData = IndicationData();
-      indicationData.updateDataFromModbus(inputBuffer);      
+      indicationData.updateDataFromModbus(inputBuffer);
       return indicationData;
     } else {
       throw Exception(
@@ -33,7 +42,7 @@ class ModbusService {
 
   Future<DeviceSettings> getDeviceSettings(Connection connection) async {
     if (connection.connectionSettings.connectionType ==
-        ConnectionType.bluetooth) {      
+        ConnectionType.bluetooth) {
       await _readHoldingRegisters(
         connection: connection,
         startAddr: 0,
@@ -42,7 +51,6 @@ class ModbusService {
       final DeviceSettings deviceSettings = DeviceSettings();
       deviceSettings.updateDataFromModbus(inputBuffer);
       return deviceSettings;
-      
     } else {
       throw Exception(
         "Modbus service: ethernet interface is not implemented yet",

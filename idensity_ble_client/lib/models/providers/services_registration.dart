@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idensity_ble_client/models/charts/chart_state.dart';
 import 'package:idensity_ble_client/models/connection_type.dart';
+import 'package:idensity_ble_client/models/device.dart';
 import 'package:idensity_ble_client/models/meas_units/meas_unit.dart';
 import 'package:idensity_ble_client/services/bluetooth/ble_scan_service.dart';
 import 'package:idensity_ble_client/services/device_service.dart';
@@ -81,4 +82,32 @@ final measUnitsStreamProvider = StreamProvider<List<MeasUnit>>((ref) {
   } else {
     throw Exception('Error loading service');
   }
+});
+
+
+final devicesStreamProvider = StreamProvider<List<Device>>((ref) {
+  final deviceService = ref.watch(deviceServiceProvider);
+  return deviceService.devicesStream;
+});
+
+final selectedDeviceIdProvider = StateProvider<String?>((ref) => null);
+
+final selectedDeviceProvider = Provider<Device?>((ref) {  
+  final devicesAsyncValue = ref.watch(devicesStreamProvider);  
+  final selectedId = ref.watch(selectedDeviceIdProvider);
+
+  
+  return devicesAsyncValue.when(
+    data: (devices) {
+      if (selectedId != null) {
+        return devices.firstWhere(
+          (device) => device.name == selectedId,
+          orElse: () => devices.first,
+        );
+      }
+      return devices.isNotEmpty ? devices.first : null;
+    },
+    loading: () => null,
+    error: (err, stack) => null,
+  );
 });

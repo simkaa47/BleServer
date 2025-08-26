@@ -26,11 +26,11 @@ class ScanList extends StatelessWidget {
             snapshot.connectionState == ConnectionState.done) {
           final state = snapshot.data;
           if (state == ScanState.notSupported) {
-            return Center(
+            return const Center(
               child: Text('Bluetooth не поддерживается на этом устройстве'),
             );
           } else if (state == ScanState.off) {
-            return Center(child: Text('Bluetooth выключен'));
+            return const Center(child: Text('Bluetooth выключен'));
           } else {
             return ListView.builder(
               itemCount: scanService.scanResults.length,
@@ -44,7 +44,7 @@ class ScanList extends StatelessWidget {
             );
           }
         }
-        return Text('Ожидание состояния адаптера Bluetooth...');
+        return const Text('Ожидание состояния адаптера Bluetooth...');
       },
     );
   }

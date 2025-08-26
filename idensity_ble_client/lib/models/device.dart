@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:idensity_ble_client/models/connection_settings.dart';
 import 'package:idensity_ble_client/models/indication/indication.dart';
 import 'package:idensity_ble_client/models/settings/device_settings.dart';
+import 'package:rxdart/rxdart.dart';
 
 class Device {
   bool connected = false;
@@ -14,11 +15,11 @@ class Device {
   String name = "";
 
   final _indicationDataController =
-      StreamController<IndicationData>.broadcast();
+      BehaviorSubject<IndicationData>();
   Stream<IndicationData> get dataStream => _indicationDataController.stream;
 
   final _deviceSettingsController =
-      StreamController<DeviceSettings>.broadcast();
+      BehaviorSubject<DeviceSettings>();
   Stream<DeviceSettings> get settingsStream => _deviceSettingsController.stream;
 
   dispose() {

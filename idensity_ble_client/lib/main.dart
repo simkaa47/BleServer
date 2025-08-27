@@ -7,6 +7,7 @@ import 'package:idensity_ble_client/app_scroll_behavior.dart';
 import 'package:idensity_ble_client/widgets/device_settings/common/common_settings_widget.dart';
 import 'package:idensity_ble_client/widgets/device_settings/device_settings_main_widget.dart';
 import 'package:idensity_ble_client/widgets/device_settings/device_settings_navigation_widget.dart';
+import 'package:idensity_ble_client/widgets/device_settings/meas_process/meas_process_settings_widget.dart';
 import 'package:idensity_ble_client/widgets/drawer/main_drawer_widget.dart';
 import 'package:idensity_ble_client/widgets/main_page/main_page_widget.dart';
 import 'package:idensity_ble_client/widgets/meas_units/meas_units_widget.dart';
@@ -83,6 +84,10 @@ final _router = GoRouter(
                     GoRoute(
                       path: "common",
                       builder: (context, state) => const CommonSettingsWidget(),
+                    ),
+                    GoRoute(
+                      path: "measProcs",
+                      builder: (context, state) => const MeasProcessSettingsWidget(),
                     ),
                   ],
                 ),

@@ -22,6 +22,43 @@ class ModbusService {
     );
   }
 
+
+  Future<void> writeCalcType(int value, int measProcIndex, Connection connection)async{
+    await _writeHoldingRegisters(
+      connection: connection,
+      registers: [value],
+      startAddr: 204 + measProcIndex*180,
+      count: 1,
+    );
+  }
+
+  Future<void> writeMeasType(int value, int measProcIndex, Connection connection)async{
+    await _writeHoldingRegisters(
+      connection: connection,
+      registers: [value],
+      startAddr: 205 + measProcIndex*180,
+      count: 1,
+    );
+  }
+
+  Future<void> writeAveragePoints(int value, int measProcIndex, Connection connection) async {
+    await _writeHoldingRegisters(
+      connection: connection,
+      registers: [value],
+      startAddr: 200 + measProcIndex*180 + 1,
+      count: 1,
+    );
+  }
+
+  Future<void> writeMeasDuration(double value, int measProcIndex, Connection connection)async{
+    await _writeHoldingRegisters(
+      connection: connection,
+      registers: [(value*10).toInt()],
+      startAddr: 200 + measProcIndex*180,
+      count: 1,
+    );
+  }
+
   Future<IndicationData> getIndicationData(Connection connection) async {
     if (connection.connectionSettings.connectionType ==
         ConnectionType.bluetooth) {

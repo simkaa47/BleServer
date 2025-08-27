@@ -217,4 +217,42 @@ class DeviceService {
       }
     });
   }
+
+  Future<void> writeMeasDuration(double value, int measProcIndex, Device device)async{
+    _commandQueue.add(() async {
+      var connection = _connections.where((c) => c.name == c.name).firstOrNull;
+      if (connection != null) {
+        await modbusService.writeMeasDuration(value, measProcIndex, connection);
+      }
+    });
+  }
+
+  Future<void> writeAveragePoints(int value, int measProcIndex, Device device) async {
+    _commandQueue.add(() async {
+      var connection = _connections.where((c) => c.name == c.name).firstOrNull;
+      if (connection != null) {
+        await modbusService.writeAveragePoints(value, measProcIndex, connection);
+      }
+    });
+  }
+
+  Future<void> writeCalcType(int value, int measProcIndex, Device device)async{
+    _commandQueue.add(() async {
+      var connection = _connections.where((c) => c.name == c.name).firstOrNull;
+      if (connection != null) {
+        await modbusService.writeCalcType(value, measProcIndex, connection);
+      }
+    });
+  }
+
+  Future<void> writeMeasType(int value, int measProcIndex, Device device)async{
+    _commandQueue.add(() async {
+      var connection = _connections.where((c) => c.name == c.name).firstOrNull;
+      if (connection != null) {
+        await modbusService.writeMeasType(value, measProcIndex, connection);
+      }
+    });
+  }
+
+  
 }

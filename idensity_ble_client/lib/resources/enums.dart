@@ -27,3 +27,11 @@ const List<String> levelmeterMeasModes = [
   "Обьем",
   "Скорость заполнения",
 ];
+
+const List<String> calcTypes = [
+  "Полином",
+  "Ослабление",
+  "Не задано"
+];
+
+

@@ -16,14 +16,15 @@ class IndicationData {
     ),
   );
 
-  final List<AnalogInputIndication> analogInputIndications = List.filled(
+  final List<AnalogInputIndication> analogInputIndications = List.generate(
     2,
-    AnalogInputIndication(adcValue: 0, commState: false, pwrState: false),
+    (i) =>
+        AnalogInputIndication(adcValue: 0, commState: false, pwrState: false),
   );
 
-  final List<AnalogOutputIndication> analogOutputIndications = List.filled(
+  final List<AnalogOutputIndication> analogOutputIndications = List.generate(
     2,
-    AnalogOutputIndication(
+    (i) => AnalogOutputIndication(
       adcValue: 0,
       commState: false,
       dacValue: 0,

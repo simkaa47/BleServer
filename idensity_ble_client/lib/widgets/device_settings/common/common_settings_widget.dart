@@ -42,22 +42,7 @@ class CommonSettingsWidget extends ConsumerWidget {
           }
           return const Center(child: Text("Нет устройства"));
         },
-      ),
-      // body:
-      //     device != null
-      //         ? ListView(
-      //           children: [
-      //             ComboboxParameterWidget(
-      //               name: 'Тип устройства',
-      //               value: device.deviceSettings?.deviceMode.index ?? 0,
-      //               options: devicesTypes,
-      //               onConfirm: (value) async{
-      //                 await service.writeDeviceType(value, device);
-      //               },
-      //             ),
-      //           ],
-      //         )
-      //         : const Center(child: Text("Нет устройства")),
+      ),     
     );
   }
 }

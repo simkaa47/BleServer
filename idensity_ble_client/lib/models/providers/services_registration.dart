@@ -3,6 +3,7 @@ import 'package:idensity_ble_client/models/charts/chart_state.dart';
 import 'package:idensity_ble_client/models/connection_type.dart';
 import 'package:idensity_ble_client/models/device.dart';
 import 'package:idensity_ble_client/models/meas_units/meas_unit.dart';
+import 'package:idensity_ble_client/models/settings/meas_process.dart';
 import 'package:idensity_ble_client/services/bluetooth/ble_scan_service.dart';
 import 'package:idensity_ble_client/services/device_service.dart';
 import 'package:idensity_ble_client/services/ethernet/ethernet_scan_service.dart';
@@ -111,3 +112,13 @@ final selectedDeviceProvider = Provider<Device?>((ref) {
     error: (err, stack) => null,
   );
 });
+
+final selectedMeasProcIndexProvider = StateProvider<int>((ref) => 0);
+
+final selectedMeasProcProvider = Provider<MeasProcess?>((ref) {
+  final selectedMeasProcIndex = ref.watch(selectedMeasProcIndexProvider);
+  final device = ref.watch(selectedDeviceProvider);
+
+  return device?.deviceSettings?.measProcesses[selectedMeasProcIndex];
+
+},);

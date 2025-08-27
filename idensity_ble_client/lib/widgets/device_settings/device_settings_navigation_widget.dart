@@ -18,10 +18,13 @@ class DeviceSettingsNavigationWidget extends StatelessWidget {
             },
           ),
         ),
-        const Card(
+         Card(
           child: ListTile(
-            title: Text("Измерительные процессы"),
-            leading: Icon(Icons.adjust_outlined),
+            title: const Text("Измерительные процессы"),
+            leading: const Icon(Icons.adjust_outlined),
+            onTap: () {
+              context.push(Routes.measProcDeviceSettings);
+            },
           ),
         ),
         const Card(

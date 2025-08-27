@@ -4,4 +4,5 @@ class Routes {
   static const String measUnits = '/home/measUnits';
   static const String deviceSettings = '/home/deviceSettings';
   static const String commonDeviceSettings = '/home/deviceSettings/common';
+  static const String measProcDeviceSettings = '/home/deviceSettings/measProcs';
 }

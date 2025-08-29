@@ -6,9 +6,9 @@ class IndicationData {
   double temperature = 0;
   double hv = 0;
   double counters = 0;
-  final List<MeasResult> measResults = List.filled(
+  final List<MeasResult> measResults = List.generate(
     2,
-    MeasResult(
+    (i) => MeasResult(
       measProcIndex: 0,
       isActive: false,
       currentValue: 0,

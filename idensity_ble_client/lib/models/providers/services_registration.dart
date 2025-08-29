@@ -33,7 +33,7 @@ final connectionTypeProvider = StateProvider<ConnectionType>(
 );
 
 final deviceServiceProvider = Provider<DeviceService>((ref) {
-  final service = DeviceService();  
+  final service = DeviceService();
   ref.onDispose(() => service.dispose());
   return service;
 });
@@ -41,7 +41,6 @@ final deviceServiceProvider = Provider<DeviceService>((ref) {
 final modbusServiceProvider = Provider<ModbusService>((ref) {
   return ModbusService();
 });
-
 
 final deviceUpdateProvider = StreamProvider<void>((ref) {
   // Получаем экземпляр сервиса.
@@ -75,7 +74,7 @@ final measUnitsStreamProvider = StreamProvider<List<MeasUnit>>((ref) {
     final service = serviceAsyncValue.value!;
     return service.measUnitsStream;
   }
-  
+
   // Если еще не готово, то остаемся в состоянии загрузки
   // (или ошибки)
   if (serviceAsyncValue.isLoading) {
@@ -85,7 +84,6 @@ final measUnitsStreamProvider = StreamProvider<List<MeasUnit>>((ref) {
   }
 });
 
-
 final devicesStreamProvider = StreamProvider<List<Device>>((ref) {
   final deviceService = ref.watch(deviceServiceProvider);
   return deviceService.devicesStream;
@@ -93,11 +91,10 @@ final devicesStreamProvider = StreamProvider<List<Device>>((ref) {
 
 final selectedDeviceIdProvider = StateProvider<String?>((ref) => null);
 
-final selectedDeviceProvider = Provider<Device?>((ref) {  
-  final devicesAsyncValue = ref.watch(devicesStreamProvider);  
+final selectedDeviceProvider = Provider<Device?>((ref) {
+  final devicesAsyncValue = ref.watch(devicesStreamProvider);
   final selectedId = ref.watch(selectedDeviceIdProvider);
 
-  
   return devicesAsyncValue.when(
     data: (devices) {
       if (selectedId != null) {
@@ -120,5 +117,22 @@ final selectedMeasProcProvider = Provider<MeasProcess?>((ref) {
   final device = ref.watch(selectedDeviceProvider);
 
   return device?.deviceSettings?.measProcesses[selectedMeasProcIndex];
+});
 
-},);
+final changeMeasUnitSelectingProvider = StreamProvider<Map<String, int>>((ref) {
+  final serviceAsyncValue = ref.watch(measUnitServiceProvider);
+
+  // Проверяем, что значение готово
+  if (serviceAsyncValue.hasValue) {
+    final service = serviceAsyncValue.value!;
+    return service.measUnitSelectingStream;
+  }
+
+  // Если еще не готово, то остаемся в состоянии загрузки
+  // (или ошибки)
+  if (serviceAsyncValue.isLoading) {
+    return const Stream.empty();
+  } else {
+    throw Exception('Error loading service');
+  }
+});

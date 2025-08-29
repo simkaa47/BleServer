@@ -45,17 +45,17 @@ class MyCharacteristicsCallbacksRw : public BLECharacteristicCallbacks {
       }
       Serial.println();
       int result = modBusRTUincomingPacketParse(receivedData, receivedLength);
-      if(result>=0){
+      if (result >= 0) {
         result = modBusRTUoutgoingPacketProcess(result);
         Serial.print("Modbus result: ");
         Serial.print(result);
         Serial.println(" bytes");
         pCharacteristic->setValue(modbus_response_buffer, result);
       }
-      
+
 
       // Устанавливаем полученные данные в качестве ответа
-      
+
 
       // Отправляем уведомление
       pCharacteristic->notify();
@@ -123,13 +123,14 @@ uint32_t currentMilis1 = 0;
 void loop() {
   delay(100);
   currentMilis1 = millis();
-  meas_proc_data_ready_strct[0].counter = 23748.7 + currentMilis1%12 + (float(currentMilis1%7)/10);
-  hv_module_telemetry_strct.v_out = 900.0 + float(currentMilis1%13)/10;
-  temp_module_telemetry_strct.t_int = 31.4 + float(currentMilis1%13)/10;
-  meas_proc_data_ready_strct[0].phys_vals[0] = 1.23 + (float(currentMilis1%2)/3) + (float(currentMilis1%2)/10);
-  meas_proc_data_ready_strct[0].phys_val_complete_aver = 1.23 + (currentMilis1%2)/10;
-  meas_proc_data_ready_strct[1].phys_vals[0] = 1.46 + (currentMilis1%2)/3 + (currentMilis1%2)/10;
-  meas_proc_data_ready_strct[1].phys_val_complete_aver = 1.46 + (currentMilis1%2)/10;
-
-
+  meas_proc_data_ready_strct[0].counter = 23748.7 + currentMilis1 % 12 + (float(currentMilis1 % 7) / 10);
+  hv_module_telemetry_strct.v_out = 900.0 + float(currentMilis1 % 13) / 10;
+  temp_module_telemetry_strct.t_int = 31.4 + float(currentMilis1 % 13) / 10;
+  meas_proc_data_ready_strct[0].phys_vals[0] = 1.23 + (float(currentMilis1 % 3) / 10);
+  meas_proc_data_ready_strct[0].phys_val_complete_aver = 1.23 + (float(currentMilis1 % 3) / 40);
+  meas_proc_data_ready_strct[0].meas_in_progress = 1;
+  meas_proc_data_ready_strct[1].phys_vals[0] = 1.46 + (float(currentMilis1 % 5) / 10);
+  meas_proc_data_ready_strct[1].phys_val_complete_aver = 1.46 + (float(currentMilis1 % 5) / 50);
+  meas_proc_data_ready_strct[1].meas_in_progress = 1;
+  meas_proc_data_ready_strct[1].meas_ndx = 1;
 }

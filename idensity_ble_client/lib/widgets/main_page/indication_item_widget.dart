@@ -35,13 +35,13 @@ class IndicationItemWidget extends StatelessWidget {
                 children: [
                   AutoSizeText(
                     paramName,
-                    style: TextStyle(fontSize: 18),
+                    style: const TextStyle(fontSize: 18),
                     maxLines: 2,
                     maxFontSize: 18,
                   ),
                   Text(
                     value,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Color.fromARGB(255, 1, 63, 50),
                       fontSize: 20,
                       

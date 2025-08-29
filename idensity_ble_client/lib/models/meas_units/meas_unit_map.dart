@@ -1,0 +1,4 @@
+class MeasUnitMap {
+   int? id;
+   
+}

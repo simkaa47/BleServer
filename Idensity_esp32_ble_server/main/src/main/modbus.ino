@@ -861,7 +861,7 @@ uint16_t modBusRTUholdRegRead(uint16_t address) {
 uint16_t modBusRTUinpRegRead(uint16_t address) {
   uint16_t result = 0;
   uint8_t bank, reg, reg_backup;
-  TMeas_Proc_Data_Struct *meas_proc_data = reg < 9 ? &meas_proc_data_ready_strct[0] : &meas_proc_data_ready_strct[1];
+  TMeas_Proc_Data_Struct *meas_proc_data = address < 9 ? &meas_proc_data_ready_strct[0] : &meas_proc_data_ready_strct[1];
 
   reg = address & 0xFF;
 
@@ -872,7 +872,7 @@ uint16_t modBusRTUinpRegRead(uint16_t address) {
       break;
     // Измерение 0 - номер измерительного процесса
     case 1:
-      result = meas_proc_data->ndx;
+      result = meas_proc_data->meas_ndx;
       break;
     // Измерение 0 - счетчик
     case 2:     
@@ -895,7 +895,7 @@ uint16_t modBusRTUinpRegRead(uint16_t address) {
       break;
     // Измерение 1 - номер измерительного процесса
     case 9:
-      result = meas_proc_data->ndx;
+      result = meas_proc_data->meas_ndx;
       break;
     // Измерение 1 - счетчик
     case 10:

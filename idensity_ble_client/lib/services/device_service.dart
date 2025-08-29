@@ -15,12 +15,8 @@ import 'package:rxdart/subjects.dart';
 
 class DeviceService {
   final Queue<Function> _commandQueue = Queue<Function>();
-  Completer<void>? _completer;
 
-  final modbusService = ModbusService();
-  DeviceService() {
-    askDevices();
-  }
+  final modbusService = ModbusService();  
 
   static const String temperatureName = "Т, C";
   static const String hvName = "HV, В";
@@ -42,11 +38,12 @@ class DeviceService {
 
   Future<void> addDevices(List<Device> newDevices) async {
     for (var newDevice in newDevices) {
-      if (!_currentDevices.any((d) => isEqual(d, newDevice)) || true) {
+      if (!_currentDevices.any((d) => isEqual(d, newDevice))) {
+       
         _currentDevices.add(newDevice);
-        for (var i = 0; i < _currentDevices.length; i++) {
-          _currentDevices[i].name = _currentDevices[i].name + "i";
-        }
+         if(_currentDevices.length == 1){
+          askDevices();
+        }        
         _devicesController.add(List.from(_currentDevices));
         _connections.add(Connection(newDevice.connectionSettings));
         debugPrint(
@@ -75,7 +72,7 @@ class DeviceService {
 
   Future<void> askDevices() async {
     debugPrint('Начало опроса устройств...');
-    while (true) {
+    while (_currentDevices.isNotEmpty) {
       try {
         // Создаем временную копию списка для итерации, чтобы избежать ConcurrentModificationError
         final List<Device> devicesToUpdate = List.from(_currentDevices);

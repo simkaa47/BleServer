@@ -79,7 +79,6 @@ class MeasUnitService {
         } else if (value is num) {
           return MapEntry(key, value.toInt());
         } else {
-          // Если значение не является числом, можно вернуть 0 или выбросить ошибку
           return MapEntry(key, 0);
         }
       });
@@ -105,5 +104,24 @@ class MeasUnitService {
   void dispose() {
     _stateController.close();
     _measUnitSelectingController.close();
+  }
+
+  List<MeasUnit> getMeasUnitsForMeasProc(int measMode, int deviceMode) {
+    return measUnits
+        .where((mu) => mu.deviceMode.index == deviceMode)
+        .where((mu) => mu.measMode == measMode)
+        .toList();
+  }
+
+  MeasUnit? getMeasUnitForMeasProc(int measMode, int deviceMode){
+    final key = "${measMode}_$deviceMode";
+    final index = _measUnitSelecting[key];
+    if(index == null) {
+      return measUnits
+        .where((mu) => mu.deviceMode.index == deviceMode)
+        .where((mu) => mu.measMode == measMode)
+        .firstOrNull;
+    } 
+    return null;
   }
 }

@@ -11,53 +11,51 @@ class MeasUnitsWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final unitsStreamValue = ref.watch(measUnitsStreamProvider);
     final serviceAsyncValue = ref.watch(measUnitServiceProvider);
-
     return Column(
-        children: [
-         IconButton(
-          
-              onPressed: () async {
-                if (serviceAsyncValue.hasValue) {
-                  final service = serviceAsyncValue.value!;
-                  showModalBottomSheet(
-                    context: context,
-                    builder: (ctx) {
-                      return AddEditMeasUnitWidget(
-                        measUnitToSave: null,
-                        onSaveMeasUnit: (unit) async {
-                          await service.addMeasUnit(unit);
-                        },
-                      );
+      children: [
+        IconButton(
+          onPressed: () async {
+            if (serviceAsyncValue.hasValue) {
+              final service = serviceAsyncValue.value!;
+              showModalBottomSheet(
+                context: context,
+                builder: (ctx) {
+                  return AddEditMeasUnitWidget(
+                    measUnitToSave: null,
+                    onSaveMeasUnit: (unit) async {
+                      await service.addMeasUnit(unit);
                     },
                   );
-                }
-              },
-              icon: const Icon(Icons.add, size: 50),
-            ),
-          Expanded(
-            child: unitsStreamValue.when(
-              loading: () {
+                },
+              );
+            }
+          },
+          icon: const Icon(Icons.add, size: 50),
+        ),
+        Expanded(
+          child: unitsStreamValue.when(
+            loading: () {
+              return const Center(child: CircularProgressIndicator());
+            },
+            error: (err, stack) => Center(child: Text('Error: $err')),
+            data: (units) {
+              if (serviceAsyncValue.isLoading || serviceAsyncValue.hasError) {
                 return const Center(child: CircularProgressIndicator());
-              },
-              error: (err, stack) => Center(child: Text('Error: $err')),
-              data: (units) {
-                if (serviceAsyncValue.isLoading || serviceAsyncValue.hasError) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                  
-                final service = serviceAsyncValue.value!;
-                  
-                return ListView.builder(
-                  itemCount: units.length,
-                  itemBuilder: (context, index) {
-                    final unit = units[index];
-                    return MeasUnitItemWidget(service: service, measUnit: unit);
-                  },
-                );
-              },
-            ),
+              }
+
+              final service = serviceAsyncValue.value!;
+
+              return ListView.builder(
+                itemCount: units.length,
+                itemBuilder: (context, index) {
+                  final unit = units[index];
+                  return MeasUnitItemWidget(service: service, measUnit: unit);
+                },
+              );
+            },
           ),
-        ],
-      );
+        ),
+      ],
+    );
   }
 }

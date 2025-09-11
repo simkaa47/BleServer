@@ -89,9 +89,10 @@ class MeasUnitService {
     }
   }
 
-  Future<void> changeMeasUnit(String id, int value) async {
+  Future<void> changeMeasUnit(MeasUnit unit) async {
+    final key = "${unit.measMode}_${unit.deviceMode.index}";
     try {
-      _measUnitSelecting[id] = value;
+      _measUnitSelecting[key] = unit.id ?? 0;
       final jsonString = json.encode(_measUnitSelecting);
       final file = await _measUnitSelectingPathFile;
       await file.writeAsString(jsonString);
@@ -113,15 +114,25 @@ class MeasUnitService {
         .toList();
   }
 
-  MeasUnit? getMeasUnitForMeasProc(int measMode, int deviceMode){
+  MeasUnit? getMeasUnitForMeasProc(int measMode, int deviceMode) {
     final key = "${measMode}_$deviceMode";
     final index = _measUnitSelecting[key];
-    if(index == null) {
-      return measUnits
-        .where((mu) => mu.deviceMode.index == deviceMode)
-        .where((mu) => mu.measMode == measMode)
-        .firstOrNull;
-    } 
-    return null;
+    MeasUnit? measUnit;
+
+    if (index != null) {
+      measUnit =
+          measUnits
+              .where((mu) => mu.deviceMode.index == deviceMode)
+              .where((mu) => mu.measMode == measMode)
+              .where((mu) => mu.id == index)
+              .firstOrNull;
+    }
+    measUnit ??=
+        measUnits
+            .where((mu) => mu.deviceMode.index == deviceMode)
+            .where((mu) => mu.measMode == measMode)
+            .firstOrNull;
+
+    return measUnit;
   }
 }

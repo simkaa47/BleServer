@@ -14,11 +14,11 @@ class MeasUnitItemWidget extends StatelessWidget {
   final MeasUnitService service;
   final MeasUnit measUnit;
 
-  Widget getFormula(String text) {
+  static Widget getFormula(String text, {double fontSize=32}) {
     final list = text.split('^').where((s) => s.isNotEmpty).toList();
     return RichText(
       text: TextSpan(
-        style: const TextStyle(fontSize: 32, color: Colors.black),
+        style:  TextStyle(fontSize: fontSize, color: Colors.black),
         children: <InlineSpan>[
           for (int i = 1; i <= list.length; i++) ...[
             // Добавляем проверку, чтобы не добавлять смещение для первого элемента
@@ -28,7 +28,7 @@ class MeasUnitItemWidget extends StatelessWidget {
                   offset: const Offset(0.0, -10.0), // Смещаем вверх
                   child: Text(
                     list[i - 1],
-                    style: const TextStyle(fontSize: 20, color: Colors.black),
+                    style:  TextStyle(fontSize: fontSize/1.5, color: Colors.black),
                   ),
                 ),
               ),

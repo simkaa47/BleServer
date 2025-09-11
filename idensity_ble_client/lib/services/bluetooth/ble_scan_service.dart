@@ -1,9 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
-import 'dart:io';
-
-import 'package:flutter_blue_plus_windows/flutter_blue_plus_windows.dart';
-
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:idensity_ble_client/flutter_blue_plus_wrapper/src/wrapper/flutter_blue_plus_wrapper.dart';
 import 'package:idensity_ble_client/models/bluetooth/bluetooth_connection.dart';
 import 'package:idensity_ble_client/models/device.dart';
 import 'package:idensity_ble_client/models/scan_result.dart';
@@ -38,8 +36,8 @@ class BleScanService implements ScanService {
     final timeout = Duration(seconds: duration);
     log('Scanning for devices...');
     var services = [Guid(BluetoothConnection.serviceUuid)];
-    await FlutterBluePlus.startScan(timeout: timeout, withServices: services);
-    subscription = FlutterBluePlus.scanResults.expand((e) => e).listen((
+    await FlutterBluePlusWrapper.startScan(timeout: timeout, withServices: services);
+    subscription = FlutterBluePlusWrapper.scanResults.expand((e) => e).listen((
       device,
     ) async {
       if (device.advertisementData.advName.isNotEmpty &&
@@ -57,7 +55,7 @@ class BleScanService implements ScanService {
         );
       }
     });
-    await FlutterBluePlus.isScanning.where((val) => val == false).first;
+    await FlutterBluePlusWrapper.isScanning.where((val) => val == false).first;
     subscription?.cancel();
     log('Found ${results.length} devices');
     _stateController.add(ScanState.on);
@@ -65,7 +63,7 @@ class BleScanService implements ScanService {
 
   @override
   Future<void> stopScan() async {
-    await FlutterBluePlus.stopScan();
+    await FlutterBluePlusWrapper.stopScan();
     _stateController.add(ScanState.on);
     subscription?.cancel();
   }
@@ -95,21 +93,15 @@ class BleScanService implements ScanService {
   }
 
   void _subsribe() {
-    
-    if (Platform.isLinux) {
-      print("Os linux!!!!");      
-      _stateController.add(ScanState.on);
-    } else {
-      adapterStateSubscription = FlutterBluePlus.adapterState.listen((
-        state,
-      ) async {
-        log(state.toString());
-        if (state == BluetoothAdapterState.on) {
-          _stateController.add(ScanState.on);
-        } else {
-          _stateController.add(ScanState.off);
-        }
-      });
-    }
+    adapterStateSubscription = FlutterBluePlusWrapper.adapterState.listen((
+      state,
+    ) async {
+      log(state.toString());
+      if (state == BluetoothAdapterState.on) {
+        _stateController.add(ScanState.on);
+      } else {
+        _stateController.add(ScanState.off);
+      }
+    });
   }
 }

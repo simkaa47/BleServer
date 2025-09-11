@@ -15,8 +15,11 @@ class LineChartSample12 extends ConsumerWidget {
   final bool _isPanEnabled = true;
   final bool _isScaleEnabled = true;
 
+  
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context, WidgetRef ref) {   
+    
     const leftReservedSize = 52.0;
     final chartState = ref.watch(chartViewModelProvider);
     return Column(

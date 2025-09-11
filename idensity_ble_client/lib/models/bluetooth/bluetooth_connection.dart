@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:core';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_blue_plus_windows/flutter_blue_plus_windows.dart';
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:idensity_ble_client/flutter_blue_plus_wrapper/src/wrapper/flutter_blue_plus_wrapper.dart';
 
 class BluetoothConnection {
   BluetoothConnection({required this.remoteId});
@@ -29,7 +29,7 @@ class BluetoothConnection {
     try {
       await _characteristicRead!.write(request);
       if (Platform.isWindows) {
-        await Future.delayed(Duration(milliseconds: 100));
+        await Future.delayed(const Duration(milliseconds: 100));
         await _characteristicRead?.read();
       }
       final response = await _readCompleter!.future.timeout(duration);
@@ -50,20 +50,20 @@ class BluetoothConnection {
       if (!Platform.isWindows) {
         _bleDevice = BluetoothDevice.fromId(remoteId);
       } else {
-        await FlutterBluePlus.startScan(
-          timeout: Duration(seconds: 12),
+        await FlutterBluePlusWrapper.startScan(
+          timeout: const Duration(seconds: 12),
           withServices: [Guid(serviceUuid)],
         );
-        _subscription = FlutterBluePlus.scanResults.expand((e) => e).listen((
+        _subscription = FlutterBluePlusWrapper.scanResults.expand((e) => e).listen((
           result,
         ) async {
           if (result.device.remoteId.str == remoteId) {
             _bleDevice = result.device;
-            await FlutterBluePlus.stopScan();
+            await FlutterBluePlusWrapper.stopScan();
             _subscription?.cancel();
           }
         });
-        await FlutterBluePlus.isScanning.where((val) => val == false).first;
+        await FlutterBluePlusWrapper.isScanning.where((val) => val == false).first;
         _subscription?.cancel();
       }
     }

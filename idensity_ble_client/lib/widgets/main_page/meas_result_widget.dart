@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idensity_ble_client/models/device.dart';
 import 'package:idensity_ble_client/models/indication/meas_result.dart';
+import 'package:idensity_ble_client/models/meas_units/meas_unit.dart';
 import 'package:idensity_ble_client/models/providers/services_registration.dart';
 import 'package:idensity_ble_client/resources/enums.dart';
+import 'package:idensity_ble_client/widgets/meas_units/meas_unit_item_widget.dart';
+import 'package:idensity_ble_client/widgets/meas_units/meas_units_widget.dart';
 
 class MeasResultWidget extends ConsumerWidget {
   const MeasResultWidget(this.result, this.device, {super.key});
@@ -33,6 +36,8 @@ class MeasResultWidget extends ConsumerWidget {
             measType,
             devMode,
           );
+          final koeff = measUnit?.coeff ?? 1;
+          final offset = measUnit?.offset ?? 0;
           return Card(
             child: Row(
               children: [
@@ -61,7 +66,7 @@ class MeasResultWidget extends ConsumerWidget {
                                       BoxFit
                                           .contain, // Масштабирует содержимое так, чтобы оно поместилось, сохраняя пропорции
                                   child: AutoSizeText(
-                                    result.averageValue.toStringAsFixed(3),
+                                    (result.averageValue*koeff + offset).toStringAsFixed(3),
                                     // maxLines: 1, // Можно убрать, если FittedBox используется
                                   ),
                                 ),
@@ -89,7 +94,7 @@ class MeasResultWidget extends ConsumerWidget {
                                       BoxFit
                                           .contain, // Масштабирует содержимое так, чтобы оно поместилось, сохраняя пропорции
                                   child: AutoSizeText(
-                                    result.currentValue.toStringAsFixed(3),
+                                   (result.currentValue*koeff + offset).toStringAsFixed(3),
                                     // maxLines: 1, // Можно убрать, если FittedBox используется
                                   ),
                                 ),
@@ -106,22 +111,21 @@ class MeasResultWidget extends ConsumerWidget {
                   ),
                 ),
                 DropdownButton(
-                  value: measUnit?.name ?? "",
+                  value: measUnit,
                   items:
                       measUnits
                           .map(
-                            (item) => DropdownMenuItem<String>(
-                              value: item.name,
-                              child: Text(
-                                item.name,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.normal,
-                                ),
-                              ),
+                            (item) => DropdownMenuItem<MeasUnit>(
+                              value: item,                              
+                              child: MeasUnitItemWidget.getFormula(item.name, fontSize: 20)
                             ),
                           )
                           .toList(),
-                  onChanged: (newValue) {},
+                  onChanged: (newValue) async {
+                    if (newValue != null) {
+                      await measUnitService.changeMeasUnit(newValue);
+                    }
+                  },
                 ),
               ],
             ),

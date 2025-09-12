@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
+import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:idensity_ble_client/flutter_blue_plus_wrapper/src/wrapper/flutter_blue_plus_wrapper.dart';
 import 'package:idensity_ble_client/models/bluetooth/bluetooth_connection.dart';
@@ -36,16 +37,20 @@ class BleScanService implements ScanService {
     final timeout = Duration(seconds: duration);
     log('Scanning for devices...');
     var services = [Guid(BluetoothConnection.serviceUuid)];
+    final devices =  FlutterBluePlus.connectedDevices;
+    for (var d in devices) {
+      debugPrint(d.remoteId.str);
+    }
     await FlutterBluePlusWrapper.startScan(timeout: timeout, withServices: services);
     subscription = FlutterBluePlusWrapper.scanResults.expand((e) => e).listen((
       device,
     ) async {
-      if (device.advertisementData.advName.isNotEmpty &&
+      if (device.device.platformName.isNotEmpty &&
           !results.any((result) {
-            return result.advName == device.device.advName;
+            return result.advName == device.device.platformName;
           })) {
         final BlueScanResult result = BlueScanResult();
-        result.advName = device.device.advName;
+        result.advName = device.device.platformName;
         result.macAddress = device.device.remoteId.str;
         results.add(result);
 

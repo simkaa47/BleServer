@@ -21,7 +21,8 @@ class BluetoothConnection {
   StreamSubscription<ScanResult>? _subscription;
 
   Future<List<int>> readBytes(List<int> request, {int timeoutMs = 1000}) async {
-    if (_bleDevice == null || !_bleDevice!.isConnected) {
+    if (_bleDevice == null || !_bleDevice!.isConnected || _characteristicWrite == null
+    || _characteristicRead == null) {
       await _connect();
     }
     final duration = Duration(milliseconds: timeoutMs);
@@ -45,9 +46,15 @@ class BluetoothConnection {
   }
 
   Future<void> _connect() async {
-    if (_bleDevice == null || _bleDevice!.remoteId.toString() != remoteId) {
-      await _bleDevice?.disconnect();
-      if (!Platform.isWindows) {
+    if (_bleDevice == null || 
+    _characteristicRead == null ||
+    _characteristicWrite == null ||
+    _bleDevice!.remoteId.toString() != remoteId) {
+      if(_bleDevice?.isConnected ?? false){
+        await _bleDevice?.disconnect();
+      }
+      
+      if (!Platform.isWindows && (_bleDevice?.remoteId.toString() ?? true) != remoteId) {
         _bleDevice = BluetoothDevice.fromId(remoteId);
       } else {
         await FlutterBluePlusWrapper.startScan(
@@ -74,8 +81,7 @@ class BluetoothConnection {
           services
               .where((service) => service.uuid.toString() == serviceUuid)
               .firstOrNull;
-      debugPrint('Успех!');
-      if (service == null) return;
+            if (service == null) return;
 
       _characteristicWrite =
           service.characteristics

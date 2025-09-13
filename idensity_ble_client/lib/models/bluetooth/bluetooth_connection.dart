@@ -76,7 +76,12 @@ class BluetoothConnection {
     }
     if (_bleDevice != null) {
       await _bleDevice!.connect();
-      List<BluetoothService> services = await _bleDevice!.discoverServices();
+      List<BluetoothService> services = [];
+      if(_bleDevice!.servicesList.isNotEmpty){
+        services = _bleDevice!.servicesList;
+      }else{
+        services = await _bleDevice!.discoverServices();
+      }      
       final service =
           services
               .where((service) => service.uuid.toString() == serviceUuid)
@@ -114,7 +119,7 @@ class BluetoothConnection {
         );
         _bleDevice!.cancelWhenDisconnected(_readSubscription!);
         if (!Platform.isWindows) {
-          await _characteristicRead!.setNotifyValue(true);
+          await _characteristicRead?.setNotifyValue(true);
         }
       }
     } else {

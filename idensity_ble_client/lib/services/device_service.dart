@@ -74,6 +74,7 @@ class DeviceService {
     debugPrint('Начало опроса устройств...');
     while (_currentDevices.isNotEmpty) {
       try {
+        debugPrint('internal Опрос устройств...');
         // Создаем временную копию списка для итерации, чтобы избежать ConcurrentModificationError
         final List<Device> devicesToUpdate = List.from(_currentDevices);
 
@@ -141,6 +142,9 @@ class DeviceService {
     _devicesController.close();
     for (var device in devices) {
       device.dispose();
+    }
+    for (var connection in _connections) {
+      connection.dispose();
     }
   }
 

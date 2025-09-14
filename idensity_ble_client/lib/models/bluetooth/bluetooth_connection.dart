@@ -12,7 +12,7 @@ class BluetoothConnection {
   BleCharacteristic? _characteristicRead;
   BleCharacteristic? _characteristicWrite;
   final BleDevice bleDevice;
-  StreamSubscription<dynamic>? _readSubscription;
+  StreamSubscription<List<int>>? _readSubscription;
   Completer<List<int>>? _readCompleter;
   late StreamSubscription<bool> _connectStateSubscription;
   bool connected = false;
@@ -61,8 +61,8 @@ class BluetoothConnection {
     }
     try {
       await bleDevice.connect();
-      var result = await bleDevice.requestMtu(256);
-      debugPrint("MTU = $result bytes");
+      // var result = await bleDevice.requestMtu(256);
+      // debugPrint("MTU = $result bytes");
     } catch (e) {
       throw Exception("Error with connect method of BleDevice - $e");
     }       
@@ -73,7 +73,7 @@ class BluetoothConnection {
     if (_characteristicRead != null) {
       debugPrint("Read characteristic was founded");
       await _characteristicRead?.notifications.subscribe();
-      _readSubscription = _characteristicRead!.notifications.listen(
+      _readSubscription = _characteristicRead!.onValueReceived.listen(
         (value) {
           debugPrint("We've gotten some value $value");
           if (_readCompleter != null && !_readCompleter!.isCompleted) {

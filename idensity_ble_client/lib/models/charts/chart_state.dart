@@ -1,7 +1,7 @@
-import 'package:idensity_ble_client/models/charts/curbe_data.dart';
+import 'package:idensity_ble_client/models/charts/curve_data.dart';
 
 class ChartState {
-  final List<CurbeData> data;
+  final List<CurveData> data;
 
   ChartState({required this.data});
 }

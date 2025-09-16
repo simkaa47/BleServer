@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:core';
+import 'dart:developer';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:universal_ble/universal_ble.dart';
 
@@ -27,6 +29,7 @@ class BluetoothConnection {
   }
 
   Future<List<int>> readBytes(List<int> request, {int timeoutMs = 1000}) async {
+    //await connectTest();
     if (!(await bleDevice.connectionState == BleConnectionState.connected) ||
         _characteristicWrite == null ||
         _characteristicRead == null) {
@@ -36,7 +39,6 @@ class BluetoothConnection {
     _readCompleter = Completer<List<int>>();
     try {
       await _characteristicRead!.write(request);
-      //final response = await _characteristicRead!.read(timeout: duration);
       final response = await _readCompleter!.future.timeout(duration);
       return response;
     } on TimeoutException {
@@ -59,20 +61,32 @@ class BluetoothConnection {
         }
       }
     }
-    try {
-      await bleDevice.connect();
-      // var result = await bleDevice.requestMtu(256);
-      // debugPrint("MTU = $result bytes");
-    } catch (e) {
-      throw Exception("Error with connect method of BleDevice - $e");
-    }       
+    final connectionState = await bleDevice.connectionState;
+    if (connectionState == BleConnectionState.disconnected) {
+      try {
+        await bleDevice.connect();
+        if (!Platform.isLinux) {
+          var result = await bleDevice.requestMtu(256);
+          debugPrint("MTU = $result bytes");
+        }
+      } catch (e) {
+        throw Exception("Error with connect method of BleDevice - $e");
+      }
+    }
+    _readSubscription?.cancel();
 
-    _characteristicWrite = await bleDevice.getCharacteristic(characteristicWriteUuid, service: serviceUuid);        
-    _characteristicRead = await bleDevice.getCharacteristic(characteristicReadUuid, service: serviceUuid);  
-   
-    if (_characteristicRead != null) {
-      debugPrint("Read characteristic was founded");
-      await _characteristicRead?.notifications.subscribe();
+    _characteristicWrite = await bleDevice.getCharacteristic(
+      characteristicWriteUuid,
+      service: serviceUuid,
+    );
+    _characteristicRead = await bleDevice.getCharacteristic(
+      characteristicReadUuid,
+      service: serviceUuid,
+    );
+    final isNotificationsSupported =
+        _characteristicRead!.notifications.isSupported;
+    if (isNotificationsSupported && _characteristicRead != null) {
+      await _characteristicRead!.notifications.subscribe();
       _readSubscription = _characteristicRead!.onValueReceived.listen(
         (value) {
           debugPrint("We've gotten some value $value");
@@ -87,6 +101,8 @@ class BluetoothConnection {
         },
       );
     }
+
+    log("End of connect method");
   }
 
   Future<void> dispose() async {

@@ -1,5 +1,6 @@
 #include <BLEDevice.h>
 #include <BLE2901.h>
+#include <BLE2902.h>
 #include "modbus.h"
 #include "adc_module.h"
 
@@ -103,14 +104,16 @@ void setup() {
     CHARACTERISTIC_1_UUID,
     BLECharacteristic::PROPERTY_WRITE);
 
-  pCharacteristic = pCharacteristicRead;
+  //pCharacteristic = pCharacteristicRead;
 
   pCharacteristicRead->setCallbacks(new MyCharacteristicsCallbacksRw());
 
-  // Descriptors
-  BLE2901 *descriptor_2901 = new BLE2901();
-  descriptor_2901->setDescription("Time");
-  pCharacteristicRead->addDescriptor(descriptor_2901);
+  // // Descriptors
+  // BLE2902 *descriptor_2901 = new BLE2902();
+  // //descriptor_2901->setDescription("Time");
+  // pCharacteristicRead->addDescriptor(descriptor_2901);
+
+  pCharacteristicRead->addDescriptor(new BLE2902());
 
 
   pService->start();

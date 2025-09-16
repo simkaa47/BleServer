@@ -81,122 +81,125 @@ class _AddEditMeasUnitWidgetState extends State<AddEditMeasUnitWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          children: [
-            TextFormField(              
-              controller: _nameController,
-              maxLength: 20,
-              decoration: const InputDecoration(label: Text("Название")),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Пожалуйста, введите название';
-                }
-                return null;
-              },
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: TextFormField(                    
-                    controller: _coeffController,
-                    keyboardType: TextInputType.number,
-                    validator: _numberValidator,
-                    decoration: const InputDecoration(
-                      label: Text("Коэффициент"),
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              TextFormField(              
+                controller: _nameController,
+                maxLength: 20,
+                decoration: const InputDecoration(label: Text("Название")),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Пожалуйста, введите название';
+                  }
+                  return null;
+                },
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(                    
+                      controller: _coeffController,
+                      keyboardType: TextInputType.number,
+                      validator: _numberValidator,
+                      decoration: const InputDecoration(
+                        label: Text("Коэффициент"),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 40),
-                Expanded(                  
-                  child: TextFormField(                   
-                    controller: _offsetController,
-                    keyboardType: TextInputType.number,
-                    validator: _numberValidator,
-                    decoration: const InputDecoration(label: Text("Смещение")),
+                  const SizedBox(width: 40),
+                  Expanded(                  
+                    child: TextFormField(                   
+                      controller: _offsetController,
+                      keyboardType: TextInputType.number,
+                      validator: _numberValidator,
+                      decoration: const InputDecoration(label: Text("Смещение")),
+                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            DropdownButtonFormField(
-              value: getByIndexFromList(_selectedDeviceTypeIndex, devicesTypes),
-              items:
-                  devicesTypes
-                      .map(
-                        (item) => DropdownMenuItem<String>(
-                          value: item,
-                          child: Text(
-                            item,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.normal,
+                ],
+              ),
+              const SizedBox(height: 20),
+              DropdownButtonFormField(
+                value: getByIndexFromList(_selectedDeviceTypeIndex, devicesTypes),
+                items:
+                    devicesTypes
+                        .map(
+                          (item) => DropdownMenuItem<String>(
+                            value: item,
+                            child: Text(
+                              item,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.normal,
+                              ),
                             ),
                           ),
-                        ),
-                      )
-                      .toList(),
-              onChanged: (value) {
-                setState(() {
-                  if (value != null) {
-                    _selectedDeviceTypeIndex = devicesTypes.indexOf(value);
-                  }
-                });
-              },
-              decoration: const InputDecoration(label: Text("Тип прибора")),
-            ),
-            const SizedBox(height: 20),
-            DropdownButtonFormField(
-              value:
-                  (_selectedDeviceTypeIndex == 0
-                      ? densityMeasModes
-                      : levelmeterMeasModes)[_selecteMeasModeIndex],
-              items:
-                  (_selectedDeviceTypeIndex == 0
-                          ? densityMeasModes
-                          : levelmeterMeasModes)
-                      .map(
-                        (item) => DropdownMenuItem<String>(
-                          value: item,
-                          child: Text(
-                            item,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.normal,
-                            ),
-                          ),
-                        ),
-                      )
-                      .toList(),
-              onChanged: (value) {
-                setState(() {
-                  if (value != null) {
-                    _selecteMeasModeIndex = (_selectedDeviceTypeIndex == 0
+                        )
+                        .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    if (value != null) {
+                      _selectedDeviceTypeIndex = devicesTypes.indexOf(value);
+                    }
+                  });
+                },
+                decoration: const InputDecoration(label: Text("Тип прибора")),
+              ),
+              const SizedBox(height: 20),
+              DropdownButtonFormField(
+                value:
+                    (_selectedDeviceTypeIndex == 0
+                        ? densityMeasModes
+                        : levelmeterMeasModes)[_selecteMeasModeIndex],
+                items:
+                    (_selectedDeviceTypeIndex == 0
                             ? densityMeasModes
                             : levelmeterMeasModes)
-                        .indexOf(value);
-                  }
-                });
-              },
-              decoration: const InputDecoration(label: Text("Тип измерения")),
-            ),
-
-            Row(
-              children: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text("Отмена"),
-                ),
-                ElevatedButton(
-                  onPressed: _submitData,
-                  child: const Text("Cохранить"),
-                ),
-              ],
-            ),
-          ],
+                        .map(
+                          (item) => DropdownMenuItem<String>(
+                            value: item,
+                            child: Text(
+                              item,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    if (value != null) {
+                      _selecteMeasModeIndex = (_selectedDeviceTypeIndex == 0
+                              ? densityMeasModes
+                              : levelmeterMeasModes)
+                          .indexOf(value);
+                    }
+                  });
+                },
+                decoration: const InputDecoration(label: Text("Тип измерения")),
+              ),
+      
+              Row(
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text("Отмена"),
+                  ),
+                  ElevatedButton(
+                    onPressed: _submitData,
+                    child: const Text("Cохранить"),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

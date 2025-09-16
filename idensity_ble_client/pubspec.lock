@@ -440,10 +440,11 @@ packages:
   universal_ble:
     dependency: "direct main"
     description:
-      name: universal_ble
-      sha256: "6a5c6c1fb295015934a5aef3dc751ae7e00721535275f8478bfe74db77b238c5"
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: main
+      resolved-ref: af873b315352787a5490d4f3ddaa1da1056abf59
+      url: "https://github.com/Navideck/universal_ble"
+    source: git
     version: "0.21.1"
   vector_math:
     dependency: transitive

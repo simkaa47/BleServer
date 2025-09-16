@@ -4,8 +4,7 @@ import 'package:idensity_ble_client/models/settings/device_mode.dart';
 class MeasUnitSeed {
   static List<MeasUnit> getMeasUnits() {
     return [
-      MeasUnit(
-        id: 0,
+      MeasUnit(        
         name: "г/см^3",
         coeff: 1,
         offset: 0,
@@ -14,7 +13,6 @@ class MeasUnitSeed {
         userCantDelete: true,
       ),
       MeasUnit(
-        id: 0,
         name: "кг/м^3",
         coeff: 1000,
         offset: 0,
@@ -23,7 +21,6 @@ class MeasUnitSeed {
         userCantDelete: true,
       ),
       MeasUnit(
-        id: 0,
         name: "г/л",
         coeff: 1000,
         offset: 0,
@@ -32,7 +29,6 @@ class MeasUnitSeed {
         userCantDelete: true,
       ),
       MeasUnit(
-        id: 0,
         name: "г/см^3",
         coeff: 1,
         offset: 0,
@@ -41,7 +37,6 @@ class MeasUnitSeed {
         userCantDelete: true,
       ),
       MeasUnit(
-        id: 0,
         name: "кг/м^3",
         coeff: 1000,
         offset: 0,
@@ -50,7 +45,6 @@ class MeasUnitSeed {
         userCantDelete: true,
       ),
       MeasUnit(
-        id: 0,
         name: "г/л",
         coeff: 1000,
         offset: 0,
@@ -59,7 +53,6 @@ class MeasUnitSeed {
         userCantDelete: true,
       ),
       MeasUnit(
-        id: 0,
         name: "г/см^3",
         coeff: 1,
         offset: 0,
@@ -68,7 +61,6 @@ class MeasUnitSeed {
         userCantDelete: true,
       ),
       MeasUnit(
-        id: 0,
         name: "г/л",
         coeff: 1000,
         offset: 0,
@@ -77,7 +69,6 @@ class MeasUnitSeed {
         userCantDelete: true,
       ),
       MeasUnit(
-        id: 0,
         name: "%",
         coeff: 1,
         offset: 0,
@@ -86,7 +77,6 @@ class MeasUnitSeed {
         userCantDelete: true,
       ),
       MeasUnit(
-        id: 0,
         name: "%",
         coeff: 1,
         offset: 0,
@@ -95,7 +85,6 @@ class MeasUnitSeed {
         userCantDelete: true,
       ),
       MeasUnit(
-        id: 0,
         name: "%",
         coeff: 1,
         offset: 0,
@@ -104,7 +93,6 @@ class MeasUnitSeed {
         userCantDelete: true,
       ),
       MeasUnit(
-        id: 0,
         name: "%",
         coeff: 1,
         offset: 0,
@@ -113,7 +101,6 @@ class MeasUnitSeed {
         userCantDelete: true,
       ),
       MeasUnit(
-        id: 0,
         name: "мм",
         coeff: 1,
         offset: 0,
@@ -122,7 +109,6 @@ class MeasUnitSeed {
         userCantDelete: true,
       ),
       MeasUnit(
-        id: 0,
         name: "м",
         coeff: 0.001,
         offset: 0,
@@ -131,7 +117,6 @@ class MeasUnitSeed {
         userCantDelete: true,
       ),
       MeasUnit(
-        id: 0,
         name: "%",
         coeff: 1,
         offset: 0,
@@ -140,7 +125,6 @@ class MeasUnitSeed {
         userCantDelete: true,
       ),
       MeasUnit(
-        id: 0,
         name: "м^3",
         coeff: 1,
         offset: 0,
@@ -149,7 +133,6 @@ class MeasUnitSeed {
         userCantDelete: true,
       ),
       MeasUnit(
-        id: 0,
         name: "см^3",
         coeff: 1000000,
         offset: 0,
@@ -158,7 +141,6 @@ class MeasUnitSeed {
         userCantDelete: true,
       ),
        MeasUnit(
-        id: 0,
         name: "мм/c",
         coeff: 1,
         offset: 0,
@@ -167,7 +149,6 @@ class MeasUnitSeed {
         userCantDelete: true,
       ),
       MeasUnit(
-        id: 0,
         name: "мм/мин",
         coeff: 0.06,
         offset: 0,
@@ -176,7 +157,6 @@ class MeasUnitSeed {
         userCantDelete: true,
       ),
       MeasUnit(
-        id: 0,
         name: "см/с",
         coeff: 0.1,
         offset: 0,
@@ -185,7 +165,6 @@ class MeasUnitSeed {
         userCantDelete: true,
       ),
       MeasUnit(
-        id: 0,
         name: "см/ч",
         coeff: 360,
         offset: 0,
@@ -194,7 +173,6 @@ class MeasUnitSeed {
         userCantDelete: true,
       ),
       MeasUnit(
-        id: 0,
         name: "м/ч",
         coeff: 3.6,
         offset: 0,

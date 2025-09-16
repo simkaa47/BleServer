@@ -20,7 +20,7 @@ class MeasUnitService {
 
   // Журнал ЕИ
   Future<String> get _measUnitSelectingPath async {
-    final directory = await getApplicationDocumentsDirectory();
+    final Directory directory =  Platform.isLinux ? Directory("/home/Documents/") :  await getApplicationDocumentsDirectory();
     return directory.path;
   }
 

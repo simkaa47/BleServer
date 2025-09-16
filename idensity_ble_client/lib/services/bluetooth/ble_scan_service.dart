@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
 import 'package:flutter/material.dart';
-import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-import 'package:idensity_ble_client/flutter_blue_plus_wrapper/src/wrapper/flutter_blue_plus_wrapper.dart';
 import 'package:idensity_ble_client/models/bluetooth/bluetooth_connection.dart';
 import 'package:idensity_ble_client/models/device.dart';
 import 'package:idensity_ble_client/models/scan_result.dart';
@@ -10,12 +8,12 @@ import 'package:idensity_ble_client/models/scan_state.dart';
 import 'package:idensity_ble_client/services/device_service.dart';
 import 'package:idensity_ble_client/services/scan_service.dart';
 import 'package:rxdart/subjects.dart';
+import 'package:universal_ble/universal_ble.dart';
 
 class BleScanService implements ScanService {
   BleScanService({required this.deviceService}) {
     _subsribe();
   }
-
   final DeviceService deviceService;
 
   List<BlueScanResult> results = [];
@@ -27,57 +25,57 @@ class BleScanService implements ScanService {
   final BehaviorSubject<ScanState> _stateController =
       BehaviorSubject<ScanState>();
 
-  StreamSubscription<ScanResult>? subscription;
-  StreamSubscription<BluetoothAdapterState>? adapterStateSubscription;
+  StreamSubscription<BleDevice>? subscription;
+  StreamSubscription<AvailabilityState>? adapterStateSubscription;
 
   @override
   Future<void> startScan({required int duration}) async {
     results.clear();
     _stateController.add(ScanState.scanning);
-    final timeout = Duration(seconds: duration);
     log('Scanning for devices...');
-    var services = [Guid(BluetoothConnection.serviceUuid)];
-    final devices =  FlutterBluePlus.connectedDevices;
-    for (var d in devices) {
-      debugPrint(d.remoteId.str);
-    }
-    await FlutterBluePlusWrapper.startScan(timeout: timeout, withServices: services);
-    subscription = FlutterBluePlusWrapper.scanResults.expand((e) => e).listen((
-      device,
-    ) async {
-      if (device.device.platformName.isNotEmpty &&
-          !results.any((result) {
-            return result.advName == device.device.platformName;
-          })) {
-        final BlueScanResult result = BlueScanResult();
-        result.advName = device.device.platformName;
-        result.macAddress = device.device.remoteId.str;
-        results.add(result);
+    var services = [BluetoothConnection.serviceUuid];
+    UniversalBle.timeout = const Duration(seconds: 15);
+    subscription = UniversalBle.scanStream.listen((BleDevice bleDevice) {
+      if (bleDevice.name != null && bleDevice.name!.isNotEmpty) {
+        if (!results.any((result) {
+          return result.advName == bleDevice.name;
+        })) {
+          final BlueScanResult result = BlueScanResult();
+          result.advName = bleDevice.name!;
+          result.macAddress = bleDevice.deviceId;
+          results.add(result);
 
-        _stateController.add(ScanState.scanning);
-        log(
-          '${device.device.remoteId}: "${device.advertisementData.advName}" found!',
-        );
+          _stateController.add(ScanState.scanning);
+          log('${bleDevice.deviceId}: "${bleDevice.name}" found!');
+        }
       }
     });
-    await FlutterBluePlusWrapper.isScanning.where((val) => val == false).first;
-    subscription?.cancel();
-    log('Found ${results.length} devices');
-    _stateController.add(ScanState.on);
+    debugPrint("Старт сканирования");
+    try {
+      await UniversalBle.startScan(
+        scanFilter: ScanFilter(withServices: services),
+      );
+    } catch (e) {
+      debugPrint("Ошибка при запуске сканирования - $e");
+    }
   }
 
   @override
   Future<void> stopScan() async {
-    await FlutterBluePlusWrapper.stopScan();
-    _stateController.add(ScanState.on);
-    subscription?.cancel();
+    try {
+      await UniversalBle.stopScan();
+      _stateController.add(ScanState.on);
+      await subscription?.cancel();
+    } catch (e) {
+      debugPrint("Ошибка при остановке сканирования - $e");
+    }
   }
 
   @override
-  void dispose() {
+  void dispose() async {
     _stateController.close();
-    subscription?.cancel();
-    adapterStateSubscription?.cancel();
+    await subscription?.cancel();
+    await adapterStateSubscription?.cancel();
   }
 
   @override
@@ -98,13 +96,17 @@ class BleScanService implements ScanService {
   }
 
   void _subsribe() {
-    adapterStateSubscription = FlutterBluePlusWrapper.adapterState.listen((
+    adapterStateSubscription = UniversalBle.availabilityStream.listen((
       state,
     ) async {
-      log(state.toString());
-      if (state == BluetoothAdapterState.on) {
+      if (state == AvailabilityState.poweredOn) {
         _stateController.add(ScanState.on);
       } else {
+        try {
+          await stopScan();
+        } catch (e) {
+          debugPrint("Error with stop scan");
+        }
         _stateController.add(ScanState.off);
       }
     });

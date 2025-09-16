@@ -42,7 +42,7 @@ final modbusServiceProvider = Provider<ModbusService>((ref) {
   return ModbusService();
 });
 
-final deviceUpdateProvider = StreamProvider<void>((ref) {
+final deviceUpdateProvider = StreamProvider<Device>((ref) {
   // Получаем экземпляр сервиса.
   final service = ref.watch(deviceServiceProvider);
   // Возвращаем стрим, который будет слушать этот провайдер.

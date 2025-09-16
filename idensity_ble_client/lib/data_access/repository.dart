@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -7,9 +8,9 @@ abstract class Repository {
   final String measUnitsTableName = "MeasUnits";
   final String databaseName = "idensity.db";
 Future<Database> getDatabase() async {
-    Directory appDocumentsDir = await getApplicationDocumentsDirectory();
+    final Directory appDocumentsDir =  Platform.isLinux ? Directory("/home/Documents/") :  await getApplicationDocumentsDirectory();
     final String path = join(appDocumentsDir.path, databaseName);
-    print("Начинаем открывать БД");    
+    log("Начинаем открывать БД");    
     databaseFactory = databaseFactoryFfi;
     return await databaseFactory.openDatabase(
       path,

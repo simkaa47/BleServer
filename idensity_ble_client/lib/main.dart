@@ -57,7 +57,7 @@ final _router = GoRouter(
         return Scaffold(
           appBar: AppBar(title: Text(currentTitle)),
           drawer: const MainDrawerWidget(),
-          body: child,
+          body: SafeArea(child: child),
         );
       },
       routes: [

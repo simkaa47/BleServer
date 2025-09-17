@@ -361,3 +361,8 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+idensity_ble_client/windows/flutter/generated_plugins.cmake
+idensity_ble_client/macos/Flutter/GeneratedPluginRegistrant.swift
+idensity_ble_client/windows/flutter/generated_plugins.cmake
+idensity_ble_client/macos/Flutter/GeneratedPluginRegistrant.swift
+idensity_ble_client/windows/flutter/generated_plugin_registrant.cc

@@ -1,4 +1,5 @@
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idensity_ble_client/models/charts/chart_state.dart';
 import 'package:idensity_ble_client/models/charts/curve_data.dart';
@@ -27,7 +28,7 @@ class MainChartViewModel extends Notifier<ChartState> {
     if (deviceAsyncState.hasValue && measUnitServiceAsyncState.hasValue) {
       final device = deviceAsyncState.value;
       final MeasUnitService? muService = measUnitServiceAsyncState.value;
-      DateTime dt = DateTime.now();      
+      DateTime dt = DateTime.now();
       if (device != null && muService != null) {
         _addToCurve(device, temperatureName, dt, muService);
         _addToCurve(device, hvName, dt, muService);
@@ -36,7 +37,7 @@ class MainChartViewModel extends Notifier<ChartState> {
         _addToCurve(device, physValueAverage1, dt, muService);
         _addToCurve(device, physValueCurrent2, dt, muService);
         _addToCurve(device, physValueAverage2, dt, muService);
-        _deleteOldPoints(dt);   
+        _deleteOldPoints(dt);
       }
     }
     return ChartState(data: [..._curves]);
@@ -51,10 +52,16 @@ class MainChartViewModel extends Notifier<ChartState> {
     var curve =
         _curves
             .where((c) => c.curveName == curveId && c.deviceName == device.name)
-            .firstOrNull;    
-    
-    if(curve == null){
-      curve = CurveData(deviceName: device.name, curveName: curveId, data: [], measUnit: _getMeasUnit(curveId, muService, device));
+            .firstOrNull;
+
+    if (curve == null) {
+      curve = CurveData(
+        deviceName: device.name,
+        curveName: curveId,
+        data: [],
+        measUnit: _getMeasUnit(curveId, muService, device),
+        color: getColor(curveId),
+      );
       _curves.add(curve);
     }
     switch (curveId) {
@@ -82,7 +89,7 @@ class MainChartViewModel extends Notifier<ChartState> {
           ),
         );
         break;
-        case physValueAverage1:
+      case physValueAverage1:
         curve.data.add(
           FlSpot(
             time.millisecondsSinceEpoch.toDouble(),
@@ -90,7 +97,7 @@ class MainChartViewModel extends Notifier<ChartState> {
           ),
         );
         break;
-        case physValueCurrent1:
+      case physValueCurrent1:
         curve.data.add(
           FlSpot(
             time.millisecondsSinceEpoch.toDouble(),
@@ -98,7 +105,7 @@ class MainChartViewModel extends Notifier<ChartState> {
           ),
         );
         break;
-        case physValueAverage2:
+      case physValueAverage2:
         curve.data.add(
           FlSpot(
             time.millisecondsSinceEpoch.toDouble(),
@@ -106,7 +113,7 @@ class MainChartViewModel extends Notifier<ChartState> {
           ),
         );
         break;
-        case physValueCurrent2:
+      case physValueCurrent2:
         curve.data.add(
           FlSpot(
             time.millisecondsSinceEpoch.toDouble(),
@@ -114,7 +121,7 @@ class MainChartViewModel extends Notifier<ChartState> {
           ),
         );
         break;
-        
+
       default:
     }
   }
@@ -128,7 +135,7 @@ class MainChartViewModel extends Notifier<ChartState> {
         ).isBefore(dateToCompare),
       );
     }
-  }  
+  }
 
   MeasUnit? _getMeasUnit(
     String curveId,
@@ -177,5 +184,25 @@ class MainChartViewModel extends Notifier<ChartState> {
         );
     }
     return null;
+  }
+
+  Color getColor(String curveId) {
+    switch (curveId) {
+      case temperatureName:
+        return Colors.black;
+      case hvName:
+        return Colors.red;
+      case countsName:
+        return Colors.brown;
+      case physValueAverage1:
+        return Colors.blue;
+      case physValueCurrent1:
+        return Colors.green;
+      case physValueAverage2:
+        return Colors.pink;
+      case physValueCurrent2:
+        return Colors.lightGreen;
+    }
+    return Colors.black;
   }
 }

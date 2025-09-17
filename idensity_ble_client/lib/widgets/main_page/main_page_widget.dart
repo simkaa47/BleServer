@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:idensity_ble_client/widgets/main_page/charts/example/line_charts_sample12.dart';
+import 'package:idensity_ble_client/widgets/main_page/charts/line_charts_sample12.dart';
 import 'package:idensity_ble_client/widgets/main_page/main_indication_widget.dart';
 
 class MainPageWidget extends StatelessWidget {

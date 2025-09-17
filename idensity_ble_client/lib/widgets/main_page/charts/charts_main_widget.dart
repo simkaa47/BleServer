@@ -27,8 +27,7 @@ class ChartsMainWidget extends ConsumerWidget {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: LineChart(
-                  duration: const Duration(milliseconds: 1),
-
+                  duration: const Duration(milliseconds: 100),
                   LineChartData(
                       gridData: const FlGridData(show: false),
                       borderData: FlBorderData(show: false),

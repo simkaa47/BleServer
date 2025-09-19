@@ -7,7 +7,6 @@ import 'package:idensity_ble_client/models/meas_units/meas_unit.dart';
 import 'package:idensity_ble_client/models/providers/services_registration.dart';
 import 'package:idensity_ble_client/resources/enums.dart';
 import 'package:idensity_ble_client/widgets/meas_units/meas_unit_item_widget.dart';
-import 'package:idensity_ble_client/widgets/meas_units/meas_units_widget.dart';
 
 class MeasResultWidget extends ConsumerWidget {
   const MeasResultWidget(this.result, this.device, {super.key});

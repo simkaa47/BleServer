@@ -17,7 +17,7 @@ class CurveData {
     required this.color
   });
 
-  changeMeasUnit(MeasUnit newMeasInit){
+  changeMeasUnit(MeasUnit? newMeasInit){
     measUnit = newMeasInit;
   }
 

@@ -24,8 +24,11 @@ class MainChartViewModel extends Notifier<ChartState> {
   ChartState build() {
     final deviceAsyncState = ref.watch(deviceUpdateProvider);
     final measUnitServiceAsyncState = ref.watch(measUnitServiceProvider);
+    final selectMeasUnitsAsyncValue = ref.watch(
+      changeMeasUnitSelectingProvider,
+    );
 
-    if (deviceAsyncState.hasValue && measUnitServiceAsyncState.hasValue) {
+    if (deviceAsyncState.hasValue && measUnitServiceAsyncState.hasValue && selectMeasUnitsAsyncValue.hasValue) {
       final device = deviceAsyncState.value;
       final MeasUnitService? muService = measUnitServiceAsyncState.value;
       DateTime dt = DateTime.now();
@@ -96,6 +99,7 @@ class MainChartViewModel extends Notifier<ChartState> {
             device.indicationData?.measResults[0].averageValue ?? 0.0,
           ),
         );
+        curve.changeMeasUnit(_getMeasUnit(curveId, muService, device));
         break;
       case physValueCurrent1:
         curve.data.add(
@@ -104,6 +108,7 @@ class MainChartViewModel extends Notifier<ChartState> {
             device.indicationData?.measResults[0].currentValue ?? 0.0,
           ),
         );
+        curve.changeMeasUnit(_getMeasUnit(curveId, muService, device));
         break;
       case physValueAverage2:
         curve.data.add(
@@ -112,14 +117,16 @@ class MainChartViewModel extends Notifier<ChartState> {
             device.indicationData?.measResults[1].averageValue ?? 0.0,
           ),
         );
+        curve.changeMeasUnit(_getMeasUnit(curveId, muService, device));
         break;
       case physValueCurrent2:
         curve.data.add(
           FlSpot(
             time.millisecondsSinceEpoch.toDouble(),
             device.indicationData?.measResults[1].currentValue ?? 0.0,
-          ),
+          ),          
         );
+        curve.changeMeasUnit(_getMeasUnit(curveId, muService, device));
         break;
 
       default:

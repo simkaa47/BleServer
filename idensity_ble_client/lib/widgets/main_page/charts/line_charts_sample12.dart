@@ -31,6 +31,7 @@ class LineChartSample12 extends ConsumerWidget {
                   scaleAxis: FlScaleAxis.free,
                   minScale: 1.0,
                   maxScale: 100,
+                  
                   panEnabled: _isPanEnabled,
                   scaleEnabled: _isScaleEnabled,
                   transformationController: _transformationController,

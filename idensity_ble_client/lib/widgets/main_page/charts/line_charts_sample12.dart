@@ -16,8 +16,7 @@ class LineChartSample12 extends ConsumerWidget {
   final bool _isScaleEnabled = true;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    const leftReservedSize = 52.0;
+  Widget build(BuildContext context, WidgetRef ref) {    
     final chartState = ref.watch(chartViewModelProvider);
     return Column(
       spacing: 16,
@@ -44,6 +43,7 @@ class LineChartSample12 extends ConsumerWidget {
                           spots: curve.data.map((p)=> FlSpot(p.x, p.y * (curve.measUnit?.coeff ?? 0.0) + (curve.measUnit?.offset ?? 0.0))).toList(),
                           dotData: const FlDotData(show: false),
                           color: curve.color,
+                          
                           barWidth: 1,                          
                         );
                       }).toList(),
@@ -128,7 +128,8 @@ class LineChartSample12 extends ConsumerWidget {
                       drawBelowEverything: true,
                       sideTitles: SideTitles(
                         showTitles: true,
-                        reservedSize: leftReservedSize,
+                        reservedSize: 52,
+                        
                         maxIncluded: false,
                         minIncluded: false,
                       ),

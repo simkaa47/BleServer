@@ -2,22 +2,17 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idensity_ble_client/models/charts/chart_state.dart';
+import 'package:idensity_ble_client/models/charts/chart_type.dart';
 import 'package:idensity_ble_client/models/charts/curve_data.dart';
 import 'package:idensity_ble_client/models/device.dart';
 import 'package:idensity_ble_client/models/meas_units/meas_unit.dart';
 import 'package:idensity_ble_client/models/providers/services_registration.dart';
-import 'package:idensity_ble_client/models/settings/device_mode.dart';
+import 'package:idensity_ble_client/resources/enums.dart';
 import 'package:idensity_ble_client/services/meas_units/meas_unit_service.dart';
 
 class MainChartViewModel extends Notifier<ChartState> {
   final List<CurveData> _curves = [];
-  static const String temperatureName = "Т, C";
-  static const String hvName = "HV";
-  static const String countsName = "Каунты";
-  static const String physValueCurrent1 = "physValueCurrent1";
-  static const String physValueAverage1 = "physValueAverage1";
-  static const String physValueCurrent2 = "physValueCurrent2";
-  static const String physValueAverage2 = "physValueAverage2";
+
   bool pointAdded = false;
 
   @override
@@ -28,18 +23,20 @@ class MainChartViewModel extends Notifier<ChartState> {
       changeMeasUnitSelectingProvider,
     );
 
-    if (deviceAsyncState.hasValue && measUnitServiceAsyncState.hasValue && selectMeasUnitsAsyncValue.hasValue) {
+    if (deviceAsyncState.hasValue &&
+        measUnitServiceAsyncState.hasValue &&
+        selectMeasUnitsAsyncValue.hasValue) {
       final device = deviceAsyncState.value;
       final MeasUnitService? muService = measUnitServiceAsyncState.value;
       DateTime dt = DateTime.now();
       if (device != null && muService != null) {
-        _addToCurve(device, temperatureName, dt, muService);
-        _addToCurve(device, hvName, dt, muService);
-        _addToCurve(device, countsName, dt, muService);
-        _addToCurve(device, physValueCurrent1, dt, muService);
-        _addToCurve(device, physValueAverage1, dt, muService);
-        _addToCurve(device, physValueCurrent2, dt, muService);
-        _addToCurve(device, physValueAverage2, dt, muService);
+        _addToCurve(device, ChartType.temp, dt, muService);
+        _addToCurve(device, ChartType.hv, dt, muService);
+        _addToCurve(device, ChartType.counter, dt, muService);
+        _addToCurve(device, ChartType.currentValue0, dt, muService);
+        _addToCurve(device, ChartType.averageValue0, dt, muService);
+        _addToCurve(device, ChartType.currentValue1, dt, muService);
+        _addToCurve(device, ChartType.averageValue1, dt, muService);
         _deleteOldPoints(dt);
       }
     }
@@ -48,27 +45,28 @@ class MainChartViewModel extends Notifier<ChartState> {
 
   void _addToCurve(
     Device device,
-    String curveId,
+    ChartType chartType,
     DateTime time,
     MeasUnitService muService,
   ) {
     var curve =
         _curves
-            .where((c) => c.curveName == curveId && c.deviceName == device.name)
+            .where((c) => c.color == chartType && c.deviceName == device.name)
             .firstOrNull;
 
     if (curve == null) {
       curve = CurveData(
         deviceName: device.name,
-        curveName: curveId,
+        chartType: chartType,
+        curveName: _getChartName(device, chartType),
         data: [],
-        measUnit: _getMeasUnit(curveId, muService, device),
-        color: getColor(curveId),
+        measUnit: _getMeasUnit(chartType, muService, device),
+        color: getColor(chartType),
       );
       _curves.add(curve);
     }
-    switch (curveId) {
-      case temperatureName:
+    switch (chartType) {
+      case ChartType.temp:
         curve.data.add(
           FlSpot(
             time.millisecondsSinceEpoch.toDouble(),
@@ -76,7 +74,7 @@ class MainChartViewModel extends Notifier<ChartState> {
           ),
         );
         break;
-      case hvName:
+      case ChartType.hv:
         curve.data.add(
           FlSpot(
             time.millisecondsSinceEpoch.toDouble(),
@@ -84,7 +82,7 @@ class MainChartViewModel extends Notifier<ChartState> {
           ),
         );
         break;
-      case countsName:
+      case ChartType.counter:
         curve.data.add(
           FlSpot(
             time.millisecondsSinceEpoch.toDouble(),
@@ -92,41 +90,41 @@ class MainChartViewModel extends Notifier<ChartState> {
           ),
         );
         break;
-      case physValueAverage1:
+      case ChartType.averageValue0:
         curve.data.add(
           FlSpot(
             time.millisecondsSinceEpoch.toDouble(),
             device.indicationData?.measResults[0].averageValue ?? 0.0,
           ),
         );
-        curve.changeMeasUnit(_getMeasUnit(curveId, muService, device));
+        curve.changeMeasUnit(_getMeasUnit(chartType, muService, device));
         break;
-      case physValueCurrent1:
+      case ChartType.currentValue0:
         curve.data.add(
           FlSpot(
             time.millisecondsSinceEpoch.toDouble(),
             device.indicationData?.measResults[0].currentValue ?? 0.0,
           ),
         );
-        curve.changeMeasUnit(_getMeasUnit(curveId, muService, device));
+        curve.changeMeasUnit(_getMeasUnit(chartType, muService, device));
         break;
-      case physValueAverage2:
+      case ChartType.averageValue1:
         curve.data.add(
           FlSpot(
             time.millisecondsSinceEpoch.toDouble(),
             device.indicationData?.measResults[1].averageValue ?? 0.0,
           ),
         );
-        curve.changeMeasUnit(_getMeasUnit(curveId, muService, device));
+        curve.changeMeasUnit(_getMeasUnit(chartType, muService, device));
         break;
-      case physValueCurrent2:
+      case ChartType.currentValue1:
         curve.data.add(
           FlSpot(
             time.millisecondsSinceEpoch.toDouble(),
             device.indicationData?.measResults[1].currentValue ?? 0.0,
-          ),          
+          ),
         );
-        curve.changeMeasUnit(_getMeasUnit(curveId, muService, device));
+        curve.changeMeasUnit(_getMeasUnit(chartType, muService, device));
         break;
 
       default:
@@ -145,71 +143,77 @@ class MainChartViewModel extends Notifier<ChartState> {
   }
 
   MeasUnit? _getMeasUnit(
-    String curveId,
+    ChartType chartType,
     MeasUnitService muService,
     Device device,
   ) {
-    switch (curveId) {
-      case temperatureName:
-        return MeasUnit(
-          name: "°C",
-          coeff: 1,
-          offset: 0,
-          deviceMode: DeviceMode.density,
-          measMode: 0,
-          userCantDelete: false,
-        );
-      case hvName:
-        return MeasUnit(
-          name: "В",
-          coeff: 1,
-          offset: 0,
-          deviceMode: DeviceMode.density,
-          measMode: 0,
-          userCantDelete: false,
-        );
-      case countsName:
-        return MeasUnit(
-          name: "имп.",
-          coeff: 1,
-          offset: 0,
-          deviceMode: DeviceMode.density,
-          measMode: 0,
-          userCantDelete: false,
-        );
-      case physValueAverage1:
-      case physValueCurrent1:
+    switch (chartType) {
+      case ChartType.currentValue0:
+      case ChartType.averageValue0:
         return muService.getMeasUnitForMeasProc(
           device.indicationData?.measResults[0].measProcIndex ?? 0,
           device.deviceSettings?.deviceMode.index ?? 0,
         );
-      case physValueAverage2:
-      case physValueCurrent2:
+      case ChartType.currentValue1:
+      case ChartType.averageValue1:
         return muService.getMeasUnitForMeasProc(
           device.indicationData?.measResults[1].measProcIndex ?? 0,
           device.deviceSettings?.deviceMode.index ?? 0,
         );
+      default:
+        return null;
     }
-    return null;
   }
 
-  Color getColor(String curveId) {
-    switch (curveId) {
-      case temperatureName:
+  Color getColor(ChartType chartType) {
+    switch (chartType) {
+      case ChartType.temp:
         return Colors.black;
-      case hvName:
+      case ChartType.hv:
         return Colors.red;
-      case countsName:
+      case ChartType.counter:
         return Colors.brown;
-      case physValueAverage1:
+      case ChartType.averageValue0:
         return Colors.blue;
-      case physValueCurrent1:
+      case ChartType.currentValue0:
         return Colors.green;
-      case physValueAverage2:
+      case ChartType.averageValue1:
         return Colors.pink;
-      case physValueCurrent2:
+      case ChartType.currentValue1:
         return Colors.lightGreen;
+      default:
+        return Colors.black;
     }
-    return Colors.black;
+  }
+
+  String _getChartName(Device device, ChartType chartType) {
+    switch (chartType) {
+      case ChartType.aiCurrent0:
+        return "AI0, mA";
+      case ChartType.aiCurrent1:
+        return "AI1, mA";
+      case ChartType.aoCurrent0:
+        return "AO0, mA";
+      case ChartType.aoCurrent1:
+        return "AO1, mA";
+      case ChartType.counter:
+        return "Интенсивность, имп";
+      case ChartType.hv:
+        return "HV, В";
+      case ChartType.temp:
+        return "T, °C";
+      case ChartType.currentValue0:
+      case ChartType.averageValue0:
+        return getMeasModeForDevice(
+          device,
+          device.indicationData?.measResults[0],
+        );
+      case ChartType.currentValue1:
+      case ChartType.averageValue1:
+        return getMeasModeForDevice(
+          device,
+          device.indicationData?.measResults[1],
+        );
+    }
   }
 }

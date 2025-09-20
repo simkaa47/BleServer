@@ -1,7 +1,9 @@
 enum ChartType {
   counter,
-  currentValue,
-  averageValue,
+  currentValue0,
+  averageValue0,
+  currentValue1,
+  averageValue1,
   temp, 
   aiCurrent0,
   aiCurrent1,

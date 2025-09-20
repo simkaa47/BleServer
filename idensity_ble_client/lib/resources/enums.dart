@@ -1,6 +1,17 @@
+import 'package:idensity_ble_client/models/device.dart';
+import 'package:idensity_ble_client/models/indication/meas_result.dart';
+
 String getMeasMode(int deviceMode, intMeasMode) {
   final list = deviceMode == 0 ? densityMeasModes : levelmeterMeasModes;
   return getByIndexFromList(intMeasMode, list);  
+}
+
+String getMeasModeForDevice(Device device, MeasResult? measResult){
+  final int measProcIndex = measResult?.measProcIndex ?? 0;
+  final measMode = device.deviceSettings?.measProcesses[measProcIndex].measType ?? 0;
+  final devModeIndex = device.deviceSettings?.deviceMode.index ?? 0;
+  return getMeasMode(devModeIndex, measMode);
+
 }
 
 String getByIndexFromList(int index, List<String> list) {

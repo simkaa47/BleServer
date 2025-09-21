@@ -11,7 +11,7 @@ import 'package:idensity_ble_client/resources/enums.dart';
 import 'package:idensity_ble_client/services/meas_units/meas_unit_service.dart';
 
 class MainChartViewModel extends Notifier<ChartState> {
-  final List<CurveData> _curves = [];
+  final List<CurveData> _curves = [];  
 
   bool pointAdded = false;
 
@@ -51,7 +51,7 @@ class MainChartViewModel extends Notifier<ChartState> {
   ) {
     var curve =
         _curves
-            .where((c) => c.color == chartType && c.deviceName == device.name)
+            .where((c) => c.chartType == chartType && c.deviceName == device.name)
             .firstOrNull;
 
     if (curve == null) {

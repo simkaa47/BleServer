@@ -40,7 +40,7 @@ class LineChartSample12 extends ConsumerWidget {
                   lineBarsData:
                       chartState.data.map((curve) {
                         return LineChartBarData(
-                          spots: curve.data.map((p)=> FlSpot(p.x, p.y * (curve.measUnit?.coeff ?? 0.0) + (curve.measUnit?.offset ?? 0.0))).toList(),
+                          spots: curve.data.map((p)=> FlSpot(p.x, p.y * (curve.measUnit?.coeff ?? 1.0) + (curve.measUnit?.offset ?? 0.0))).toList(),
                           dotData: const FlDotData(show: false),
                           color: curve.color,
                           

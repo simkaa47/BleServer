@@ -1,10 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:idensity_ble_client/models/charts/chart_settings.dart';
 import 'package:idensity_ble_client/models/charts/chart_state.dart';
 import 'package:idensity_ble_client/models/connection_type.dart';
 import 'package:idensity_ble_client/models/device.dart';
 import 'package:idensity_ble_client/models/meas_units/meas_unit.dart';
 import 'package:idensity_ble_client/models/settings/meas_process.dart';
 import 'package:idensity_ble_client/services/bluetooth/ble_scan_service.dart';
+import 'package:idensity_ble_client/services/charts/charts_settings_service.dart';
 import 'package:idensity_ble_client/services/device_service.dart';
 import 'package:idensity_ble_client/services/ethernet/ethernet_scan_service.dart';
 import 'package:idensity_ble_client/services/meas_units/meas_unit_service.dart';
@@ -50,7 +52,10 @@ final deviceUpdateProvider = StreamProvider<Device>((ref) {
 });
 
 final chartViewModelProvider = NotifierProvider<MainChartViewModel, ChartState>(
-  () => MainChartViewModel(),
+  () {
+    final vm = MainChartViewModel();    
+    return vm;
+  },
 );
 
 final measUnitServiceProvider = FutureProvider<MeasUnitService>((ref) async {
@@ -66,17 +71,34 @@ final measUnitServiceProvider = FutureProvider<MeasUnitService>((ref) async {
   return service;
 });
 
+final chartSettingsServiceProvider = FutureProvider<ChartsSettingsService>((ref)async{
+  final deviceService = ref.read(deviceServiceProvider);
+  final service = ChartsSettingsService(deviceService: deviceService);
+  await service.init();
+  return service;
+});
+
+final chartSettingsStreamProvider = StreamProvider<List<ChartSettings>>((ref){
+  final serviceAsyncValue = ref.watch(chartSettingsServiceProvider);
+  if (serviceAsyncValue.hasValue) {
+    final service = serviceAsyncValue.value!;
+    return service.settingsStream;
+  }
+
+  if (serviceAsyncValue.isLoading) {
+    return const Stream.empty();
+  } else {
+    throw Exception('Error loading service');
+  }
+});
+
 final measUnitsStreamProvider = StreamProvider<List<MeasUnit>>((ref) {
   final serviceAsyncValue = ref.watch(measUnitServiceProvider);
-
-  // Проверяем, что значение готово
+  
   if (serviceAsyncValue.hasValue) {
     final service = serviceAsyncValue.value!;
     return service.measUnitsStream;
-  }
-
-  // Если еще не готово, то остаемся в состоянии загрузки
-  // (или ошибки)
+  }  
   if (serviceAsyncValue.isLoading) {
     return const Stream.empty();
   } else {

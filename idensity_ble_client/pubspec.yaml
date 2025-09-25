@@ -47,6 +47,7 @@ dependencies:
     git:
       url: https://github.com/Navideck/universal_ble
       ref: main
+  financial_chart: ^0.3.4
 
 
 dev_dependencies:

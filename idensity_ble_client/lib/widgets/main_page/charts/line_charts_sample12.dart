@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idensity_ble_client/models/charts/chart_state.dart';
+import 'package:idensity_ble_client/models/charts/curve_data.dart';
 import 'package:idensity_ble_client/models/providers/services_registration.dart';
 import 'package:idensity_ble_client/widgets/main_page/charts/app_colors.dart';
 import 'package:idensity_ble_client/widgets/main_page/charts/app_utils.dart';
@@ -14,10 +15,24 @@ class LineChartSample12 extends ConsumerWidget {
   final _transformationController = TransformationController();
   final bool _isPanEnabled = true;
   final bool _isScaleEnabled = true;
+  double minLeft = double.maxFinite;
+  double maxLeft = double.minPositive;
+  double minRight = double.maxFinite;
+  double maxRight = double.minPositive;
+  double rightDiff = 0;
+  double leftDiff = 0;
+  bool rightExists = false;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {    
+  Widget build(BuildContext context, WidgetRef ref) {
     final chartState = ref.watch(chartViewModelProvider);
+
+    minLeft = double.maxFinite;
+    maxLeft = double.negativeInfinity;
+    minRight = double.maxFinite;
+    maxRight = double.minPositive;
+    rightExists = false;
+    final charts = _getLinesCharts(chartState.data);
     return Column(
       spacing: 16,
       children: [
@@ -30,24 +45,14 @@ class LineChartSample12 extends ConsumerWidget {
                   scaleAxis: FlScaleAxis.free,
                   minScale: 1.0,
                   maxScale: 100,
-                  
+
                   panEnabled: _isPanEnabled,
                   scaleEnabled: _isScaleEnabled,
                   transformationController: _transformationController,
                 ),
 
                 LineChartData(
-                  lineBarsData:
-                      chartState.data.map((curve) {
-                        return LineChartBarData(
-                          spots: curve.data.map((p)=> FlSpot(p.x, p.y * (curve.measUnit?.coeff ?? 1.0) + (curve.measUnit?.offset ?? 0.0))).toList(),
-                          dotData: const FlDotData(show: false),
-                          color: curve.color,
-                          
-                          barWidth: 1,                          
-                        );
-                      }).toList(),
-
+                  lineBarsData: charts,
                   lineTouchData: LineTouchData(
                     touchSpotThreshold: 5,
                     getTouchLineStart: (_, __) => -double.infinity,
@@ -116,13 +121,20 @@ class LineChartSample12 extends ConsumerWidget {
                           (LineBarSpot barSpot) => AppColors.contentColorBlack,
                     ),
                   ),
+                  minY: minLeft - maxLeft * 0.1,
+                  maxY: maxLeft * 1.1,
                   titlesData: FlTitlesData(
                     show: true,
-                    rightTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
                     topTitles: const AxisTitles(
                       sideTitles: SideTitles(showTitles: false),
+                    ),
+                    rightTitles: AxisTitles(
+                      drawBelowEverything: true,
+                      sideTitles: SideTitles(showTitles: true, 
+                      reservedSize: 52, 
+                      getTitlesWidget: _getRightTitle,
+                      maxIncluded: false,
+                      minIncluded: false,),
                     ),
                     leftTitles: const AxisTitles(
                       drawBelowEverything: true,
@@ -163,6 +175,74 @@ class LineChartSample12 extends ConsumerWidget {
               state.data[0].data[0].x) /
           10;
     }
+  }
+
+
+  Widget _getRightTitle(double value, TitleMeta meta){
+    final modified = minRight + (value - minLeft) * rightDiff / leftDiff;
+    return Text(modified.toStringAsPrecision(5));
+  }
+
+  List<LineChartBarData> _getLinesCharts(List<CurveData> curves) {
+    final leftCharts =
+        curves.where((c) => !c.rightAxis).map((curve) {
+          return LineChartBarData(
+            spots: _getSpotsForCurve(curve),
+            dotData: const FlDotData(show: false),
+            color: curve.color,
+            barWidth: 1,
+          );
+        }).toList();
+
+    final rightCurves = curves.where((c) => c.rightAxis).toList();
+
+    if (rightCurves.isNotEmpty) {
+      rightExists = true;
+      for (var curve in rightCurves) {
+        for (var point in curve.data) {
+          if (point.y > maxRight) {
+            maxRight = point.y;
+          } else if (point.y < minRight) {
+            minRight = point.y;
+          }
+        }
+      }
+      leftDiff = maxLeft - minLeft;
+      rightDiff = maxRight - minRight;
+      final rightCharts =
+          curves.where((c) => c.rightAxis).map((curve) {
+            return LineChartBarData(
+              spots: _getSpotsForCurve(curve, right: true),
+              dotData: const FlDotData(show: false),
+              color: curve.color,
+              barWidth: 1,
+            );
+          }).toList();
+
+      return [...leftCharts, ...rightCharts];
+    }
+
+    return leftCharts;
+  }
+
+  List<FlSpot> _getSpotsForCurve(CurveData curve, {bool right = false}) {
+    return curve.data.map((p) {
+      if (!right) {
+        if (p.y > maxLeft) {
+          maxLeft = p.y;
+        }
+        if (p.y < minLeft) {
+          minLeft = p.y;
+        }
+      }
+      if (right) {
+        return FlSpot(
+          p.x,
+          minLeft + (p.y - minRight) * leftDiff / rightDiff,
+        );
+      }
+      return p;
+    }).toList();
   }
 
   Widget getTitlesWidget(double value, TitleMeta meta) {

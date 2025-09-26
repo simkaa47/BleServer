@@ -1,5 +1,4 @@
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idensity_ble_client/models/charts/chart_state.dart';
 import 'package:idensity_ble_client/models/charts/chart_type.dart';
@@ -10,7 +9,6 @@ import 'package:idensity_ble_client/models/meas_units/meas_unit.dart';
 import 'package:idensity_ble_client/models/providers/services_registration.dart';
 import 'package:idensity_ble_client/resources/enums.dart';
 import 'package:idensity_ble_client/services/meas_units/meas_unit_service.dart';
-import 'package:rxdart/rxdart.dart';
 
 class MainChartViewModel extends Notifier<ChartState> {
   final List<LogCellsList> _dataLogCells = [];
@@ -55,13 +53,22 @@ class MainChartViewModel extends Notifier<ChartState> {
                   )
                   .map((l) {
                     final settings = settingsMap[(l.deviceName, l.chartType)]!;
-
+                    final mu = _getMeasUnit(l.chartType, muService, device);
                     return CurveData(
                       deviceName: l.deviceName,
                       curveName: _getChartName(device, l.chartType),
                       chartType: l.chartType,
-                      data: l.data,
-                      measUnit: _getMeasUnit(l.chartType, muService, device),
+                      data:
+                          mu == null
+                              ? l.data
+                              : l.data
+                                  .map(
+                                    (p) =>
+                                        FlSpot(p.x, p.y * mu.coeff + mu.offset),
+                                  )
+                                  .toList(),
+                      measUnit: mu,
+                      rightAxis: settings.rightAxis,
                       color: settings.color,
                     );
                   })

@@ -8,6 +8,7 @@ class CurveData {
   final String curveName;
   final ChartType chartType;
   final Color color;
+  final bool rightAxis;
   final List<FlSpot> data;
   MeasUnit? measUnit;
 
@@ -17,7 +18,8 @@ class CurveData {
     required this.chartType,
     required this.data,
     required this.measUnit,
-    required this.color
+    required this.color,
+    this.rightAxis = false
   });
 
   changeMeasUnit(MeasUnit? newMeasInit){

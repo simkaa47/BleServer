@@ -1,12 +1,9 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:idensity_ble_client/models/charts/chart_state.dart';
 import 'package:idensity_ble_client/models/charts/curve_data.dart';
 import 'package:idensity_ble_client/models/providers/services_registration.dart';
-import 'package:idensity_ble_client/widgets/main_page/charts/app_colors.dart';
-import 'package:idensity_ble_client/widgets/main_page/charts/app_utils.dart';
-import 'package:idensity_ble_client/widgets/main_page/charts/color_extensions.dart';
+import 'package:idensity_ble_client/widgets/main_page/charts/curve_indicator.dart';
 import 'package:intl/intl.dart';
 
 class LineChartSample12 extends ConsumerWidget {
@@ -21,7 +18,7 @@ class LineChartSample12 extends ConsumerWidget {
   double maxRight = double.minPositive;
   double rightDiff = 0;
   double leftDiff = 0;
-  bool rightExists = false;
+  bool _rightExists = false;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -31,215 +28,230 @@ class LineChartSample12 extends ConsumerWidget {
     maxLeft = double.negativeInfinity;
     minRight = double.maxFinite;
     maxRight = double.minPositive;
-    rightExists = false;
+    _rightExists = false;
     final charts = _getLinesCharts(chartState.data);
-    return Column(
-      spacing: 16,
-      children: [
-        if (chartState.data.isNotEmpty)
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 0.0, right: 18.0),
-              child: LineChart(
-                transformationConfig: FlTransformationConfig(
-                  scaleAxis: FlScaleAxis.free,
-                  minScale: 1.0,
-                  maxScale: 100,
+    if (chartState.data.isNotEmpty) {
+      return Expanded(
+        child: Column(
+          spacing: 16,
+          children: [
+            Container(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Expanded(
+                    child: Column(
+                      children: [
+                        ...chartState.data
+                            .where((c) => !c.rightAxis)
+                            .map((c) => CurveIndicator(curve: c)),
+                      ],
+                    ),
+                  ),
+                  if (_rightExists)
+                    Expanded(
+                      child: Column(
+                        children: [
+                          ...chartState.data
+                              .where((c) => c.rightAxis)
+                              .map((c) => CurveIndicator(curve: c)),
+                        ],
+                      ),
+                    ),
+                  Container(
+                    margin: const EdgeInsets.all(2),
+                    child: IconButton.outlined(
+                      onPressed: () {},
+                      icon: const Icon(Icons.settings),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 0.0, right: 18.0),
+                child: LineChart(
+                  transformationConfig: FlTransformationConfig(
+                    scaleAxis: FlScaleAxis.free,
+                    minScale: 1.0,
+                    maxScale: 100,
 
-                  panEnabled: _isPanEnabled,
-                  scaleEnabled: _isScaleEnabled,
-                  transformationController: _transformationController,
-                ),
+                    panEnabled: _isPanEnabled,
+                    scaleEnabled: _isScaleEnabled,
+                    transformationController: _transformationController,
+                  ),
 
-                LineChartData(
-                  lineBarsData: charts,
-                  lineTouchData: LineTouchData(
-                    touchSpotThreshold: 5,
-                    getTouchLineStart: (_, __) => -double.infinity,
-                    getTouchLineEnd: (_, __) => double.infinity,
-                    getTouchedSpotIndicator: (
-                      LineChartBarData barData,
-                      List<int> spotIndexes,
-                    ) {
-                      return spotIndexes.map((spotIndex) {
-                        return TouchedSpotIndicatorData(
-                          const FlLine(
-                            color: AppColors.contentColorRed,
-                            strokeWidth: 1.5,
-                            dashArray: [8, 2],
-                          ),
-                          FlDotData(
-                            show: true,
-                            getDotPainter: (spot, percent, barData, index) {
-                              return FlDotCirclePainter(
-                                radius: 6,
-                                color: AppColors.contentColorYellow,
-                                strokeWidth: 0,
-                                strokeColor: AppColors.contentColorYellow,
-                              );
-                            },
-                          ),
-                        );
-                      }).toList();
-                    },
-                    touchTooltipData: LineTouchTooltipData(
-                      getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
-                        return touchedBarSpots.map((barSpot) {
-                          final price = barSpot.y;
-                          final date = DateTime.fromMillisecondsSinceEpoch(
-                            chartState.data[0].data[barSpot.barIndex].x.toInt(),
-                          );
-                          return LineTooltipItem(
-                            '',
-                            const TextStyle(
-                              color: AppColors.contentColorBlack,
-                              fontWeight: FontWeight.bold,
+                  LineChartData(
+                    lineBarsData: charts,
+
+                    lineTouchData: LineTouchData(
+                      touchSpotThreshold: 5,
+                      getTouchLineStart: (_, __) => -double.infinity,
+                      getTouchLineEnd: (_, __) => double.infinity,
+                      getTouchedSpotIndicator: (
+                        LineChartBarData barData,
+                        List<int> spotIndexes,
+                      ) {
+                        return spotIndexes.map((spotIndex) {
+                          return TouchedSpotIndicatorData(
+                            const FlLine(
+                              color: Colors.red,
+                              strokeWidth: 1,
+                              dashArray: [8, 2],
                             ),
-                            children: [
-                              TextSpan(
-                                text: '${date.year}/${date.month}/${date.day}',
-                                style: TextStyle(
-                                  color: AppColors.contentColorGreen.darken(20),
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 12,
-                                ),
-                              ),
-                              TextSpan(
-                                text:
-                                    '\n${AppUtils.getFormattedCurrency(context, price, noDecimals: true)}',
-                                style: const TextStyle(
-                                  color: AppColors.contentColorYellow,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ],
+                            FlDotData(
+                              show: true,
+                              getDotPainter: (spot, percent, barData, index) {
+                                return FlDotCirclePainter(
+                                  radius: 6,
+                                  color: Colors.yellow,
+                                  strokeWidth: 0,
+                                  strokeColor: Colors.amberAccent,
+                                );
+                              },
+                            ),
                           );
                         }).toList();
                       },
-                      getTooltipColor:
-                          (LineBarSpot barSpot) => AppColors.contentColorBlack,
-                    ),
-                  ),
-                  minY: minLeft - maxLeft * 0.1,
-                  maxY: maxLeft * 1.1,
-                  titlesData: FlTitlesData(
-                    show: true,
-                    topTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    rightTitles: AxisTitles(
-                      drawBelowEverything: true,
-                      sideTitles: SideTitles(showTitles: true, 
-                      reservedSize: 52, 
-                      getTitlesWidget: _getRightTitle,
-                      maxIncluded: false,
-                      minIncluded: false,),
-                    ),
-                    leftTitles: const AxisTitles(
-                      drawBelowEverything: true,
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        reservedSize: 52,
-                        
-                        maxIncluded: false,
-                        minIncluded: false,
+                      touchTooltipData: LineTouchTooltipData(
+                        fitInsideVertically: true,
+                        getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
+                          int i = 0;
+                          return touchedBarSpots.map((barSpot) {
+                            i++;
+                            final curve = chartState.data[barSpot.barIndex];
+                            final value = curve.data[barSpot.spotIndex].y;
+                            final date = DateTime.fromMillisecondsSinceEpoch(
+                              curve.data[barSpot.spotIndex].x.toInt(),
+                            );
+                            return LineTooltipItem(
+                              '',
+                              const TextStyle(fontWeight: FontWeight.bold),
+                              children: [
+                                if (i == 1)
+                                  TextSpan(
+                                    text: DateFormat("HH:mm:ss").format(date),
+                                  ),
+                                if (i == 1)
+                                  TextSpan(
+                                    text: '\n${value.toStringAsPrecision(5)}',
+                                    style: TextStyle(color: curve.color),
+                                  ),
+                                if (i != 1)
+                                  TextSpan(
+                                    text: value.toStringAsPrecision(5),
+                                    style: TextStyle(color: curve.color),
+                                  ),
+                              ],
+                            );
+                          }).toList();
+                        },
                       ),
                     ),
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        interval: null,
+                    minY: maxLeft - leftDiff * 1.1,
+                    maxY: minLeft + leftDiff * 1.1,
 
-                        reservedSize: 100,
-                        minIncluded: false,
-                        maxIncluded: false,
-                        getTitlesWidget: getTitlesWidget,
+                    titlesData: FlTitlesData(
+                      show: true,
+                      topTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
+                      rightTitles: AxisTitles(
+                        drawBelowEverything: true,
+                        sideTitles: SideTitles(
+                          showTitles: _rightExists,
+                          reservedSize: 52,
+                          getTitlesWidget: _getRightTitle,
+                          maxIncluded: false,
+                          minIncluded: false,
+                        ),
+                      ),
+                      leftTitles: const AxisTitles(
+                        drawBelowEverything: true,
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          reservedSize: 52,
+
+                          maxIncluded: false,
+                          minIncluded: false,
+                        ),
+                      ),
+                      bottomTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          interval: null,
+
+                          reservedSize: 100,
+                          minIncluded: false,
+                          maxIncluded: false,
+                          getTitlesWidget: getTitlesWidget,
+                        ),
                       ),
                     ),
                   ),
+                  duration: Duration.zero,
                 ),
-                duration: Duration.zero,
               ),
             ),
-          ),
-      ],
-    );
-  }
-
-  double getInterval(ChartState state) {
-    if (state.data[0].data.isEmpty)
-      return 30000000;
-    else {
-      return (state.data[0].data[state.data[0].data.length - 1].x -
-              state.data[0].data[0].x) /
-          10;
+          ],
+        ),
+      );
     }
+    return const Center(child: CircularProgressIndicator());
   }
 
-
-  Widget _getRightTitle(double value, TitleMeta meta){
+  Widget _getRightTitle(double value, TitleMeta meta) {
     final modified = minRight + (value - minLeft) * rightDiff / leftDiff;
     return Text(modified.toStringAsPrecision(5));
   }
 
   List<LineChartBarData> _getLinesCharts(List<CurveData> curves) {
-    final leftCharts =
-        curves.where((c) => !c.rightAxis).map((curve) {
-          return LineChartBarData(
-            spots: _getSpotsForCurve(curve),
-            dotData: const FlDotData(show: false),
-            color: curve.color,
-            barWidth: 1,
-          );
-        }).toList();
-
     final rightCurves = curves.where((c) => c.rightAxis).toList();
-
+    _getMinMaxValues(curves);
+    leftDiff = maxLeft - minLeft;
     if (rightCurves.isNotEmpty) {
-      rightExists = true;
-      for (var curve in rightCurves) {
-        for (var point in curve.data) {
-          if (point.y > maxRight) {
-            maxRight = point.y;
-          } else if (point.y < minRight) {
-            minRight = point.y;
+      _rightExists = true;
+
+      rightDiff = maxRight - minRight;
+    }
+
+    return curves.map((curve) {
+      return LineChartBarData(
+        spots: _getSpotsForCurve(curve),
+        dotData: const FlDotData(show: false),
+
+        color: curve.color,
+        barWidth: 1,
+      );
+    }).toList();
+  }
+
+  void _getMinMaxValues(List<CurveData> curves) {
+    for (var curve in curves) {
+      for (var p in curve.data) {
+        if (curve.rightAxis) {
+          if (p.y > maxRight) {
+            maxRight = p.y;
+          } else if (p.y < minRight) {
+            minRight = p.y;
+          }
+        } else {
+          if (p.y > maxLeft) {
+            maxLeft = p.y;
+          } else if (p.y < minLeft) {
+            minLeft = p.y;
           }
         }
       }
-      leftDiff = maxLeft - minLeft;
-      rightDiff = maxRight - minRight;
-      final rightCharts =
-          curves.where((c) => c.rightAxis).map((curve) {
-            return LineChartBarData(
-              spots: _getSpotsForCurve(curve, right: true),
-              dotData: const FlDotData(show: false),
-              color: curve.color,
-              barWidth: 1,
-            );
-          }).toList();
-
-      return [...leftCharts, ...rightCharts];
     }
-
-    return leftCharts;
   }
 
-  List<FlSpot> _getSpotsForCurve(CurveData curve, {bool right = false}) {
+  List<FlSpot> _getSpotsForCurve(CurveData curve) {
     return curve.data.map((p) {
-      if (!right) {
-        if (p.y > maxLeft) {
-          maxLeft = p.y;
-        }
-        if (p.y < minLeft) {
-          minLeft = p.y;
-        }
-      }
-      if (right) {
-        return FlSpot(
-          p.x,
-          minLeft + (p.y - minRight) * leftDiff / rightDiff,
-        );
+      if (curve.rightAxis) {
+        return FlSpot(p.x, minLeft + (p.y - minRight) * leftDiff / rightDiff);
       }
       return p;
     }).toList();
@@ -261,16 +273,10 @@ class LineChartSample12 extends ConsumerWidget {
                 width: 100,
                 height: 100,
                 margin: const EdgeInsets.symmetric(horizontal: 10),
-                child:
-                    dateMax.hour != dateMin.hour
-                        ? Text(
-                          DateFormat('dd.MM.yyyy HH:mm:ss').format(date),
-                          style: const TextStyle(fontSize: 12),
-                        )
-                        : Text(
-                          DateFormat('HH:mm:ss').format(date),
-                          style: const TextStyle(fontSize: 12),
-                        ),
+                child: Text(
+                  _getDateFormat(date, dateMin, dateMax),
+                  style: const TextStyle(fontSize: 12),
+                ),
               ),
             ),
           ],
@@ -278,36 +284,14 @@ class LineChartSample12 extends ConsumerWidget {
       ),
     );
   }
-}
 
-class _ChartTitle extends StatelessWidget {
-  const _ChartTitle();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(height: 14),
-        Text(
-          'Bitcoin Price History',
-          style: TextStyle(
-            color: AppColors.contentColorYellow,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
-        ),
-        Text(
-          '2023/12/19 - 2024/12/17',
-          style: TextStyle(
-            color: AppColors.contentColorGreen,
-            fontWeight: FontWeight.bold,
-            fontSize: 14,
-          ),
-        ),
-        SizedBox(height: 14),
-      ],
-    );
+  String _getDateFormat(DateTime date, DateTime min, DateTime max) {
+    if (max.isBefore(min.add(const Duration(minutes: 5)))) {
+      return DateFormat("HH:mm:ss").format(date);
+    } else if (max.isBefore(min.add(const Duration(days: 1)))) {
+      return DateFormat("HH:mm").format(date);
+    }
+    return DateFormat("dd.MM.yyyy HH:mm").format(date);
   }
 }
 

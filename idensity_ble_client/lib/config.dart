@@ -1,0 +1,1 @@
+const String kDE = String.fromEnvironment('DE', defaultValue: 'with');

@@ -3,8 +3,22 @@ import 'package:idensity_ble_client/models/meas_units/meas_unit.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 class MeasUnitRepository extends Repository {
+   static const String measUnitsTableName = "MeasUnits";
+   static const String initializeDatabaseCommand = '''
+    CREATE TABLE $measUnitsTableName (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT,
+        coeff REAL,
+        offset REAL,
+        deviceMode INTEGER,
+        measMode INTEGER,
+        userCantDelete INTEGER
+    )
+    ''';
+   
+
   Future<void> loadMeasUnits(List<MeasUnit> measUnits) async {
-    final db = await getDatabase();
+    final db = await getDatabase(measUnitsTableName, initializeDatabaseCommand);
 
     for (final unit in measUnits) {
       try {
@@ -21,7 +35,7 @@ class MeasUnitRepository extends Repository {
   }
 
   Future<void> addMeasUnit(MeasUnit unit) async {
-    final db = await getDatabase();
+    final db = await getDatabase(measUnitsTableName, initializeDatabaseCommand);
     await db.insert(
       measUnitsTableName,
       unit.toMap(),
@@ -32,7 +46,7 @@ class MeasUnitRepository extends Repository {
 
   Future<List<MeasUnit>> getMeasUnits() async {
     try {
-      final db = await getDatabase();
+      final db = await getDatabase(measUnitsTableName, initializeDatabaseCommand);
       final List<Map<String, dynamic>> maps = await db.query(
         measUnitsTableName,
       );
@@ -47,7 +61,7 @@ class MeasUnitRepository extends Repository {
 
   Future<bool> deleteMeasUnit(MeasUnit unit) async {
     if (unit.id == null) return false;
-    final db = await getDatabase();
+    final db = await getDatabase(measUnitsTableName, initializeDatabaseCommand);
     await db.delete(
       measUnitsTableName,
       // Используем 'where' для указания условия удаления

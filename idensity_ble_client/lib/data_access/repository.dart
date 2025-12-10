@@ -1,14 +1,14 @@
 import 'dart:developer';
 import 'dart:io';
+import 'package:idensity_ble_client/services/path/path_provider.dart';
 import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 abstract class Repository {
-  final String measUnitsTableName = "MeasUnits";
+ 
   final String databaseName = "idensity.db";
-Future<Database> getDatabase() async {
-    final Directory appDocumentsDir =  Platform.isLinux ? Directory("/home/Documents/") :  await getApplicationDocumentsDirectory();
+Future<Database> getDatabase(String databaseName, String initializeDatabaseCommand) async {
+    final Directory appDocumentsDir =  await getLocalApplicationDocumentsDirectory();
     final String path = join(appDocumentsDir.path, databaseName);
     log("Начинаем открывать БД");    
     databaseFactory = databaseFactoryFfi;
@@ -17,18 +17,7 @@ Future<Database> getDatabase() async {
       options: OpenDatabaseOptions(
         version: 1,
         onCreate: (db, version) async {
-          print("On crerate db");
-          await db.execute('''
-    CREATE TABLE $measUnitsTableName (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT,
-        coeff REAL,
-        offset REAL,
-        deviceMode INTEGER,
-        measMode INTEGER,
-        userCantDelete INTEGER
-    )
-    ''');
+          await db.execute(initializeDatabaseCommand);
         },
       ),
     );

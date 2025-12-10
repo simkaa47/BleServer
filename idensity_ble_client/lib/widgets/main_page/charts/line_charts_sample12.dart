@@ -35,39 +35,37 @@ class LineChartSample12 extends ConsumerWidget {
         child: Column(
           spacing: 16,
           children: [
-            Container(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Expanded(
+                  child: Column(
+                    children: [
+                      ...chartState.data
+                          .where((c) => !c.rightAxis)
+                          .map((c) => CurveIndicator(curve: c)),
+                    ],
+                  ),
+                ),
+                if (_rightExists)
                   Expanded(
                     child: Column(
                       children: [
                         ...chartState.data
-                            .where((c) => !c.rightAxis)
+                            .where((c) => c.rightAxis)
                             .map((c) => CurveIndicator(curve: c)),
                       ],
                     ),
                   ),
-                  if (_rightExists)
-                    Expanded(
-                      child: Column(
-                        children: [
-                          ...chartState.data
-                              .where((c) => c.rightAxis)
-                              .map((c) => CurveIndicator(curve: c)),
-                        ],
-                      ),
-                    ),
-                  Container(
-                    margin: const EdgeInsets.all(2),
-                    child: IconButton.outlined(
-                      onPressed: () {},
-                      icon: const Icon(Icons.settings),
-                    ),
+                Container(
+                  margin: const EdgeInsets.all(2),
+                  child: IconButton.outlined(
+                    onPressed: () {},
+                    icon: const Icon(Icons.settings),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
             Expanded(
               child: Padding(

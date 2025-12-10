@@ -36,7 +36,7 @@ class DeviceService {
           askDevices();
         }        
         _devicesController.add(List.from(_currentDevices));
-        _connections.add(Connection(newDevice.connectionSettings));
+        _connections.add(Connection(newDevice.connectionSettings, name: newDevice.name),);
         debugPrint(
           'Устройство добавлено: ${newDevice.name}. Текущих устройств: ${_currentDevices.length}',
         );
@@ -69,7 +69,7 @@ class DeviceService {
         for (var i = 0; i < devicesToUpdate.length; i++) {
           final device = devicesToUpdate[i];
           var connection =
-              _connections.where((c) => c.name == c.name).firstOrNull;
+              _connections.where((c) => c.name == device.name).firstOrNull;
           if (connection != null) {
             // Получаем новые данные для устройства
             final newIndicationData = await _getIndicationData(connection);

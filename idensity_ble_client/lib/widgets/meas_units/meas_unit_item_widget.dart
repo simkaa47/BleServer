@@ -85,7 +85,8 @@ class MeasUnitItemWidget extends StatelessWidget {
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            duration: const Duration(seconds: 3),
+                            persist: false,
+                            duration: const Duration(seconds: 3),                            
                             content: Text(
                               'Единица измерения "${measUnit.name}" удалена!',
                             ),

@@ -18,6 +18,7 @@ class MainChartViewModel extends Notifier<ChartState> {
   @override
   ChartState build() {
     final deviceAsyncState = ref.watch(deviceUpdateProvider);
+    final deviceService = ref.read(deviceServiceProvider);
     final measUnitServiceAsyncState = ref.watch(measUnitServiceProvider);
     final selectMeasUnitsAsyncValue = ref.watch(
       changeMeasUnitSelectingProvider,
@@ -53,7 +54,7 @@ class MainChartViewModel extends Notifier<ChartState> {
                   )
                   .map((l) {
                     final settings = settingsMap[(l.deviceName, l.chartType)]!;
-                    final mu = _getMeasUnit(l.chartType, muService, device);
+                    final mu = _getMeasUnit(l.chartType, muService, l.deviceName, deviceService.devices);
                     return CurveData(
                       deviceName: l.deviceName,
                       curveName: _getChartName(device, l.chartType),
@@ -170,8 +171,15 @@ class MainChartViewModel extends Notifier<ChartState> {
   MeasUnit? _getMeasUnit(
     ChartType chartType,
     MeasUnitService muService,
-    Device device,
+    String deviceName,
+    List<Device> devices
   ) {
+    final device = devices.where((d)=> d.name == deviceName).firstOrNull;
+
+    if(device == null) {
+      return null;
+    }
+
     switch (chartType) {
       case ChartType.currentValue0:
       case ChartType.averageValue0:

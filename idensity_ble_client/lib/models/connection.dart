@@ -4,12 +4,12 @@ import 'package:idensity_ble_client/models/connection_type.dart';
 import 'package:universal_ble/universal_ble.dart';
 
 class Connection {
-  Connection(this.connectionSettings);
+  Connection(this.connectionSettings, {required this.name});
 
   BluetoothConnection? _bluetoothConnection;
   BluetoothConnection? get bluetoothConnection => _bluetoothConnection;
   ConnectionSettings connectionSettings;
-  String name = "";
+  final String name;
 
   dispose() async {
     await _bluetoothConnection?.dispose();

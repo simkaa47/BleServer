@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idensity_ble_client/models/charts/curve_data.dart';
 import 'package:idensity_ble_client/models/providers/services_registration.dart';
 import 'package:idensity_ble_client/widgets/main_page/charts/curve_indicator.dart';
+import 'package:idensity_ble_client/widgets/main_page/charts/edit_charts_settings_widget.dart';
 import 'package:intl/intl.dart';
 
 class LineChartSample12 extends ConsumerWidget {
@@ -61,7 +62,14 @@ class LineChartSample12 extends ConsumerWidget {
                 Container(
                   margin: const EdgeInsets.all(2),
                   child: IconButton.outlined(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (ctx) => EditChartsSettingsWidget(),
+                        ),
+                      );
+                    },
                     icon: const Icon(Icons.settings),
                   ),
                 ),

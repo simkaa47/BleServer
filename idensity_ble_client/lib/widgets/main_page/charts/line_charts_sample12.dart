@@ -31,50 +31,50 @@ class LineChartSample12 extends ConsumerWidget {
     maxRight = double.minPositive;
     _rightExists = false;
     final charts = _getLinesCharts(chartState.data);
-    if (chartState.data.isNotEmpty) {
-      return Expanded(
-        child: Column(
-          spacing: 16,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
+    return Expanded(
+      child: Column(
+        spacing: 16,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Expanded(
+                child: Column(
+                  children: [
+                    ...chartState.data
+                        .where((c) => !c.rightAxis)
+                        .map((c) => CurveIndicator(curve: c)),
+                  ],
+                ),
+              ),
+              if (_rightExists)
                 Expanded(
                   child: Column(
                     children: [
                       ...chartState.data
-                          .where((c) => !c.rightAxis)
+                          .where((c) => c.rightAxis)
                           .map((c) => CurveIndicator(curve: c)),
                     ],
                   ),
                 ),
-                if (_rightExists)
-                  Expanded(
-                    child: Column(
-                      children: [
-                        ...chartState.data
-                            .where((c) => c.rightAxis)
-                            .map((c) => CurveIndicator(curve: c)),
-                      ],
-                    ),
-                  ),
-                Container(
-                  margin: const EdgeInsets.all(2),
-                  child: IconButton.outlined(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (ctx) => EditChartsSettingsWidget(),
-                        ),
-                      );
-                    },
-                    icon: const Icon(Icons.settings),
-                  ),
+              Container(
+                margin: const EdgeInsets.all(2),
+                child: IconButton.outlined(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (ctx) => const EditChartsSettingsWidget(),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.settings),
                 ),
-              ],
-            ),
+              ),
+            ],
+          ),
+          if (chartState.data.isNotEmpty)
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.only(top: 0.0, right: 18.0),
@@ -201,10 +201,9 @@ class LineChartSample12 extends ConsumerWidget {
                 ),
               ),
             ),
-          ],
-        ),
-      );
-    }
+        ],
+      ),
+    );
     return const Center(child: CircularProgressIndicator());
   }
 

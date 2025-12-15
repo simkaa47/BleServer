@@ -36,8 +36,9 @@ class EditChartsSettingsWidget extends ConsumerWidget {
           itemBuilder: (context, index) {
             final setting = chartSettingsList[index];
             return ChartSettingsItem(
-              service: chartServiceAsyncValue.value!,
+              settingsService: chartServiceAsyncValue.value!,
               settings: setting,
+              deviceService: deviceService,
             );
           },
         );

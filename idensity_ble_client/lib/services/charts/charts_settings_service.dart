@@ -35,9 +35,26 @@ class ChartsSettingsService {
       await _chartSettingsRepository.add(setts);
       _settings = await _chartSettingsRepository.getSettings();
     } catch (e) {
-      debugPrint("Ошибка при добавлении настроек графиков в БД - $e");
+      throw("Ошибка при добавлении настроек графиков в БД - $e");
     } finally {
       _stateController.add(_settings);
     }
   }
+
+
+  Future<void> editSettings(ChartSettings setts) async {
+    try {
+      await _chartSettingsRepository.add(setts);     
+    } catch (e) {
+      throw("Ошибка при редактировании настроек графиков в БД - $e");
+    } finally {
+      _stateController.add(_settings);
+    }
+  }
+
+
+
+
+
+
 }

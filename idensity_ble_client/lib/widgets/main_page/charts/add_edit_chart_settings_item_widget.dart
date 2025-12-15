@@ -38,6 +38,9 @@ class _AddEditChartSettingsItemWidgetState
     _chartType = widget.chartSettings?.chartType ?? ChartType.counter;
     _isRightAxis = widget.chartSettings?.rightAxis ?? false;
     _selectedColor = widget.chartSettings?.color ?? Colors.transparent;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _formKey.currentState?.validate();
+    });
   }
 
   Future<void> _submitData() async {
@@ -73,6 +76,18 @@ class _AddEditChartSettingsItemWidgetState
 
   @override
   Widget build(BuildContext context) {
+    final deviceNamesItems =
+        widget.deviceNames
+            .map(
+              (item) => DropdownMenuItem<String>(
+                value: item,
+                child: Text(
+                  item,
+                  style: const TextStyle(fontWeight: FontWeight.normal),
+                ),
+              ),
+            )
+            .toList();
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       child: Padding(
@@ -83,27 +98,25 @@ class _AddEditChartSettingsItemWidgetState
             children: [
               const SizedBox(height: 20),
               DropdownButtonFormField(
-                initialValue: _deviceName,
-                items:
-                    widget.deviceNames
-                        .map(
-                          (item) => DropdownMenuItem<String>(
-                            value: item,
-                            child: Text(
-                              item,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.normal,
-                              ),
-                            ),
-                          ),
-                        )
-                        .toList(),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Пожалуйста, введите ID прибора';
+                  }
+                  return null;
+                },
+
+                initialValue:
+                    widget.deviceNames.isEmpty ||
+                            _deviceName == null ||
+                            !widget.deviceNames.contains(_deviceName)
+                        ? null
+                        : _deviceName,
+                items: deviceNamesItems,
                 onChanged: (value) {
-                  setState(() {
-                    if (value != null) {
-                      _deviceName = value;
-                    }
-                  });
+                  if (value != null) {
+                    _deviceName = value;
+                  }
+                  _formKey.currentState?.validate();
                 },
                 decoration: const InputDecoration(label: Text("ID прибора")),
               ),

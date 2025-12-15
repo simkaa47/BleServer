@@ -25,7 +25,7 @@ class _ChartSettingsItemState extends State<ChartSettingsItem> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      child: ListTile(
+      child: ListTile(        
         onLongPress: () {
           showModalBottomSheet(
                   context: context,

@@ -52,6 +52,20 @@ class ChartsSettingsService {
     }
   }
 
+  Future<void> deleteSettings(ChartSettings setts)async{
+    
+    try {
+      if(await _chartSettingsRepository.delete(setts)){
+        _settings.remove(setts);        
+      }
+
+    } catch (e) {
+      throw("Ошибка при удалении настроек графиков в БД - $e");
+    } finally {
+      _stateController.add(_settings);
+    }
+  }
+
 
 
 

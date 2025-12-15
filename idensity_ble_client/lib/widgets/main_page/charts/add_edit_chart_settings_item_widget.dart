@@ -167,7 +167,7 @@ class _AddEditChartSettingsItemWidgetState
                 onChanged: (value) {
                   setState(() {
                     if (value != null) {
-                      final selectedIndex = chartNames.indexOf(value);
+                      final selectedIndex = _axis.indexOf(value);
                       _isRightAxis = selectedIndex != 0;
                     }
                   });

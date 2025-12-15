@@ -21,7 +21,9 @@ class DrawerItem extends StatelessWidget {
       selected: currentRouteName == routeName || (routeName != "/home" && currentRouteName.startsWith(routeName)),
       onTap: () {                        
         if (currentRouteName != routeName) {
-           Navigator.of(context).pop();
+          if(Navigator.canPop(context)){
+              Navigator.of(context).pop();
+          }          
           context.go(routeName);
         }
       },

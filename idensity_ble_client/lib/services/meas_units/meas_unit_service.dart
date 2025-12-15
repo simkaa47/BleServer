@@ -6,7 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:idensity_ble_client/data_access/meas_unit_repository.dart';
 import 'package:idensity_ble_client/models/meas_units/meas_unit.dart';
 import 'package:idensity_ble_client/models/meas_units/meas_unit_seed.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:idensity_ble_client/services/path/path_provider.dart';
 import 'package:rxdart/rxdart.dart';
 
 class MeasUnitService {
@@ -20,7 +20,7 @@ class MeasUnitService {
 
   // Журнал ЕИ
   Future<String> get _measUnitSelectingPath async {
-    final Directory directory =  Platform.isLinux ? Directory("/home/Documents/") :  await getApplicationDocumentsDirectory();
+    final Directory directory =  Platform.isLinux ? Directory("/home/Documents/") :  await getLocalApplicationDocumentsDirectory();
     return directory.path;
   }
 

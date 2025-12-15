@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:idensity_ble_client/config.dart';
 import 'package:idensity_ble_client/models/bluetooth/bluetooth_connection.dart';
 import 'package:idensity_ble_client/models/device.dart';
 import 'package:idensity_ble_client/models/scan_result.dart';
@@ -30,9 +31,10 @@ class BleScanService implements ScanService {
 
   @override
   Future<void> startScan({required int duration}) async {
+    debugPrint("DE = $kDE");
     results.clear();
     _stateController.add(ScanState.scanning);
-    log('Scanning for devices...');
+    debugPrint('Scanning for devices...');
     var services = [BluetoothConnection.serviceUuid];
     UniversalBle.timeout = const Duration(seconds: 15);
     subscription = UniversalBle.scanStream.listen((BleDevice bleDevice) {

@@ -13,198 +13,197 @@ class LineChartSample12 extends ConsumerWidget {
   final _transformationController = TransformationController();
   final bool _isPanEnabled = true;
   final bool _isScaleEnabled = true;
-  double minLeft = double.maxFinite;
-  double maxLeft = double.minPositive;
-  double minRight = double.maxFinite;
-  double maxRight = double.minPositive;
+  double minLeft = 0;
+  double maxLeft = 0;
+  double minRight = 0;
+  double maxRight = 0;
   double rightDiff = 0;
   double leftDiff = 0;
   bool _rightExists = false;
+  bool _leftExists = false;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final chartState = ref.watch(chartViewModelProvider);
 
-    minLeft = double.maxFinite;
-    maxLeft = double.negativeInfinity;
-    minRight = double.maxFinite;
-    maxRight = double.minPositive;
+    minLeft = 0;
+    maxLeft = 0;
+    minRight = 0;
+    maxRight = 0;
     _rightExists = false;
+    _leftExists = false;
     final charts = _getLinesCharts(chartState.data);
-    return Expanded(
-      child: Column(
-        spacing: 16,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
+    return Column(
+      spacing: 16,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Expanded(
+              child: Column(
+                children: [
+                  ...chartState.data
+                      .where((c) => !c.rightAxis)
+                      .map((c) => CurveIndicator(curve: c)),
+                ],
+              ),
+            ),
+            if (_rightExists)
               Expanded(
                 child: Column(
                   children: [
                     ...chartState.data
-                        .where((c) => !c.rightAxis)
+                        .where((c) => c.rightAxis)
                         .map((c) => CurveIndicator(curve: c)),
                   ],
                 ),
               ),
-              if (_rightExists)
-                Expanded(
-                  child: Column(
-                    children: [
-                      ...chartState.data
-                          .where((c) => c.rightAxis)
-                          .map((c) => CurveIndicator(curve: c)),
-                    ],
-                  ),
-                ),
-              Container(
-                margin: const EdgeInsets.all(2),
-                child: IconButton.outlined(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (ctx) => const EditChartsSettingsWidget(),
-                      ),
-                    );
-                  },
-                  icon: const Icon(Icons.settings),
-                ),
+            Container(
+              margin: const EdgeInsets.all(2),
+              child: IconButton.outlined(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (ctx) => const EditChartsSettingsWidget(),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.settings),
               ),
-            ],
-          ),
-          if (chartState.data.isNotEmpty)
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 0.0, right: 18.0),
-                child: LineChart(
-                  transformationConfig: FlTransformationConfig(
-                    scaleAxis: FlScaleAxis.free,
-                    minScale: 1.0,
-                    maxScale: 100,
+            ),
+          ],
+        ),
+        if (chartState.data.isNotEmpty)
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 0.0, right: 18.0),
+              child: LineChart(
+                transformationConfig: FlTransformationConfig(
+                  scaleAxis: FlScaleAxis.free,
+                  minScale: 1.0,
+                  maxScale: 100,
 
-                    panEnabled: _isPanEnabled,
-                    scaleEnabled: _isScaleEnabled,
-                    transformationController: _transformationController,
-                  ),
+                  panEnabled: _isPanEnabled,
+                  scaleEnabled: _isScaleEnabled,
+                  transformationController: _transformationController,
+                ),
 
-                  LineChartData(
-                    lineBarsData: charts,
+                LineChartData(
+                  lineBarsData: charts,
 
-                    lineTouchData: LineTouchData(
-                      touchSpotThreshold: 5,
-                      getTouchLineStart: (_, __) => -double.infinity,
-                      getTouchLineEnd: (_, __) => double.infinity,
-                      getTouchedSpotIndicator: (
-                        LineChartBarData barData,
-                        List<int> spotIndexes,
-                      ) {
-                        return spotIndexes.map((spotIndex) {
-                          return TouchedSpotIndicatorData(
-                            const FlLine(
-                              color: Colors.red,
-                              strokeWidth: 1,
-                              dashArray: [8, 2],
-                            ),
-                            FlDotData(
-                              show: true,
-                              getDotPainter: (spot, percent, barData, index) {
-                                return FlDotCirclePainter(
-                                  radius: 6,
-                                  color: Colors.yellow,
-                                  strokeWidth: 0,
-                                  strokeColor: Colors.amberAccent,
-                                );
-                              },
-                            ),
+                  lineTouchData: LineTouchData(
+                    touchSpotThreshold: 5,
+                    getTouchLineStart: (_, __) => -double.infinity,
+                    getTouchLineEnd: (_, __) => double.infinity,
+                    getTouchedSpotIndicator: (
+                      LineChartBarData barData,
+                      List<int> spotIndexes,
+                    ) {
+                      return spotIndexes.map((spotIndex) {
+                        return TouchedSpotIndicatorData(
+                          const FlLine(
+                            color: Colors.red,
+                            strokeWidth: 1,
+                            dashArray: [8, 2],
+                          ),
+                          FlDotData(
+                            show: true,
+                            getDotPainter: (spot, percent, barData, index) {
+                              return FlDotCirclePainter(
+                                radius: 6,
+                                color: Colors.yellow,
+                                strokeWidth: 0,
+                                strokeColor: Colors.amberAccent,
+                              );
+                            },
+                          ),
+                        );
+                      }).toList();
+                    },
+                    touchTooltipData: LineTouchTooltipData(
+                      fitInsideVertically: true,
+                      getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
+                        int i = 0;
+                        return touchedBarSpots.map((barSpot) {
+                          i++;
+                          final curve = chartState.data[barSpot.barIndex];
+                          final value = curve.data[barSpot.spotIndex].y;
+                          final date = DateTime.fromMillisecondsSinceEpoch(
+                            curve.data[barSpot.spotIndex].x.toInt(),
+                          );
+                          return LineTooltipItem(
+                            '',
+                            const TextStyle(fontWeight: FontWeight.bold),
+                            children: [
+                              if (i == 1)
+                                TextSpan(
+                                  text: DateFormat("HH:mm:ss").format(date),
+                                ),
+                              if (i == 1)
+                                TextSpan(
+                                  text: '\n${value.toStringAsPrecision(5)}',
+                                  style: TextStyle(color: curve.color),
+                                ),
+                              if (i != 1)
+                                TextSpan(
+                                  text: value.toStringAsPrecision(5),
+                                  style: TextStyle(color: curve.color),
+                                ),
+                            ],
                           );
                         }).toList();
                       },
-                      touchTooltipData: LineTouchTooltipData(
-                        fitInsideVertically: true,
-                        getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
-                          int i = 0;
-                          return touchedBarSpots.map((barSpot) {
-                            i++;
-                            final curve = chartState.data[barSpot.barIndex];
-                            final value = curve.data[barSpot.spotIndex].y;
-                            final date = DateTime.fromMillisecondsSinceEpoch(
-                              curve.data[barSpot.spotIndex].x.toInt(),
-                            );
-                            return LineTooltipItem(
-                              '',
-                              const TextStyle(fontWeight: FontWeight.bold),
-                              children: [
-                                if (i == 1)
-                                  TextSpan(
-                                    text: DateFormat("HH:mm:ss").format(date),
-                                  ),
-                                if (i == 1)
-                                  TextSpan(
-                                    text: '\n${value.toStringAsPrecision(5)}',
-                                    style: TextStyle(color: curve.color),
-                                  ),
-                                if (i != 1)
-                                  TextSpan(
-                                    text: value.toStringAsPrecision(5),
-                                    style: TextStyle(color: curve.color),
-                                  ),
-                              ],
-                            );
-                          }).toList();
-                        },
+                    ),
+                  ),
+                  minY: (_leftExists ? (maxLeft - leftDiff) : (maxRight - rightDiff)) * 1.1,
+                  maxY: (_leftExists ? (maxLeft + leftDiff) : (maxRight + rightDiff)) * 1.1,
+
+                  titlesData: FlTitlesData(
+                    show: true,
+                    topTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    rightTitles: AxisTitles(
+                      drawBelowEverything: true,
+                      sideTitles: SideTitles(
+                        showTitles: _rightExists,
+                        reservedSize: 52,
+                        getTitlesWidget: _getRightTitle,
+                        maxIncluded: false,
+                        minIncluded: false,
                       ),
                     ),
-                    minY: maxLeft - leftDiff * 1.1,
-                    maxY: minLeft + leftDiff * 1.1,
+                    leftTitles: const AxisTitles(
+                      drawBelowEverything: true,
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: 52,
 
-                    titlesData: FlTitlesData(
-                      show: true,
-                      topTitles: const AxisTitles(
-                        sideTitles: SideTitles(showTitles: false),
+                        maxIncluded: false,
+                        minIncluded: false,
                       ),
-                      rightTitles: AxisTitles(
-                        drawBelowEverything: true,
-                        sideTitles: SideTitles(
-                          showTitles: _rightExists,
-                          reservedSize: 52,
-                          getTitlesWidget: _getRightTitle,
-                          maxIncluded: false,
-                          minIncluded: false,
-                        ),
-                      ),
-                      leftTitles: const AxisTitles(
-                        drawBelowEverything: true,
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          reservedSize: 52,
+                    ),
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        interval: null,
 
-                          maxIncluded: false,
-                          minIncluded: false,
-                        ),
-                      ),
-                      bottomTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          interval: null,
-
-                          reservedSize: 100,
-                          minIncluded: false,
-                          maxIncluded: false,
-                          getTitlesWidget: getTitlesWidget,
-                        ),
+                        reservedSize: 100,
+                        minIncluded: false,
+                        maxIncluded: false,
+                        getTitlesWidget: getTitlesWidget,
                       ),
                     ),
                   ),
-                  duration: Duration.zero,
                 ),
+                duration: Duration.zero,
               ),
             ),
-        ],
-      ),
-    );
-    return const Center(child: CircularProgressIndicator());
+          ),
+      ],
+    );   
   }
 
   Widget _getRightTitle(double value, TitleMeta meta) {
@@ -214,6 +213,7 @@ class LineChartSample12 extends ConsumerWidget {
 
   List<LineChartBarData> _getLinesCharts(List<CurveData> curves) {
     final rightCurves = curves.where((c) => c.rightAxis).toList();
+    _leftExists = curves.any((c)=> !c.rightAxis);
     _getMinMaxValues(curves);
     leftDiff = maxLeft - minLeft;
     if (rightCurves.isNotEmpty) {
@@ -222,15 +222,18 @@ class LineChartSample12 extends ConsumerWidget {
       rightDiff = maxRight - minRight;
     }
 
-    return curves.map((curve) {
-      return LineChartBarData(
-        spots: _getSpotsForCurve(curve),
-        dotData: const FlDotData(show: false),
+    final charts =
+        curves.map((curve) {
+          return LineChartBarData(
+            spots: _getSpotsForCurve(curve),
+            dotData: const FlDotData(show: false),
 
-        color: curve.color,
-        barWidth: 1,
-      );
-    }).toList();
+            color: curve.color,
+            barWidth: 1,
+          );
+        }).toList();
+
+    return charts;
   }
 
   void _getMinMaxValues(List<CurveData> curves) {
@@ -254,12 +257,18 @@ class LineChartSample12 extends ConsumerWidget {
   }
 
   List<FlSpot> _getSpotsForCurve(CurveData curve) {
-    return curve.data.map((p) {
-      if (curve.rightAxis) {
-        return FlSpot(p.x, minLeft + (p.y - minRight) * leftDiff / rightDiff);
-      }
-      return p;
-    }).toList();
+    return curve.data
+        .map((p) {
+          if (curve.rightAxis) {
+            return FlSpot(
+              p.x,
+              minLeft + (p.y - minRight) * leftDiff / rightDiff,
+            );
+          }
+          return p;
+        })
+        .where((p) => p.y != double.infinity && p.y != double.negativeInfinity)
+        .toList();
   }
 
   Widget getTitlesWidget(double value, TitleMeta meta) {

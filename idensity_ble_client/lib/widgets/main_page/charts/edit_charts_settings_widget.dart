@@ -137,8 +137,11 @@ class EditChartsSettingsWidget extends ConsumerWidget {
 
   Widget _getBackground(DismissDirection direction) {
     return Container(
-      color: Colors.red,      
-      alignment: direction == DismissDirection.startToEnd ?  Alignment.centerLeft : Alignment.centerRight,
+      color: Colors.red,
+      alignment:
+          direction == DismissDirection.startToEnd
+              ? Alignment.centerLeft
+              : Alignment.centerRight,
       padding: const EdgeInsets.only(left: 20, right: 20),
       child: const Icon(Icons.delete, color: Colors.white, size: 30),
     );

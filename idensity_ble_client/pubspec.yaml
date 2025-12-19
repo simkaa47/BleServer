@@ -49,6 +49,7 @@ dependencies:
       ref: main
   financial_chart: ^0.3.4
   flutter_colorpicker: ^1.1.0
+  syncfusion_flutter_charts: ^32.1.19
 
 
 dev_dependencies:

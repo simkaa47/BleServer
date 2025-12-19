@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:idensity_ble_client/widgets/main_page/charts/line_charts_sample12.dart';
+import 'package:idensity_ble_client/widgets/main_page/charts/main_real_time_widget.dart';
 import 'package:idensity_ble_client/widgets/main_page/main_indication_widget.dart';
 
 class MainPageWidget extends StatelessWidget {
@@ -13,7 +14,7 @@ class MainPageWidget extends StatelessWidget {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Expanded(flex: 1, child: LineChartSample12()),
+              const Expanded(flex: 1, child: MainRealTimeWidget()),
               Expanded(
                 flex: 1,
                 child: Container(
@@ -27,7 +28,7 @@ class MainPageWidget extends StatelessWidget {
           return Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Expanded(flex: 1, child: LineChartSample12()),
+              const Expanded(flex: 1, child: MainRealTimeWidget()),
               Expanded(
                 flex: 1,
                 child: Container(

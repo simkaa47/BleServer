@@ -12,6 +12,8 @@ class ChartsSettingsService {
   final DeviceService deviceService;
   List<ChartSettings> _settings = [];
 
+  List<ChartSettings> get settings => _settings;
+
   final StreamController<List<ChartSettings>> _stateController =
       BehaviorSubject<List<ChartSettings>>();
 

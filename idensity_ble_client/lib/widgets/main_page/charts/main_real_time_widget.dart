@@ -26,6 +26,12 @@ class _MainRealTimeWidgetState extends ConsumerState<MainRealTimeWidget> {
   late AsyncValue<List<Device>> _devicesAsyncValue;
   late AsyncValue<MeasUnitService> _measUnitServiceAsyncState;
 
+  List<_ChartLine> get _leftLines =>
+      _chartLines.values.where((l) => !l.isRight).toList();
+
+  List<_ChartLine> get _rightLines =>
+      _chartLines.values.where((l) => l.isRight).toList();
+
   @override
   void initState() {
     _zoomPanBehavior = ZoomPanBehavior(
@@ -64,7 +70,6 @@ class _MainRealTimeWidgetState extends ConsumerState<MainRealTimeWidget> {
       children: [
         Padding(
           padding: const EdgeInsets.all(16.0),
-
           child: SfCartesianChart(
             key: ValueKey('$_hasLeftAxis-$_hasRightAxis'),
             // Включаем сглаживание для отрисовки
@@ -78,7 +83,7 @@ class _MainRealTimeWidgetState extends ConsumerState<MainRealTimeWidget> {
             ),
 
             primaryYAxis: const NumericAxis(isVisible: false),
-            axes: _buildAxes(),            
+            axes: _buildAxes(),
 
             series:
                 _chartLines.entries.map((entry) {
@@ -108,7 +113,8 @@ class _MainRealTimeWidgetState extends ConsumerState<MainRealTimeWidget> {
           bottom: 0,
           right: 0,
           child: IconButton(
-            iconSize: 50,
+            iconSize: 40,
+             tooltip: 'Настройки',
             onPressed: () {
               Navigator.push(
                 context,
@@ -121,27 +127,72 @@ class _MainRealTimeWidgetState extends ConsumerState<MainRealTimeWidget> {
           ),
         ),
         Positioned(
-          top: 20,
-          right: 20,
+          bottom: 0,
+          left: 0,
           child: Container(
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surface.withOpacity(0.7),
               borderRadius: BorderRadius.circular(8),
             ),
             child: IconButton(
-              iconSize: 50,
+              iconSize: 40,
               icon: const Icon(Icons.zoom_out_map),
               onPressed: () => _zoomPanBehavior.reset(),
               tooltip: 'Сбросить зум',
             ),
           ),
         ),
+        Positioned(top: 12, left: 12, child: _buildOverlayLegend(_leftLines)),
+        Positioned(top: 12, right: 12, child: _buildOverlayLegend(_rightLines)),
       ],
     );
 
     return _isChartSettingsNotReady()
         ? const Center(child: CircularProgressIndicator())
         : chart;
+  }
+
+  Widget _buildOverlayLegend(List<_ChartLine> lines) {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: Colors.white.withAlpha(160),
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: const [BoxShadow(blurRadius: 6, color: Colors.black26)],
+      ),
+      child: _buildLegendColumn(lines),
+    );
+  }
+
+  Widget _buildLegendColumn(List<_ChartLine> lines) {
+    if (lines.isEmpty) return const SizedBox();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 6),
+        ...lines.map((line) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 10,
+                  height: 10,
+                  decoration: BoxDecoration(
+                    color: line.color,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Text(line.name, style: const TextStyle(fontSize: 11)),
+              ],
+            ),
+          );
+        }),
+      ],
+    );
   }
 
   _addData(Device device) {
@@ -265,6 +316,7 @@ class _MainRealTimeWidgetState extends ConsumerState<MainRealTimeWidget> {
 
       if (_chartLines.containsKey(lineId)) {
         _chartLines[lineId]!.isRight = setting.rightAxis;
+        _chartLines[lineId]!.color = setting.color;
         continue;
       }
 
@@ -408,12 +460,12 @@ class _ChartData {
 class _ChartLine {
   final List<_ChartData> points;
   final String name;
-  final Color color;
+  Color color;
   MeasUnit? measUnit;
   bool isRight;
   _ChartLine({
     required this.name,
-    required this.color,
+    this.color = Colors.black,
     required this.points,
     this.isRight = false,
   });

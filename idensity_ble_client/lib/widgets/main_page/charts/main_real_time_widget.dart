@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idensity_ble_client/models/charts/chart_settings.dart';
 import 'package:idensity_ble_client/models/charts/chart_type.dart';
 import 'package:idensity_ble_client/models/device.dart';
+import 'package:idensity_ble_client/models/meas_units/meas_unit.dart';
 import 'package:idensity_ble_client/models/providers/services_registration.dart';
 import 'package:idensity_ble_client/resources/enums.dart';
+import 'package:idensity_ble_client/services/meas_units/meas_unit_service.dart';
 import 'package:idensity_ble_client/widgets/main_page/charts/edit_charts_settings_widget.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -22,6 +24,7 @@ class _MainRealTimeWidgetState extends ConsumerState<MainRealTimeWidget> {
   late ZoomPanBehavior _zoomPanBehavior;
   late AsyncValue<List<ChartSettings>> _chartSettingsAsyncState;
   late AsyncValue<List<Device>> _devicesAsyncValue;
+  late AsyncValue<MeasUnitService> _measUnitServiceAsyncState;
 
   @override
   void initState() {
@@ -48,6 +51,13 @@ class _MainRealTimeWidgetState extends ConsumerState<MainRealTimeWidget> {
     });
     _chartSettingsAsyncState = ref.watch(chartSettingsStreamProvider);
     _devicesAsyncValue = ref.watch(devicesStreamProvider);
+    _measUnitServiceAsyncState = ref.watch(measUnitServiceProvider);
+    ref.listen(changeMeasUnitSelectingProvider, (previous, next) {
+      next.whenData((update) {
+        _updateMeasUnits();
+      });
+    });
+
     _rebuild();
 
     final chart = Stack(
@@ -79,7 +89,10 @@ class _MainRealTimeWidgetState extends ConsumerState<MainRealTimeWidget> {
                     key: ValueKey(entry.value.name),
                     dataSource: entry.value.points,
                     xValueMapper: (data, _) => data.x,
-                    yValueMapper: (data, _) => data.y,
+                    yValueMapper:
+                        (data, _) =>
+                            data.y * (entry.value.measUnit?.coeff ?? 1) +
+                            (entry.value.measUnit?.offset ?? 0),
                     color: entry.value.color,
                     animationDuration: 0,
                   );
@@ -229,9 +242,14 @@ class _MainRealTimeWidgetState extends ConsumerState<MainRealTimeWidget> {
   }
 
   void _rebuild() {
-    if (_isChartSettingsNotReady() || !_devicesAsyncValue.hasValue) return;
+    if (_isChartSettingsNotReady() ||
+        !_devicesAsyncValue.hasValue ||
+        !_measUnitServiceAsyncState.hasValue) {
+      return;
+    }
 
     final devices = _devicesAsyncValue.value!;
+    final muService = _measUnitServiceAsyncState.value!;
     final chartSettings = _chartSettingsAsyncState.value!;
     final dt = DateTime.now();
 
@@ -243,11 +261,18 @@ class _MainRealTimeWidgetState extends ConsumerState<MainRealTimeWidget> {
       if (_chartLines.containsKey(lineId)) continue;
 
       if (devices.any((d) => d.name == setting.deviceName)) {
-        _chartLines[lineId] = _ChartLine(
+        final line = _ChartLine(
           name: lineId,
           color: setting.color,
           points: [_ChartData(dt, 0)],
         );
+        line.measUnit = _getMeasUnit(
+          setting.chartType,
+          muService,
+          setting.deviceName,
+          devices,
+        );
+        _chartLines[lineId] = line;
         _controllers[lineId] = null;
       }
     }
@@ -275,6 +300,64 @@ class _MainRealTimeWidgetState extends ConsumerState<MainRealTimeWidget> {
         _chartSettingsAsyncState.hasError ||
         _chartSettingsAsyncState.isLoading;
   }
+
+  _updateMeasUnits() {
+    if (_isChartSettingsNotReady() ||
+        !_devicesAsyncValue.hasValue ||
+        !_measUnitServiceAsyncState.hasValue) {
+      return;
+    }
+
+    final devices = _devicesAsyncValue.value!;
+    final chartSettings = _chartSettingsAsyncState.value!;
+    final muService = _measUnitServiceAsyncState.value!;
+    setState(() {
+      for (var setting in chartSettings) {
+        final lineId =
+            "${setting.deviceName}:${getByIndexFromList(setting.chartType.index, chartNames)}";
+
+        if (_chartLines.containsKey(lineId)) {
+          final line = _chartLines[lineId];
+          line!.measUnit = _getMeasUnit(
+            setting.chartType,
+            muService,
+            setting.deviceName,
+            devices,
+          );
+        }
+      }
+    });
+  }
+
+  MeasUnit? _getMeasUnit(
+    ChartType chartType,
+    MeasUnitService muService,
+    String deviceName,
+    List<Device> devices,
+  ) {
+    final device = devices.where((d) => d.name == deviceName).firstOrNull;
+
+    if (device == null) {
+      return null;
+    }
+
+    switch (chartType) {
+      case ChartType.currentValue0:
+      case ChartType.averageValue0:
+        return muService.getMeasUnitForMeasProc(
+          device.indicationData?.measResults[0].measProcIndex ?? 0,
+          device.deviceSettings?.deviceMode.index ?? 0,
+        );
+      case ChartType.currentValue1:
+      case ChartType.averageValue1:
+        return muService.getMeasUnitForMeasProc(
+          device.indicationData?.measResults[1].measProcIndex ?? 0,
+          device.deviceSettings?.deviceMode.index ?? 0,
+        );
+      default:
+        return null;
+    }
+  }
 }
 
 class _ChartData {
@@ -287,6 +370,7 @@ class _ChartLine {
   final List<_ChartData> points;
   final String name;
   final Color color;
+  MeasUnit? measUnit;
 
   _ChartLine({required this.name, required this.color, required this.points});
 }

@@ -66,6 +66,7 @@ class _MainRealTimeWidgetState extends ConsumerState<MainRealTimeWidget> {
           padding: const EdgeInsets.all(16.0),
 
           child: SfCartesianChart(
+            key: ValueKey('$_hasLeftAxis-$_hasRightAxis'),
             // Включаем сглаживание для отрисовки
             enableSideBySideSeriesPlacement: false,
             zoomPanBehavior: _zoomPanBehavior,
@@ -76,7 +77,8 @@ class _MainRealTimeWidgetState extends ConsumerState<MainRealTimeWidget> {
               enableAutoIntervalOnZooming: false,
             ),
 
-            primaryYAxis: const NumericAxis(axisLine: AxisLine(width: 0)),
+            primaryYAxis: const NumericAxis(isVisible: false),
+            axes: _buildAxes(),            
 
             series:
                 _chartLines.entries.map((entry) {
@@ -86,7 +88,10 @@ class _MainRealTimeWidgetState extends ConsumerState<MainRealTimeWidget> {
                         (controller) => {
                           _controllers[entry.value.name] = controller,
                         },
-                    key: ValueKey(entry.value.name),
+                    key: ValueKey(
+                      "${entry.value.name}_${entry.value.isRight ? 'right' : 'left'}",
+                    ),
+                    yAxisName: entry.value.isRight ? 'right' : 'left',
                     dataSource: entry.value.points,
                     xValueMapper: (data, _) => data.x,
                     yValueMapper:
@@ -258,11 +263,15 @@ class _MainRealTimeWidgetState extends ConsumerState<MainRealTimeWidget> {
       final lineId =
           "${setting.deviceName}:${getByIndexFromList(setting.chartType.index, chartNames)}";
 
-      if (_chartLines.containsKey(lineId)) continue;
+      if (_chartLines.containsKey(lineId)) {
+        _chartLines[lineId]!.isRight = setting.rightAxis;
+        continue;
+      }
 
       if (devices.any((d) => d.name == setting.deviceName)) {
         final line = _ChartLine(
           name: lineId,
+          isRight: setting.rightAxis,
           color: setting.color,
           points: [_ChartData(dt, 0)],
         );
@@ -291,6 +300,36 @@ class _MainRealTimeWidgetState extends ConsumerState<MainRealTimeWidget> {
       return !exists;
     });
   }
+
+  List<ChartAxis> _buildAxes() {
+    final axes = <ChartAxis>[];
+
+    if (_hasLeftAxis) {
+      axes.add(
+        const NumericAxis(
+          name: 'left',
+          opposedPosition: false,
+          axisLine: AxisLine(width: 0),
+        ),
+      );
+    }
+
+    if (_hasRightAxis) {
+      axes.add(
+        const NumericAxis(
+          name: 'right',
+          opposedPosition: true,
+          axisLine: AxisLine(width: 0),
+        ),
+      );
+    }
+
+    return axes;
+  }
+
+  bool get _hasLeftAxis => _chartLines.values.any((l) => !l.isRight);
+
+  bool get _hasRightAxis => _chartLines.values.any((l) => l.isRight);
 
   String _getLineName(Device device, ChartType type) =>
       "${device.name}:${getByIndexFromList(type.index, chartNames)}";
@@ -371,6 +410,11 @@ class _ChartLine {
   final String name;
   final Color color;
   MeasUnit? measUnit;
-
-  _ChartLine({required this.name, required this.color, required this.points});
+  bool isRight;
+  _ChartLine({
+    required this.name,
+    required this.color,
+    required this.points,
+    this.isRight = false,
+  });
 }

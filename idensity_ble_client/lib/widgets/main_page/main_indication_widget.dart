@@ -14,6 +14,7 @@ class MainIndicationWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final deviceService = ref.read(deviceServiceProvider);
+    
     return StreamBuilder<List<Device>>(
       stream: deviceService.devicesStream,
       builder: (context, snapshot) {

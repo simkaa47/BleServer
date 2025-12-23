@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idensity_ble_client/models/charts/chart_settings.dart';
-import 'package:idensity_ble_client/models/charts/chart_state.dart';
 import 'package:idensity_ble_client/models/connection_type.dart';
 import 'package:idensity_ble_client/models/device.dart';
 import 'package:idensity_ble_client/models/meas_units/meas_unit.dart';
@@ -12,7 +11,6 @@ import 'package:idensity_ble_client/services/ethernet/ethernet_scan_service.dart
 import 'package:idensity_ble_client/services/meas_units/meas_unit_service.dart';
 import 'package:idensity_ble_client/services/modbus/modbus_service.dart';
 import 'package:idensity_ble_client/services/scan_service.dart';
-import 'package:idensity_ble_client/viewModels/main_chart_view_model.dart';
 
 final scanServiceProvider = Provider.family
     .autoDispose<ScanService, ConnectionType>((ref, conType) {
@@ -50,13 +48,6 @@ final deviceUpdateProvider = StreamProvider<Device>((ref) {
   // Возвращаем стрим, который будет слушать этот провайдер.
   return service.updateStream;
 });
-
-final chartViewModelProvider = NotifierProvider<MainChartViewModel, ChartState>(
-  () {
-    final vm = MainChartViewModel();    
-    return vm;
-  },
-);
 
 final measUnitServiceProvider = FutureProvider<MeasUnitService>((ref) async {
   final service = MeasUnitService();

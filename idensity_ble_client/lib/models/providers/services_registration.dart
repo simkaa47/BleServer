@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:idensity_ble_client/data_access/DataLogCells/data_log_cells_repository_provider.dart';
 import 'package:idensity_ble_client/models/charts/chart_settings.dart';
 import 'package:idensity_ble_client/models/connection_type.dart';
 import 'package:idensity_ble_client/models/device.dart';
@@ -33,7 +34,8 @@ final connectionTypeProvider = StateProvider<ConnectionType>(
 );
 
 final deviceServiceProvider = Provider<DeviceService>((ref) {
-  final service = DeviceService();
+  final repo = ref.read(dataLogCellsRepositoryProvider);
+  final service = DeviceService(logCellRepository: repo);
   ref.onDispose(() => service.dispose());
   return service;
 });

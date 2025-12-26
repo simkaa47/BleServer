@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:idensity_ble_client/widgets/main_page/charts/main_real_time_widget.dart';
+import 'package:idensity_ble_client/widgets/main_page/charts/main_chart.dart';
 import 'package:idensity_ble_client/widgets/main_page/main_indication_widget.dart';
 
 class MainPageWidget extends StatelessWidget {
@@ -7,7 +7,7 @@ class MainPageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final chart = const MainRealTimeWidget();
+    final chart = const MainChart();
     final indication = const MainIndicationWidget();
     return OrientationBuilder(
       builder: (context, orientation) {

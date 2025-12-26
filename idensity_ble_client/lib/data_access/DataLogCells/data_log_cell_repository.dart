@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:idensity_ble_client/data_access/app_database.dart';
+import 'package:idensity_ble_client/models/charts/chart_type.dart';
 
 class DataLogCellRepository {
   final AppDatabase db;
@@ -32,5 +33,31 @@ class DataLogCellRepository {
   Future<int> deleteOlderThan(DateTime dt) {
     return (db.delete(db.dataLogCells)
       ..where((t) => t.dt.isSmallerThanValue(dt))).go();
+  }
+
+  Future<List<DataLogCell>> getHistory({
+    required String deviceName,
+    required ChartType chartType,
+    DateTime? from,
+    DateTime? to,
+  }) {
+    final query =
+        db.select(db.dataLogCells)
+          ..where(
+            (t) =>
+                t.deviceName.equals(deviceName) &
+                t.chartType.equals(chartType.index),
+          )
+          ..orderBy([(t) => OrderingTerm(expression: t.dt)]);
+
+    if (from != null) {
+      query.where((t) => t.dt.isBiggerOrEqualValue(from));
+    }
+
+    if (to != null) {
+      query.where((t) => t.dt.isSmallerOrEqualValue(to));
+    }
+
+    return query.get();
   }
 }

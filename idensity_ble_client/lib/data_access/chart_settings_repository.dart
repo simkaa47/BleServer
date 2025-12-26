@@ -51,4 +51,6 @@ class ChartSettingsRepository extends Repository {
     return true;
   }
 
+  
+
 }

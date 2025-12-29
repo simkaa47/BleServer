@@ -1,12 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idensity_ble_client/data_access/DataLogCells/data_log_cells_repository_provider.dart';
+import 'package:idensity_ble_client/data_access/common_settings/app_settings_providers.dart';
 import 'package:idensity_ble_client/models/charts/chart_line.dart';
 import 'package:idensity_ble_client/models/charts/line_point.dart';
 import 'package:idensity_ble_client/models/providers/services_registration.dart';
 import 'package:idensity_ble_client/widgets/main_page/charts/chart_helpers.dart';
 
-class ChartInitController extends AsyncNotifier<Map<String, ChartLine>> {
-  static const _timeWindow = Duration(seconds: 600);
+class ChartInitController extends AsyncNotifier<Map<String, ChartLine>> {  
 
   @override
   Future<Map<String, ChartLine>> build() async {
@@ -14,7 +14,9 @@ class ChartInitController extends AsyncNotifier<Map<String, ChartLine>> {
     final chartSettings = await ref.watch(chartSettingsStreamProvider.future);
     final devices = await ref.watch(devicesStreamProvider.future);
     final muService = await ref.watch(measUnitServiceProvider.future);
-
+    final settings = await ref.watch(appSettingsProvider.future);
+    final window = settings.chartWindow;
+   
     final repo = ref.read(dataLogCellsRepositoryProvider);
 
     final now = DateTime.now();
@@ -27,7 +29,7 @@ class ChartInitController extends AsyncNotifier<Map<String, ChartLine>> {
       final history = await repo.getHistory(
         deviceName: s.deviceName,
         chartType: s.chartType,
-        from: now.subtract(_timeWindow),
+        from: now.subtract(window),
         to: now,
       );
 

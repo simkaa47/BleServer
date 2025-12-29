@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:idensity_ble_client/data_access/common_settings/app_settings_providers.dart';
 import 'package:idensity_ble_client/models/charts/chart_line.dart';
 import 'package:idensity_ble_client/models/charts/line_point.dart';
 import 'package:idensity_ble_client/models/device.dart';
 import 'package:idensity_ble_client/models/providers/services_registration.dart';
+import 'package:idensity_ble_client/models/settings/app_settings.dart';
 import 'package:idensity_ble_client/widgets/main_page/charts/chart_helpers.dart';
 import 'package:idensity_ble_client/widgets/main_page/charts/chart_init_provider.dart';
 import 'package:idensity_ble_client/widgets/main_page/charts/charts_overlay_legend.dart';
@@ -24,12 +26,13 @@ class _MainChartState extends ConsumerState<ConsumerStatefulWidget> {
   final Map<String, ChartSeriesController?> _controllers = {};
   Map<String, ChartLine> _chartLines = {};
   late final ZoomPanBehavior _zoomPanBehavior;
+  AppSettings? _settings;
 
   @override
   void initState() {
     super.initState();
 
-     _zoomPanBehavior = ZoomPanBehavior(
+    _zoomPanBehavior = ZoomPanBehavior(
       enablePanning: true,
       enableDirectionalZooming: true,
       enablePinching: true,
@@ -37,7 +40,6 @@ class _MainChartState extends ConsumerState<ConsumerStatefulWidget> {
       enableMouseWheelZooming: true,
       enableSelectionZooming: true,
     );
-
 
     ref.listenManual<AsyncValue<Device>>(deviceUpdateProvider, (prev, next) {
       next.whenData(_addData);
@@ -47,6 +49,14 @@ class _MainChartState extends ConsumerState<ConsumerStatefulWidget> {
       next.whenData((update) {
         _updateMeasUnits();
       });
+    });
+
+    ref.listenManual<AppSettings?>(appSettingsProvider.select((a) => a.value), (
+      _,
+      next,
+    ) {
+      if (next == null) return;
+      _settings = next;
     });
   }
 
@@ -142,11 +152,7 @@ class _MainChartState extends ConsumerState<ConsumerStatefulWidget> {
             ),
           ),
         ),
-        Positioned(
-          top: 12,
-          left: 12,
-          child: ChartsOverlayLegend(lines: left),
-        ),
+        Positioned(top: 12, left: 12, child: ChartsOverlayLegend(lines: left)),
         Positioned(
           top: 12,
           right: 12,
@@ -156,7 +162,7 @@ class _MainChartState extends ConsumerState<ConsumerStatefulWidget> {
     );
   }
 
-   List<ChartAxis> _buildAxes(bool hasLeft, bool hasRight) {
+  List<ChartAxis> _buildAxes(bool hasLeft, bool hasRight) {
     final axes = <ChartAxis>[];
 
     if (hasLeft) {
@@ -191,27 +197,30 @@ class _MainChartState extends ConsumerState<ConsumerStatefulWidget> {
       return;
     }
     final devicesAsyncValue = ref.read(devicesStreamProvider);
-    if(!devicesAsyncValue.hasValue){
+    if (!devicesAsyncValue.hasValue) {
       return;
     }
-    final devices = devicesAsyncValue.value!;    
+    final devices = devicesAsyncValue.value!;
     final muService = muServiceAsyncState.value!;
     setState(() {
       for (var line in state.values) {
         line.measUnit = ChartHelpers.getMeasUnit(
-            line.chartType,
-            muService,
-            line.deviceName,
-            devices,
-          );
+          line.chartType,
+          muService,
+          line.deviceName,
+          devices,
+        );
       }
     });
   }
 
   _addData(Device device) {
+    if (_settings == null) {
+      return;
+    }
     final state = ref.read(chartInitProvider).value;
     if (state == null) return;
-
+    final cutoff = DateTime.now().subtract(_settings!.chartWindow);
     for (final line in state.values) {
       if (line.deviceName != device.name) continue;
 
@@ -222,7 +231,23 @@ class _MainChartState extends ConsumerState<ConsumerStatefulWidget> {
       final value = ChartHelpers.getValueFromDevice(device, line.chartType);
 
       line.points.add(LinePoint(dt, value));
-      controller.updateDataSource(addedDataIndex: line.points.length - 1);
+
+      final removed = _trimOldPoints(line, cutoff);
+      controller.updateDataSource(
+        addedDataIndex: line.points.length - 1,
+        removedDataIndex: removed > 0 ? 0 : -1,
+      );
     }
+  }
+
+  int _trimOldPoints(ChartLine line, DateTime cutoff) {
+    int removed = 0;
+
+    while (line.points.isNotEmpty && line.points.first.x.isBefore(cutoff)) {
+      line.points.removeAt(0);
+      removed++;
+    }
+
+    return removed;
   }
 }

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:idensity_ble_client/models/charts/chart_type.dart';
 
 class ChartSettings {
   ChartSettings({
-    this.id,
+    this.id,    
     required this.color,
     required this.deviceName,
     required this.chartType,
@@ -15,37 +14,8 @@ class ChartSettings {
   bool rightAxis = false;
   Color color;
   String deviceName = "";
-  ChartType chartType;
-
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'rightAxis': rightAxis ? 1 : 0,
-      'color': color.toHexString(),
-      'deviceName': deviceName,
-      'chartType': chartType.index,
-    };
-  }
-
-  static ChartSettings fromMap(Map<String, dynamic> map) {
-    return ChartSettings(
-      id: map['id'],
-      rightAxis: map['rightAxis'] != 0,
-      color: _getColorFromString(map['color']),
-      deviceName: map['deviceName'],
-      chartType: ChartType.values[map['chartType']],
-    );
-  }
-
-  ChartSettings getCopy() {
-    return ChartSettings(
-      color: color,
-      deviceName: deviceName,
-      chartType: chartType,
-      rightAxis: rightAxis,
-    );
-  }
-
+  ChartType chartType;  
+ 
   ChartSettings.withDefaults()
     : this(
         chartType: ChartType.counter,
@@ -53,7 +23,7 @@ class ChartSettings {
         deviceName: "",
       );
 
-  static _getColorFromString(
+  static getColorFromString(
     String hexColor, {
     Color defaultColor = Colors.transparent,
   }) {

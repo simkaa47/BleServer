@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:idensity_ble_client/data_access/chart_setting/chart_setting_table_rows.dart';
 import 'package:idensity_ble_client/data_access/common_settings/common_settings.dart';
 import 'package:idensity_ble_client/data_access/meas_units/meas_unit_rows.dart';
 import 'package:path/path.dart' as p;
@@ -13,14 +14,15 @@ part 'app_database.g.dart';
   tables: [
     DataLogCells,
     MeasUnitRows,
-    CommonSettings
+    CommonSettings,
+    ChartSettingTableRows
   ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
    @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -33,6 +35,9 @@ class AppDatabase extends _$AppDatabase {
           }
           if(from < 3){
             await m.createTable(measUnitRows);
+          }
+          if(from < 4){
+           await m.createTable(chartSettingTableRows);
           }
           
         },

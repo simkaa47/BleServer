@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:idensity_ble_client/data_access/chart_setting/chart_settings_repository_provider.dart';
 import 'package:idensity_ble_client/data_access/data_log_cells/data_log_cells_repository_provider.dart';
 import 'package:idensity_ble_client/data_access/meas_units/meas_units_repository_provider.dart';
 import 'package:idensity_ble_client/models/charts/chart_settings.dart';
@@ -66,14 +67,20 @@ final measUnitServiceProvider = FutureProvider<MeasUnitService>((ref) async {
   return service;
 });
 
-final chartSettingsServiceProvider = FutureProvider<ChartsSettingsService>((ref)async{
+final chartSettingsServiceProvider = FutureProvider<ChartsSettingsService>((
+  ref,
+) async {
   final deviceService = ref.read(deviceServiceProvider);
-  final service = ChartsSettingsService(deviceService: deviceService);
+  final repo = ref.read(chartSettingsRepositoryProvider);
+  final service = ChartsSettingsService(
+    deviceService: deviceService,
+    chartSettingsRepository: repo,
+  );
   await service.init();
   return service;
 });
 
-final chartSettingsStreamProvider = StreamProvider<List<ChartSettings>>((ref){
+final chartSettingsStreamProvider = StreamProvider<List<ChartSettings>>((ref) {
   final serviceAsyncValue = ref.watch(chartSettingsServiceProvider);
   if (serviceAsyncValue.hasValue) {
     final service = serviceAsyncValue.value!;
@@ -89,11 +96,11 @@ final chartSettingsStreamProvider = StreamProvider<List<ChartSettings>>((ref){
 
 final measUnitsStreamProvider = StreamProvider<List<MeasUnit>>((ref) {
   final serviceAsyncValue = ref.watch(measUnitServiceProvider);
-  
+
   if (serviceAsyncValue.hasValue) {
     final service = serviceAsyncValue.value!;
     return service.measUnitsStream;
-  }  
+  }
   if (serviceAsyncValue.isLoading) {
     return const Stream.empty();
   } else {
@@ -153,5 +160,3 @@ final changeMeasUnitSelectingProvider = StreamProvider<Map<String, int>>((ref) {
     throw Exception('Error loading service');
   }
 });
-
-

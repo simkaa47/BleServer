@@ -1075,12 +1075,373 @@ class CommonSettingsCompanion extends UpdateCompanion<CommonSetting> {
   }
 }
 
+class $ChartSettingTableRowsTable extends ChartSettingTableRows
+    with TableInfo<$ChartSettingTableRowsTable, ChartSettingTableRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ChartSettingTableRowsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _colorMeta = const VerificationMeta('color');
+  @override
+  late final GeneratedColumn<String> color = GeneratedColumn<String>(
+    'color',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deviceNameMeta = const VerificationMeta(
+    'deviceName',
+  );
+  @override
+  late final GeneratedColumn<String> deviceName = GeneratedColumn<String>(
+    'device_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _chartTypeMeta = const VerificationMeta(
+    'chartType',
+  );
+  @override
+  late final GeneratedColumn<int> chartType = GeneratedColumn<int>(
+    'chart_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _rightAxisMeta = const VerificationMeta(
+    'rightAxis',
+  );
+  @override
+  late final GeneratedColumn<bool> rightAxis = GeneratedColumn<bool>(
+    'right_axis',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("right_axis" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    color,
+    deviceName,
+    chartType,
+    rightAxis,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'chart_setting_table_rows';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ChartSettingTableRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('color')) {
+      context.handle(
+        _colorMeta,
+        color.isAcceptableOrUnknown(data['color']!, _colorMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_colorMeta);
+    }
+    if (data.containsKey('device_name')) {
+      context.handle(
+        _deviceNameMeta,
+        deviceName.isAcceptableOrUnknown(data['device_name']!, _deviceNameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_deviceNameMeta);
+    }
+    if (data.containsKey('chart_type')) {
+      context.handle(
+        _chartTypeMeta,
+        chartType.isAcceptableOrUnknown(data['chart_type']!, _chartTypeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_chartTypeMeta);
+    }
+    if (data.containsKey('right_axis')) {
+      context.handle(
+        _rightAxisMeta,
+        rightAxis.isAcceptableOrUnknown(data['right_axis']!, _rightAxisMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ChartSettingTableRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ChartSettingTableRow(
+      id:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}id'],
+          )!,
+      color:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}color'],
+          )!,
+      deviceName:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}device_name'],
+          )!,
+      chartType:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}chart_type'],
+          )!,
+      rightAxis:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.bool,
+            data['${effectivePrefix}right_axis'],
+          )!,
+    );
+  }
+
+  @override
+  $ChartSettingTableRowsTable createAlias(String alias) {
+    return $ChartSettingTableRowsTable(attachedDatabase, alias);
+  }
+}
+
+class ChartSettingTableRow extends DataClass
+    implements Insertable<ChartSettingTableRow> {
+  final int id;
+  final String color;
+  final String deviceName;
+  final int chartType;
+  final bool rightAxis;
+  const ChartSettingTableRow({
+    required this.id,
+    required this.color,
+    required this.deviceName,
+    required this.chartType,
+    required this.rightAxis,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['color'] = Variable<String>(color);
+    map['device_name'] = Variable<String>(deviceName);
+    map['chart_type'] = Variable<int>(chartType);
+    map['right_axis'] = Variable<bool>(rightAxis);
+    return map;
+  }
+
+  ChartSettingTableRowsCompanion toCompanion(bool nullToAbsent) {
+    return ChartSettingTableRowsCompanion(
+      id: Value(id),
+      color: Value(color),
+      deviceName: Value(deviceName),
+      chartType: Value(chartType),
+      rightAxis: Value(rightAxis),
+    );
+  }
+
+  factory ChartSettingTableRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ChartSettingTableRow(
+      id: serializer.fromJson<int>(json['id']),
+      color: serializer.fromJson<String>(json['color']),
+      deviceName: serializer.fromJson<String>(json['deviceName']),
+      chartType: serializer.fromJson<int>(json['chartType']),
+      rightAxis: serializer.fromJson<bool>(json['rightAxis']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'color': serializer.toJson<String>(color),
+      'deviceName': serializer.toJson<String>(deviceName),
+      'chartType': serializer.toJson<int>(chartType),
+      'rightAxis': serializer.toJson<bool>(rightAxis),
+    };
+  }
+
+  ChartSettingTableRow copyWith({
+    int? id,
+    String? color,
+    String? deviceName,
+    int? chartType,
+    bool? rightAxis,
+  }) => ChartSettingTableRow(
+    id: id ?? this.id,
+    color: color ?? this.color,
+    deviceName: deviceName ?? this.deviceName,
+    chartType: chartType ?? this.chartType,
+    rightAxis: rightAxis ?? this.rightAxis,
+  );
+  ChartSettingTableRow copyWithCompanion(ChartSettingTableRowsCompanion data) {
+    return ChartSettingTableRow(
+      id: data.id.present ? data.id.value : this.id,
+      color: data.color.present ? data.color.value : this.color,
+      deviceName:
+          data.deviceName.present ? data.deviceName.value : this.deviceName,
+      chartType: data.chartType.present ? data.chartType.value : this.chartType,
+      rightAxis: data.rightAxis.present ? data.rightAxis.value : this.rightAxis,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ChartSettingTableRow(')
+          ..write('id: $id, ')
+          ..write('color: $color, ')
+          ..write('deviceName: $deviceName, ')
+          ..write('chartType: $chartType, ')
+          ..write('rightAxis: $rightAxis')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, color, deviceName, chartType, rightAxis);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ChartSettingTableRow &&
+          other.id == this.id &&
+          other.color == this.color &&
+          other.deviceName == this.deviceName &&
+          other.chartType == this.chartType &&
+          other.rightAxis == this.rightAxis);
+}
+
+class ChartSettingTableRowsCompanion
+    extends UpdateCompanion<ChartSettingTableRow> {
+  final Value<int> id;
+  final Value<String> color;
+  final Value<String> deviceName;
+  final Value<int> chartType;
+  final Value<bool> rightAxis;
+  const ChartSettingTableRowsCompanion({
+    this.id = const Value.absent(),
+    this.color = const Value.absent(),
+    this.deviceName = const Value.absent(),
+    this.chartType = const Value.absent(),
+    this.rightAxis = const Value.absent(),
+  });
+  ChartSettingTableRowsCompanion.insert({
+    this.id = const Value.absent(),
+    required String color,
+    required String deviceName,
+    required int chartType,
+    this.rightAxis = const Value.absent(),
+  }) : color = Value(color),
+       deviceName = Value(deviceName),
+       chartType = Value(chartType);
+  static Insertable<ChartSettingTableRow> custom({
+    Expression<int>? id,
+    Expression<String>? color,
+    Expression<String>? deviceName,
+    Expression<int>? chartType,
+    Expression<bool>? rightAxis,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (color != null) 'color': color,
+      if (deviceName != null) 'device_name': deviceName,
+      if (chartType != null) 'chart_type': chartType,
+      if (rightAxis != null) 'right_axis': rightAxis,
+    });
+  }
+
+  ChartSettingTableRowsCompanion copyWith({
+    Value<int>? id,
+    Value<String>? color,
+    Value<String>? deviceName,
+    Value<int>? chartType,
+    Value<bool>? rightAxis,
+  }) {
+    return ChartSettingTableRowsCompanion(
+      id: id ?? this.id,
+      color: color ?? this.color,
+      deviceName: deviceName ?? this.deviceName,
+      chartType: chartType ?? this.chartType,
+      rightAxis: rightAxis ?? this.rightAxis,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (color.present) {
+      map['color'] = Variable<String>(color.value);
+    }
+    if (deviceName.present) {
+      map['device_name'] = Variable<String>(deviceName.value);
+    }
+    if (chartType.present) {
+      map['chart_type'] = Variable<int>(chartType.value);
+    }
+    if (rightAxis.present) {
+      map['right_axis'] = Variable<bool>(rightAxis.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ChartSettingTableRowsCompanion(')
+          ..write('id: $id, ')
+          ..write('color: $color, ')
+          ..write('deviceName: $deviceName, ')
+          ..write('chartType: $chartType, ')
+          ..write('rightAxis: $rightAxis')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $DataLogCellsTable dataLogCells = $DataLogCellsTable(this);
   late final $MeasUnitRowsTable measUnitRows = $MeasUnitRowsTable(this);
   late final $CommonSettingsTable commonSettings = $CommonSettingsTable(this);
+  late final $ChartSettingTableRowsTable chartSettingTableRows =
+      $ChartSettingTableRowsTable(this);
   late final Index idxDeviceTypeDt = Index(
     'idx_device_type_dt',
     'CREATE INDEX idx_device_type_dt ON data_log_cells (device_name, chart_type, dt)',
@@ -1093,6 +1454,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     dataLogCells,
     measUnitRows,
     commonSettings,
+    chartSettingTableRows,
     idxDeviceTypeDt,
   ];
 }
@@ -1716,6 +2078,228 @@ typedef $$CommonSettingsTableProcessedTableManager =
       CommonSetting,
       PrefetchHooks Function()
     >;
+typedef $$ChartSettingTableRowsTableCreateCompanionBuilder =
+    ChartSettingTableRowsCompanion Function({
+      Value<int> id,
+      required String color,
+      required String deviceName,
+      required int chartType,
+      Value<bool> rightAxis,
+    });
+typedef $$ChartSettingTableRowsTableUpdateCompanionBuilder =
+    ChartSettingTableRowsCompanion Function({
+      Value<int> id,
+      Value<String> color,
+      Value<String> deviceName,
+      Value<int> chartType,
+      Value<bool> rightAxis,
+    });
+
+class $$ChartSettingTableRowsTableFilterComposer
+    extends Composer<_$AppDatabase, $ChartSettingTableRowsTable> {
+  $$ChartSettingTableRowsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get color => $composableBuilder(
+    column: $table.color,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get deviceName => $composableBuilder(
+    column: $table.deviceName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get chartType => $composableBuilder(
+    column: $table.chartType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get rightAxis => $composableBuilder(
+    column: $table.rightAxis,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ChartSettingTableRowsTableOrderingComposer
+    extends Composer<_$AppDatabase, $ChartSettingTableRowsTable> {
+  $$ChartSettingTableRowsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get color => $composableBuilder(
+    column: $table.color,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get deviceName => $composableBuilder(
+    column: $table.deviceName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get chartType => $composableBuilder(
+    column: $table.chartType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get rightAxis => $composableBuilder(
+    column: $table.rightAxis,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ChartSettingTableRowsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ChartSettingTableRowsTable> {
+  $$ChartSettingTableRowsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get color =>
+      $composableBuilder(column: $table.color, builder: (column) => column);
+
+  GeneratedColumn<String> get deviceName => $composableBuilder(
+    column: $table.deviceName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get chartType =>
+      $composableBuilder(column: $table.chartType, builder: (column) => column);
+
+  GeneratedColumn<bool> get rightAxis =>
+      $composableBuilder(column: $table.rightAxis, builder: (column) => column);
+}
+
+class $$ChartSettingTableRowsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ChartSettingTableRowsTable,
+          ChartSettingTableRow,
+          $$ChartSettingTableRowsTableFilterComposer,
+          $$ChartSettingTableRowsTableOrderingComposer,
+          $$ChartSettingTableRowsTableAnnotationComposer,
+          $$ChartSettingTableRowsTableCreateCompanionBuilder,
+          $$ChartSettingTableRowsTableUpdateCompanionBuilder,
+          (
+            ChartSettingTableRow,
+            BaseReferences<
+              _$AppDatabase,
+              $ChartSettingTableRowsTable,
+              ChartSettingTableRow
+            >,
+          ),
+          ChartSettingTableRow,
+          PrefetchHooks Function()
+        > {
+  $$ChartSettingTableRowsTableTableManager(
+    _$AppDatabase db,
+    $ChartSettingTableRowsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer:
+              () => $$ChartSettingTableRowsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer:
+              () => $$ChartSettingTableRowsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer:
+              () => $$ChartSettingTableRowsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> color = const Value.absent(),
+                Value<String> deviceName = const Value.absent(),
+                Value<int> chartType = const Value.absent(),
+                Value<bool> rightAxis = const Value.absent(),
+              }) => ChartSettingTableRowsCompanion(
+                id: id,
+                color: color,
+                deviceName: deviceName,
+                chartType: chartType,
+                rightAxis: rightAxis,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String color,
+                required String deviceName,
+                required int chartType,
+                Value<bool> rightAxis = const Value.absent(),
+              }) => ChartSettingTableRowsCompanion.insert(
+                id: id,
+                color: color,
+                deviceName: deviceName,
+                chartType: chartType,
+                rightAxis: rightAxis,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable(table),
+                          BaseReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ChartSettingTableRowsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ChartSettingTableRowsTable,
+      ChartSettingTableRow,
+      $$ChartSettingTableRowsTableFilterComposer,
+      $$ChartSettingTableRowsTableOrderingComposer,
+      $$ChartSettingTableRowsTableAnnotationComposer,
+      $$ChartSettingTableRowsTableCreateCompanionBuilder,
+      $$ChartSettingTableRowsTableUpdateCompanionBuilder,
+      (
+        ChartSettingTableRow,
+        BaseReferences<
+          _$AppDatabase,
+          $ChartSettingTableRowsTable,
+          ChartSettingTableRow
+        >,
+      ),
+      ChartSettingTableRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -1726,4 +2310,6 @@ class $AppDatabaseManager {
       $$MeasUnitRowsTableTableManager(_db, _db.measUnitRows);
   $$CommonSettingsTableTableManager get commonSettings =>
       $$CommonSettingsTableTableManager(_db, _db.commonSettings);
+  $$ChartSettingTableRowsTableTableManager get chartSettingTableRows =>
+      $$ChartSettingTableRowsTableTableManager(_db, _db.chartSettingTableRows);
 }

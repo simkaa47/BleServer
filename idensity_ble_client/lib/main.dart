@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -13,12 +11,8 @@ import 'package:idensity_ble_client/widgets/main_page/main_page_widget.dart';
 import 'package:idensity_ble_client/widgets/meas_units/meas_units_widget.dart';
 import 'package:idensity_ble_client/widgets/routes.dart';
 import 'package:idensity_ble_client/widgets/scanning/scan_main.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-void main() {
-  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-    sqfliteFfiInit();
-  }
+void main() {  
   runApp(const ProviderScope(child: MyApp()));
 }
 

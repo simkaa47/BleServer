@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:idensity_ble_client/data_access/DataLogCells/data_log_cells_repository_provider.dart';
+import 'package:idensity_ble_client/data_access/data_log_cells/data_log_cells_repository_provider.dart';
+import 'package:idensity_ble_client/data_access/meas_units/meas_units_repository_provider.dart';
 import 'package:idensity_ble_client/models/charts/chart_settings.dart';
 import 'package:idensity_ble_client/models/connection_type.dart';
 import 'package:idensity_ble_client/models/device.dart';
@@ -52,7 +53,8 @@ final deviceUpdateProvider = StreamProvider<Device>((ref) {
 });
 
 final measUnitServiceProvider = FutureProvider<MeasUnitService>((ref) async {
-  final service = MeasUnitService();
+  final repo = ref.read(measUnitsRepositoryProvider);
+  final service = MeasUnitService(measUnitRepository: repo);
 
   // Регистрация метода dispose() для автоматического вызова
   // когда провайдер будет уничтожен

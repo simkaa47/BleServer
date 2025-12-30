@@ -352,6 +352,469 @@ class DataLogCellsCompanion extends UpdateCompanion<DataLogCell> {
   }
 }
 
+class $MeasUnitRowsTable extends MeasUnitRows
+    with TableInfo<$MeasUnitRowsTable, MeasUnitRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MeasUnitRowsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _coeffMeta = const VerificationMeta('coeff');
+  @override
+  late final GeneratedColumn<double> coeff = GeneratedColumn<double>(
+    'coeff',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _offsetMeta = const VerificationMeta('offset');
+  @override
+  late final GeneratedColumn<double> offset = GeneratedColumn<double>(
+    'offset',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deviceModeMeta = const VerificationMeta(
+    'deviceMode',
+  );
+  @override
+  late final GeneratedColumn<int> deviceMode = GeneratedColumn<int>(
+    'device_mode',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _measModeMeta = const VerificationMeta(
+    'measMode',
+  );
+  @override
+  late final GeneratedColumn<int> measMode = GeneratedColumn<int>(
+    'meas_mode',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _userCantDeleteMeta = const VerificationMeta(
+    'userCantDelete',
+  );
+  @override
+  late final GeneratedColumn<bool> userCantDelete = GeneratedColumn<bool>(
+    'user_cant_delete',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("user_cant_delete" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    coeff,
+    offset,
+    deviceMode,
+    measMode,
+    userCantDelete,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'meas_unit_rows';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<MeasUnitRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('coeff')) {
+      context.handle(
+        _coeffMeta,
+        coeff.isAcceptableOrUnknown(data['coeff']!, _coeffMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_coeffMeta);
+    }
+    if (data.containsKey('offset')) {
+      context.handle(
+        _offsetMeta,
+        offset.isAcceptableOrUnknown(data['offset']!, _offsetMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_offsetMeta);
+    }
+    if (data.containsKey('device_mode')) {
+      context.handle(
+        _deviceModeMeta,
+        deviceMode.isAcceptableOrUnknown(data['device_mode']!, _deviceModeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_deviceModeMeta);
+    }
+    if (data.containsKey('meas_mode')) {
+      context.handle(
+        _measModeMeta,
+        measMode.isAcceptableOrUnknown(data['meas_mode']!, _measModeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_measModeMeta);
+    }
+    if (data.containsKey('user_cant_delete')) {
+      context.handle(
+        _userCantDeleteMeta,
+        userCantDelete.isAcceptableOrUnknown(
+          data['user_cant_delete']!,
+          _userCantDeleteMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  MeasUnitRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return MeasUnitRow(
+      id:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}id'],
+          )!,
+      name:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}name'],
+          )!,
+      coeff:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.double,
+            data['${effectivePrefix}coeff'],
+          )!,
+      offset:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.double,
+            data['${effectivePrefix}offset'],
+          )!,
+      deviceMode:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}device_mode'],
+          )!,
+      measMode:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}meas_mode'],
+          )!,
+      userCantDelete:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.bool,
+            data['${effectivePrefix}user_cant_delete'],
+          )!,
+    );
+  }
+
+  @override
+  $MeasUnitRowsTable createAlias(String alias) {
+    return $MeasUnitRowsTable(attachedDatabase, alias);
+  }
+}
+
+class MeasUnitRow extends DataClass implements Insertable<MeasUnitRow> {
+  final int id;
+  final String name;
+  final double coeff;
+  final double offset;
+  final int deviceMode;
+  final int measMode;
+  final bool userCantDelete;
+  const MeasUnitRow({
+    required this.id,
+    required this.name,
+    required this.coeff,
+    required this.offset,
+    required this.deviceMode,
+    required this.measMode,
+    required this.userCantDelete,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['name'] = Variable<String>(name);
+    map['coeff'] = Variable<double>(coeff);
+    map['offset'] = Variable<double>(offset);
+    map['device_mode'] = Variable<int>(deviceMode);
+    map['meas_mode'] = Variable<int>(measMode);
+    map['user_cant_delete'] = Variable<bool>(userCantDelete);
+    return map;
+  }
+
+  MeasUnitRowsCompanion toCompanion(bool nullToAbsent) {
+    return MeasUnitRowsCompanion(
+      id: Value(id),
+      name: Value(name),
+      coeff: Value(coeff),
+      offset: Value(offset),
+      deviceMode: Value(deviceMode),
+      measMode: Value(measMode),
+      userCantDelete: Value(userCantDelete),
+    );
+  }
+
+  factory MeasUnitRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return MeasUnitRow(
+      id: serializer.fromJson<int>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      coeff: serializer.fromJson<double>(json['coeff']),
+      offset: serializer.fromJson<double>(json['offset']),
+      deviceMode: serializer.fromJson<int>(json['deviceMode']),
+      measMode: serializer.fromJson<int>(json['measMode']),
+      userCantDelete: serializer.fromJson<bool>(json['userCantDelete']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'name': serializer.toJson<String>(name),
+      'coeff': serializer.toJson<double>(coeff),
+      'offset': serializer.toJson<double>(offset),
+      'deviceMode': serializer.toJson<int>(deviceMode),
+      'measMode': serializer.toJson<int>(measMode),
+      'userCantDelete': serializer.toJson<bool>(userCantDelete),
+    };
+  }
+
+  MeasUnitRow copyWith({
+    int? id,
+    String? name,
+    double? coeff,
+    double? offset,
+    int? deviceMode,
+    int? measMode,
+    bool? userCantDelete,
+  }) => MeasUnitRow(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    coeff: coeff ?? this.coeff,
+    offset: offset ?? this.offset,
+    deviceMode: deviceMode ?? this.deviceMode,
+    measMode: measMode ?? this.measMode,
+    userCantDelete: userCantDelete ?? this.userCantDelete,
+  );
+  MeasUnitRow copyWithCompanion(MeasUnitRowsCompanion data) {
+    return MeasUnitRow(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      coeff: data.coeff.present ? data.coeff.value : this.coeff,
+      offset: data.offset.present ? data.offset.value : this.offset,
+      deviceMode:
+          data.deviceMode.present ? data.deviceMode.value : this.deviceMode,
+      measMode: data.measMode.present ? data.measMode.value : this.measMode,
+      userCantDelete:
+          data.userCantDelete.present
+              ? data.userCantDelete.value
+              : this.userCantDelete,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MeasUnitRow(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('coeff: $coeff, ')
+          ..write('offset: $offset, ')
+          ..write('deviceMode: $deviceMode, ')
+          ..write('measMode: $measMode, ')
+          ..write('userCantDelete: $userCantDelete')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    name,
+    coeff,
+    offset,
+    deviceMode,
+    measMode,
+    userCantDelete,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MeasUnitRow &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.coeff == this.coeff &&
+          other.offset == this.offset &&
+          other.deviceMode == this.deviceMode &&
+          other.measMode == this.measMode &&
+          other.userCantDelete == this.userCantDelete);
+}
+
+class MeasUnitRowsCompanion extends UpdateCompanion<MeasUnitRow> {
+  final Value<int> id;
+  final Value<String> name;
+  final Value<double> coeff;
+  final Value<double> offset;
+  final Value<int> deviceMode;
+  final Value<int> measMode;
+  final Value<bool> userCantDelete;
+  const MeasUnitRowsCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.coeff = const Value.absent(),
+    this.offset = const Value.absent(),
+    this.deviceMode = const Value.absent(),
+    this.measMode = const Value.absent(),
+    this.userCantDelete = const Value.absent(),
+  });
+  MeasUnitRowsCompanion.insert({
+    this.id = const Value.absent(),
+    required String name,
+    required double coeff,
+    required double offset,
+    required int deviceMode,
+    required int measMode,
+    this.userCantDelete = const Value.absent(),
+  }) : name = Value(name),
+       coeff = Value(coeff),
+       offset = Value(offset),
+       deviceMode = Value(deviceMode),
+       measMode = Value(measMode);
+  static Insertable<MeasUnitRow> custom({
+    Expression<int>? id,
+    Expression<String>? name,
+    Expression<double>? coeff,
+    Expression<double>? offset,
+    Expression<int>? deviceMode,
+    Expression<int>? measMode,
+    Expression<bool>? userCantDelete,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (coeff != null) 'coeff': coeff,
+      if (offset != null) 'offset': offset,
+      if (deviceMode != null) 'device_mode': deviceMode,
+      if (measMode != null) 'meas_mode': measMode,
+      if (userCantDelete != null) 'user_cant_delete': userCantDelete,
+    });
+  }
+
+  MeasUnitRowsCompanion copyWith({
+    Value<int>? id,
+    Value<String>? name,
+    Value<double>? coeff,
+    Value<double>? offset,
+    Value<int>? deviceMode,
+    Value<int>? measMode,
+    Value<bool>? userCantDelete,
+  }) {
+    return MeasUnitRowsCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      coeff: coeff ?? this.coeff,
+      offset: offset ?? this.offset,
+      deviceMode: deviceMode ?? this.deviceMode,
+      measMode: measMode ?? this.measMode,
+      userCantDelete: userCantDelete ?? this.userCantDelete,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (coeff.present) {
+      map['coeff'] = Variable<double>(coeff.value);
+    }
+    if (offset.present) {
+      map['offset'] = Variable<double>(offset.value);
+    }
+    if (deviceMode.present) {
+      map['device_mode'] = Variable<int>(deviceMode.value);
+    }
+    if (measMode.present) {
+      map['meas_mode'] = Variable<int>(measMode.value);
+    }
+    if (userCantDelete.present) {
+      map['user_cant_delete'] = Variable<bool>(userCantDelete.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MeasUnitRowsCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('coeff: $coeff, ')
+          ..write('offset: $offset, ')
+          ..write('deviceMode: $deviceMode, ')
+          ..write('measMode: $measMode, ')
+          ..write('userCantDelete: $userCantDelete')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $CommonSettingsTable extends CommonSettings
     with TableInfo<$CommonSettingsTable, CommonSetting> {
   @override
@@ -616,6 +1079,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $DataLogCellsTable dataLogCells = $DataLogCellsTable(this);
+  late final $MeasUnitRowsTable measUnitRows = $MeasUnitRowsTable(this);
   late final $CommonSettingsTable commonSettings = $CommonSettingsTable(this);
   late final Index idxDeviceTypeDt = Index(
     'idx_device_type_dt',
@@ -627,6 +1091,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
     dataLogCells,
+    measUnitRows,
     commonSettings,
     idxDeviceTypeDt,
   ];
@@ -836,6 +1301,250 @@ typedef $$DataLogCellsTableProcessedTableManager =
       DataLogCell,
       PrefetchHooks Function()
     >;
+typedef $$MeasUnitRowsTableCreateCompanionBuilder =
+    MeasUnitRowsCompanion Function({
+      Value<int> id,
+      required String name,
+      required double coeff,
+      required double offset,
+      required int deviceMode,
+      required int measMode,
+      Value<bool> userCantDelete,
+    });
+typedef $$MeasUnitRowsTableUpdateCompanionBuilder =
+    MeasUnitRowsCompanion Function({
+      Value<int> id,
+      Value<String> name,
+      Value<double> coeff,
+      Value<double> offset,
+      Value<int> deviceMode,
+      Value<int> measMode,
+      Value<bool> userCantDelete,
+    });
+
+class $$MeasUnitRowsTableFilterComposer
+    extends Composer<_$AppDatabase, $MeasUnitRowsTable> {
+  $$MeasUnitRowsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get coeff => $composableBuilder(
+    column: $table.coeff,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get offset => $composableBuilder(
+    column: $table.offset,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get deviceMode => $composableBuilder(
+    column: $table.deviceMode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get measMode => $composableBuilder(
+    column: $table.measMode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get userCantDelete => $composableBuilder(
+    column: $table.userCantDelete,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$MeasUnitRowsTableOrderingComposer
+    extends Composer<_$AppDatabase, $MeasUnitRowsTable> {
+  $$MeasUnitRowsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get coeff => $composableBuilder(
+    column: $table.coeff,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get offset => $composableBuilder(
+    column: $table.offset,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get deviceMode => $composableBuilder(
+    column: $table.deviceMode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get measMode => $composableBuilder(
+    column: $table.measMode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get userCantDelete => $composableBuilder(
+    column: $table.userCantDelete,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$MeasUnitRowsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $MeasUnitRowsTable> {
+  $$MeasUnitRowsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<double> get coeff =>
+      $composableBuilder(column: $table.coeff, builder: (column) => column);
+
+  GeneratedColumn<double> get offset =>
+      $composableBuilder(column: $table.offset, builder: (column) => column);
+
+  GeneratedColumn<int> get deviceMode => $composableBuilder(
+    column: $table.deviceMode,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get measMode =>
+      $composableBuilder(column: $table.measMode, builder: (column) => column);
+
+  GeneratedColumn<bool> get userCantDelete => $composableBuilder(
+    column: $table.userCantDelete,
+    builder: (column) => column,
+  );
+}
+
+class $$MeasUnitRowsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $MeasUnitRowsTable,
+          MeasUnitRow,
+          $$MeasUnitRowsTableFilterComposer,
+          $$MeasUnitRowsTableOrderingComposer,
+          $$MeasUnitRowsTableAnnotationComposer,
+          $$MeasUnitRowsTableCreateCompanionBuilder,
+          $$MeasUnitRowsTableUpdateCompanionBuilder,
+          (
+            MeasUnitRow,
+            BaseReferences<_$AppDatabase, $MeasUnitRowsTable, MeasUnitRow>,
+          ),
+          MeasUnitRow,
+          PrefetchHooks Function()
+        > {
+  $$MeasUnitRowsTableTableManager(_$AppDatabase db, $MeasUnitRowsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer:
+              () => $$MeasUnitRowsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer:
+              () => $$MeasUnitRowsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer:
+              () =>
+                  $$MeasUnitRowsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<double> coeff = const Value.absent(),
+                Value<double> offset = const Value.absent(),
+                Value<int> deviceMode = const Value.absent(),
+                Value<int> measMode = const Value.absent(),
+                Value<bool> userCantDelete = const Value.absent(),
+              }) => MeasUnitRowsCompanion(
+                id: id,
+                name: name,
+                coeff: coeff,
+                offset: offset,
+                deviceMode: deviceMode,
+                measMode: measMode,
+                userCantDelete: userCantDelete,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String name,
+                required double coeff,
+                required double offset,
+                required int deviceMode,
+                required int measMode,
+                Value<bool> userCantDelete = const Value.absent(),
+              }) => MeasUnitRowsCompanion.insert(
+                id: id,
+                name: name,
+                coeff: coeff,
+                offset: offset,
+                deviceMode: deviceMode,
+                measMode: measMode,
+                userCantDelete: userCantDelete,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable(table),
+                          BaseReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$MeasUnitRowsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $MeasUnitRowsTable,
+      MeasUnitRow,
+      $$MeasUnitRowsTableFilterComposer,
+      $$MeasUnitRowsTableOrderingComposer,
+      $$MeasUnitRowsTableAnnotationComposer,
+      $$MeasUnitRowsTableCreateCompanionBuilder,
+      $$MeasUnitRowsTableUpdateCompanionBuilder,
+      (
+        MeasUnitRow,
+        BaseReferences<_$AppDatabase, $MeasUnitRowsTable, MeasUnitRow>,
+      ),
+      MeasUnitRow,
+      PrefetchHooks Function()
+    >;
 typedef $$CommonSettingsTableCreateCompanionBuilder =
     CommonSettingsCompanion Function({
       Value<int> id,
@@ -1013,6 +1722,8 @@ class $AppDatabaseManager {
   $AppDatabaseManager(this._db);
   $$DataLogCellsTableTableManager get dataLogCells =>
       $$DataLogCellsTableTableManager(_db, _db.dataLogCells);
+  $$MeasUnitRowsTableTableManager get measUnitRows =>
+      $$MeasUnitRowsTableTableManager(_db, _db.measUnitRows);
   $$CommonSettingsTableTableManager get commonSettings =>
       $$CommonSettingsTableTableManager(_db, _db.commonSettings);
 }

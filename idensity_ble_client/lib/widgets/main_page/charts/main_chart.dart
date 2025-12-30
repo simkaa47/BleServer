@@ -87,9 +87,10 @@ class _MainChartState extends ConsumerState<ConsumerStatefulWidget> {
             zoomPanBehavior: _zoomPanBehavior,
             primaryXAxis: DateTimeAxis(
               dateFormat: DateFormat('HH:mm:ss'),
+              desiredIntervals: 5,
               intervalType: DateTimeIntervalType.seconds,
               rangePadding: ChartRangePadding.none,
-              enableAutoIntervalOnZooming: false,
+              enableAutoIntervalOnZooming: true,
             ),
 
             primaryYAxis: const NumericAxis(isVisible: false),
@@ -152,7 +153,9 @@ class _MainChartState extends ConsumerState<ConsumerStatefulWidget> {
             ),
           ),
         ),
+        if(left.isNotEmpty)
         Positioned(top: 12, left: 12, child: ChartsOverlayLegend(lines: left)),
+        if(right.isNotEmpty)
         Positioned(
           top: 12,
           right: 12,

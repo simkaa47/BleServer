@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
-import 'package:idensity_ble_client/data_access/meas_unit_repository.dart';
+import 'package:idensity_ble_client/data_access/meas_units/meas_units_repository.dart';
 import 'package:idensity_ble_client/models/meas_units/meas_unit.dart';
 import 'package:idensity_ble_client/models/meas_units/meas_unit_seed.dart';
 import 'package:idensity_ble_client/services/path/path_provider.dart';
@@ -13,7 +13,9 @@ class MeasUnitService {
   List<MeasUnit> _measUnits = [];
   Map<String, int> _measUnitSelecting = {};
   List<MeasUnit> get measUnits => _measUnits;
-  final MeasUnitRepository _measUnitRepository = MeasUnitRepository();
+
+  final MeasUnitsRepository _measUnitRepository;
+  
   final StreamController<List<MeasUnit>> _stateController =
       BehaviorSubject<List<MeasUnit>>();
   Stream<List<MeasUnit>> get measUnitsStream => _stateController.stream;
@@ -31,6 +33,8 @@ class MeasUnitService {
 
   final StreamController<Map<String, int>> _measUnitSelectingController =
       BehaviorSubject<Map<String, int>>();
+
+  MeasUnitService({required MeasUnitsRepository measUnitRepository}) : _measUnitRepository = measUnitRepository;
 
   Stream<Map<String, int>> get measUnitSelectingStream =>
       _measUnitSelectingController.stream;

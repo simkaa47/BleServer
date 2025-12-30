@@ -64,7 +64,6 @@ class EditChartsSettingsWidget extends ConsumerWidget {
       },
     );
 
-
     final chartsWindowWinget = settingsAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => Text('Ошибка: $e'),
@@ -72,12 +71,9 @@ class EditChartsSettingsWidget extends ConsumerWidget {
         final value = settings.maxChartWindowSec.toDouble();
 
         return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const Text(
-              'Окно отображения измерений',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
+            const Text('Окно отображения измерений'),
             const SizedBox(height: 8),
 
             Row(
@@ -86,17 +82,28 @@ class EditChartsSettingsWidget extends ConsumerWidget {
                   child: Slider(
                     min: minSeconds.toDouble(),
                     max: maxSeconds.toDouble(),
-                    divisions:
-                        (maxSeconds - minSeconds) ~/ 10,
+                    divisions: (maxSeconds - minSeconds) ~/ 10,
                     value: value.clamp(
                       minSeconds.toDouble(),
                       maxSeconds.toDouble(),
                     ),
                     label: '${settings.maxChartWindowSec} сек',
                     onChanged: (v) {
-                      ref
-                          .read(appSettingsRepositoryProvider)
-                          .setChartWindow(Duration(seconds: v.round()));
+                      try {
+                        ref
+                            .read(appSettingsRepositoryProvider)
+                            .setChartWindow(Duration(seconds: v.round()));
+                      } on Exception catch (e) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              backgroundColor: Colors.red,
+                              content: Text("Ошибка  - $e"),
+                              duration: const Duration(seconds: 3),
+                            ),
+                          );
+                        }
+                      }
                     },
                   ),
                 ),
@@ -119,8 +126,6 @@ class EditChartsSettingsWidget extends ConsumerWidget {
         );
       },
     );
-
-   
 
     return Column(
       children: <Widget>[
@@ -215,7 +220,7 @@ class EditChartsSettingsWidget extends ConsumerWidget {
     );
   }
 
-   String _humanize(int seconds) {
+  String _humanize(int seconds) {
     if (seconds < 60) return '$seconds секунд';
     if (seconds < 3600) {
       final m = seconds ~/ 60;

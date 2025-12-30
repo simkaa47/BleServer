@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:idensity_ble_client/data_access/DataLogCells/data_log_cells_repository_provider.dart';
+import 'package:idensity_ble_client/data_access/data_log_cells/data_log_cells_repository_provider.dart';
 import 'package:idensity_ble_client/data_access/common_settings/app_settings_providers.dart';
 import 'package:idensity_ble_client/models/charts/chart_line.dart';
 import 'package:idensity_ble_client/models/charts/line_point.dart';

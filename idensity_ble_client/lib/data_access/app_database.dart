@@ -1,9 +1,10 @@
 import 'dart:io';
 import 'package:idensity_ble_client/data_access/common_settings/common_settings.dart';
+import 'package:idensity_ble_client/data_access/meas_units/meas_unit_rows.dart';
 import 'package:path/path.dart' as p;
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
-import 'package:idensity_ble_client/data_access/DataLogCells/data_log_cells.dart';
+import 'package:idensity_ble_client/data_access/data_log_cells/data_log_cells.dart';
 import 'package:idensity_ble_client/services/path/path_provider.dart';
 
 part 'app_database.g.dart';
@@ -11,6 +12,7 @@ part 'app_database.g.dart';
 @DriftDatabase(
   tables: [
     DataLogCells,
+    MeasUnitRows,
     CommonSettings
   ],
 )
@@ -18,7 +20,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
    @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -29,6 +31,10 @@ class AppDatabase extends _$AppDatabase {
           if (from < 2) {
             await m.createTable(commonSettings);
           }
+          if(from < 3){
+            await m.createTable(measUnitRows);
+          }
+          
         },
       );
 }

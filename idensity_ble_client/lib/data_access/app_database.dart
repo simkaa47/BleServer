@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:idensity_ble_client/data_access/chart_setting/chart_setting_table_rows.dart';
 import 'package:idensity_ble_client/data_access/common_settings/common_settings.dart';
+import 'package:idensity_ble_client/data_access/device/device_rows.dart';
 import 'package:idensity_ble_client/data_access/meas_units/meas_unit_rows.dart';
 import 'package:path/path.dart' as p;
 import 'package:drift/drift.dart';
@@ -14,6 +15,7 @@ part 'app_database.g.dart';
   tables: [
     DataLogCells,
     MeasUnitRows,
+    DeviceRows,
     CommonSettings,
     ChartSettingTableRows
   ],

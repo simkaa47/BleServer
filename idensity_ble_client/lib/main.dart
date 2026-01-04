@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:idensity_ble_client/app_scroll_behavior.dart';
+import 'package:idensity_ble_client/widgets/communication/communication_tab.dart';
 import 'package:idensity_ble_client/widgets/device_settings/common/common_settings_widget.dart';
 import 'package:idensity_ble_client/widgets/device_settings/device_settings_main_widget.dart';
 import 'package:idensity_ble_client/widgets/device_settings/device_settings_navigation_widget.dart';
@@ -60,8 +61,11 @@ final _router = GoRouter(
           path: Routes.home,
           name: "home",
           builder: (context, state) => const MainPageWidget(),
-          routes: [
+          routes: [            
             GoRoute(
+              path: "communication",
+              builder: (context, state) => const CommunicationTab(),
+            ), GoRoute(
               path: "measUnits",
               builder: (context, state) => const MeasUnitsWidget(),
             ),
@@ -100,11 +104,13 @@ final Map<String, Map<String, String>> _localizedTitles = {
     Routes.home: 'Главная',
     Routes.measUnits: 'Единицы измерения',
     Routes.deviceSettings: 'Настройки прибора',
+    Routes.communication: "Устройства"
   },
   'ru': {
     Routes.home: 'Home',
     Routes.measUnits: 'Meas Units',
     Routes.deviceSettings: 'Device Settings',
+    Routes.communication: "Devices"
   },
 };
 

@@ -3,7 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idensity_ble_client/data_access/common_settings/app_settings_providers.dart';
 import 'package:idensity_ble_client/models/charts/chart_settings.dart';
 import 'package:idensity_ble_client/models/providers/services_registration.dart';
+import 'package:idensity_ble_client/models/settings/app_settings.dart';
 import 'package:idensity_ble_client/services/charts/charts_settings_service.dart';
+import 'package:idensity_ble_client/services/device_service.dart';
+import 'package:idensity_ble_client/widgets/async_state_handlers/universal_async_handler.dart';
 import 'package:idensity_ble_client/widgets/main_page/charts/add_edit_chart_settings_item_widget.dart';
 import 'package:idensity_ble_client/widgets/main_page/charts/chart_settings_item.dart';
 
@@ -15,11 +18,36 @@ class EditChartsSettingsWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final chartServiceAsyncValue = ref.read(chartSettingsServiceProvider);
+    final chartServiceAsyncValue = ref.watch(chartSettingsServiceProvider);
     final chartSettingsStream = ref.watch(chartSettingsStreamProvider);
-    final deviceService = ref.watch(deviceServiceProvider);
+    final deviceServiceAsyncState = ref.watch(deviceServiceProvider);
     final settingsAsync = ref.watch(appSettingsProvider);
 
+    final serviceName = "Сервис устройств";
+
+    return deviceServiceAsyncState.when(
+      data:
+          (deviceService) => _onHasDeviceService(
+            context,
+            chartServiceAsyncValue,
+            chartSettingsStream,
+            deviceService,
+            ref,
+            settingsAsync,
+          ),
+      error: (e, s) => UniversalAsyncHandler.onError(serviceName, e, s),
+      loading: () => UniversalAsyncHandler.onLoading(serviceName),
+    );
+  }
+
+  Widget _onHasDeviceService(
+    BuildContext context,
+    AsyncValue<ChartsSettingsService> chartServiceAsyncValue,
+    AsyncValue<List<ChartSettings>> chartSettingsStream,
+    DeviceService deviceService,
+    WidgetRef ref,
+    AsyncValue<AppSettings> settingsAsync,
+  ) {
     final mainContentWinget = chartSettingsStream.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error:

@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
 }
 
 final _router = GoRouter(
-  initialLocation: Routes.scanning,
+  initialLocation: Routes.home,
   routes: [
     GoRoute(
       path: Routes.scanning,

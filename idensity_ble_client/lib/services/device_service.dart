@@ -5,6 +5,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:idensity_ble_client/data_access/data_log_cells/data_log_cell_repository.dart';
 import 'package:idensity_ble_client/data_access/app_database.dart';
+import 'package:idensity_ble_client/data_access/device/device_repository.dart';
 import 'package:idensity_ble_client/models/charts/chart_type.dart';
 import 'package:idensity_ble_client/models/connection.dart';
 import 'package:idensity_ble_client/models/connection_type.dart';
@@ -15,9 +16,13 @@ import 'package:idensity_ble_client/services/modbus/modbus_service.dart';
 import 'package:rxdart/subjects.dart';
 
 class DeviceService {
-  DeviceService({required this.logCellRepository});
+  DeviceService({
+    required this.logCellRepository,
+    required this.deviceRepository,
+  });
 
   final DataLogCellRepository logCellRepository;
+  final DeviceRepository deviceRepository;
   final Queue<Function> _commandQueue = Queue<Function>();
 
   final List<DataLogCellsCompanion> _logCells = [];
@@ -36,6 +41,11 @@ class DeviceService {
   final List<Device> _currentDevices = [];
   List<Device> get devices => List.unmodifiable(_currentDevices);
 
+  Future<void> init() async {
+    final devices = await deviceRepository.getDevicesList();
+    await addDevices(devices);
+  }
+
   Future<void> addDevices(List<Device> newDevices) async {
     for (var newDevice in newDevices) {
       if (!_currentDevices.any((d) => isEqual(d, newDevice))) {
@@ -43,7 +53,7 @@ class DeviceService {
         if (_currentDevices.length == 1) {
           askDevices();
         }
-        _devicesController.add(List.from(_currentDevices));
+
         _connections.add(
           Connection(newDevice.connectionSettings, name: newDevice.name),
         );
@@ -52,6 +62,7 @@ class DeviceService {
         );
       }
     }
+    _devicesController.add(List.from(_currentDevices));
   }
 
   Future<void> removeDevice(Device device) async {
@@ -122,73 +133,95 @@ class DeviceService {
 
   Future<void> _log(Device device) async {
     final dt = DateTime.now();
-    _logCells.add(DataLogCellsCompanion.insert(
-      deviceName: device.name,
-      chartType: ChartType.counter.index,
-      dt: dt,
-      value: device.indicationData?.counters ?? 0,
-    ));
-    _logCells.add(DataLogCellsCompanion.insert(
-      deviceName: device.name,
-      chartType: ChartType.currentValue0.index,
-      dt: dt,
-      value: device.indicationData?.measResults[0].currentValue ?? 0,
-    ));
-    _logCells.add(DataLogCellsCompanion.insert(
-      deviceName: device.name,
-      chartType: ChartType.averageValue0.index,
-      dt: dt,
-      value: device.indicationData?.measResults[0].averageValue ?? 0,
-    ));
-    _logCells.add(DataLogCellsCompanion.insert(
-      deviceName: device.name,
-      chartType: ChartType.currentValue1.index,
-      dt: dt,
-      value: device.indicationData?.measResults[1].currentValue ?? 0,
-    ));
-    _logCells.add(DataLogCellsCompanion.insert(
-      deviceName: device.name,
-      chartType: ChartType.averageValue1.index,
-      dt: dt,
-      value: device.indicationData?.measResults[1].averageValue ?? 0,
-    ));
-     _logCells.add(DataLogCellsCompanion.insert(
-      deviceName: device.name,
-      chartType: ChartType.aiCurrent0.index,
-      dt: dt,
-      value: device.indicationData?.analogInputIndications[0].current ?? 0,
-    ));
-    _logCells.add(DataLogCellsCompanion.insert(
-      deviceName: device.name,
-      chartType: ChartType.aoCurrent0.index,
-      dt: dt,
-      value: device.indicationData?.analogOutputIndications[0].current ?? 0,
-    ));
-    _logCells.add(DataLogCellsCompanion.insert(
-      deviceName: device.name,
-      chartType: ChartType.aiCurrent1.index,
-      dt: dt,
-      value: device.indicationData?.analogInputIndications[1].current ?? 0,
-    ));
-    _logCells.add(DataLogCellsCompanion.insert(
-      deviceName: device.name,
-      chartType: ChartType.aoCurrent1.index,
-      dt: dt,
-      value: device.indicationData?.analogOutputIndications[1].current ?? 0,
-    ));
-    _logCells.add(DataLogCellsCompanion.insert(
-      deviceName: device.name,
-      chartType: ChartType.hv.index,
-      dt: dt,
-      value: device.indicationData?.hv ?? 0,
-    ));
-    _logCells.add(DataLogCellsCompanion.insert(
-      deviceName: device.name,
-      chartType: ChartType.temp.index,
-      dt: dt,
-      value: device.indicationData?.temperature ?? 0,
-    ));
-    if(_logCells.length>100){
+    _logCells.add(
+      DataLogCellsCompanion.insert(
+        deviceName: device.name,
+        chartType: ChartType.counter.index,
+        dt: dt,
+        value: device.indicationData?.counters ?? 0,
+      ),
+    );
+    _logCells.add(
+      DataLogCellsCompanion.insert(
+        deviceName: device.name,
+        chartType: ChartType.currentValue0.index,
+        dt: dt,
+        value: device.indicationData?.measResults[0].currentValue ?? 0,
+      ),
+    );
+    _logCells.add(
+      DataLogCellsCompanion.insert(
+        deviceName: device.name,
+        chartType: ChartType.averageValue0.index,
+        dt: dt,
+        value: device.indicationData?.measResults[0].averageValue ?? 0,
+      ),
+    );
+    _logCells.add(
+      DataLogCellsCompanion.insert(
+        deviceName: device.name,
+        chartType: ChartType.currentValue1.index,
+        dt: dt,
+        value: device.indicationData?.measResults[1].currentValue ?? 0,
+      ),
+    );
+    _logCells.add(
+      DataLogCellsCompanion.insert(
+        deviceName: device.name,
+        chartType: ChartType.averageValue1.index,
+        dt: dt,
+        value: device.indicationData?.measResults[1].averageValue ?? 0,
+      ),
+    );
+    _logCells.add(
+      DataLogCellsCompanion.insert(
+        deviceName: device.name,
+        chartType: ChartType.aiCurrent0.index,
+        dt: dt,
+        value: device.indicationData?.analogInputIndications[0].current ?? 0,
+      ),
+    );
+    _logCells.add(
+      DataLogCellsCompanion.insert(
+        deviceName: device.name,
+        chartType: ChartType.aoCurrent0.index,
+        dt: dt,
+        value: device.indicationData?.analogOutputIndications[0].current ?? 0,
+      ),
+    );
+    _logCells.add(
+      DataLogCellsCompanion.insert(
+        deviceName: device.name,
+        chartType: ChartType.aiCurrent1.index,
+        dt: dt,
+        value: device.indicationData?.analogInputIndications[1].current ?? 0,
+      ),
+    );
+    _logCells.add(
+      DataLogCellsCompanion.insert(
+        deviceName: device.name,
+        chartType: ChartType.aoCurrent1.index,
+        dt: dt,
+        value: device.indicationData?.analogOutputIndications[1].current ?? 0,
+      ),
+    );
+    _logCells.add(
+      DataLogCellsCompanion.insert(
+        deviceName: device.name,
+        chartType: ChartType.hv.index,
+        dt: dt,
+        value: device.indicationData?.hv ?? 0,
+      ),
+    );
+    _logCells.add(
+      DataLogCellsCompanion.insert(
+        deviceName: device.name,
+        chartType: ChartType.temp.index,
+        dt: dt,
+        value: device.indicationData?.temperature ?? 0,
+      ),
+    );
+    if (_logCells.length > 100) {
       try {
         logCellRepository.insertBatch(_logCells);
         _logCells.clear();

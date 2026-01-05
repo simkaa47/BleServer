@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:idensity_ble_client/models/device.dart';
 import 'package:idensity_ble_client/models/providers/services_registration.dart';
+import 'package:idensity_ble_client/services/device_service.dart';
+import 'package:idensity_ble_client/widgets/async_state_handlers/universal_async_handler.dart';
 import 'package:idensity_ble_client/widgets/communication/device_item_widget.dart';
 import 'package:idensity_ble_client/widgets/routes.dart';
 
@@ -11,8 +13,17 @@ class CommunicationTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final deviceService = ref.read(deviceServiceProvider);
+    final deviceServiceAsyncState = ref.watch(deviceServiceProvider);
+    final serviceName = "Сервис устройств";
 
+    return deviceServiceAsyncState.when(
+      data: (deviceService) => _onHasDeviceService(deviceService),
+      error: (e, s) => UniversalAsyncHandler.onError(serviceName, e, s),
+      loading: () => UniversalAsyncHandler.onLoading(serviceName),
+    );
+  }
+
+  Widget _onHasDeviceService(DeviceService deviceService) {
     return StreamBuilder<List<Device>>(
       stream: deviceService.devicesStream,
       builder: (context, snapshot) {

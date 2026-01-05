@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:idensity_ble_client/models/device.dart';
 import 'package:idensity_ble_client/models/providers/services_registration.dart';
 import 'package:idensity_ble_client/models/settings/device_mode.dart';
 import 'package:idensity_ble_client/resources/enums.dart';
+import 'package:idensity_ble_client/services/device_service.dart';
+import 'package:idensity_ble_client/widgets/async_state_handlers/universal_async_handler.dart';
 import 'package:idensity_ble_client/widgets/parameters/combobox_parameter_widget.dart';
 import 'package:idensity_ble_client/widgets/parameters/text_parameter_widget.dart';
 
@@ -11,10 +14,24 @@ class MeasProcessParametersWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final deviceService = ref.read(deviceServiceProvider);
+    final deviceServiceAsyncState = ref.watch(deviceServiceProvider);
     final measProcIndex = ref.watch(selectedMeasProcIndexProvider);
     final device = ref.watch(selectedDeviceProvider);
 
+    final serviceName = "Сервис устройств";
+
+    return deviceServiceAsyncState.when(
+      data: (service) => _onDeviceServiceData(device, measProcIndex, service),
+      error: (e, s) => UniversalAsyncHandler.onError(serviceName, e, s),
+      loading: () => UniversalAsyncHandler.onLoading(serviceName),
+    );
+  }
+
+  Widget _onDeviceServiceData(
+    Device? device,
+    int measProcIndex,
+    DeviceService deviceService,
+  ) {
     return device != null
         ? StreamBuilder(
           stream: device.settingsStream,

@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idensity_ble_client/data_access/chart_setting/chart_settings_repository_provider.dart';
 import 'package:idensity_ble_client/data_access/data_log_cells/data_log_cells_repository_provider.dart';
+import 'package:idensity_ble_client/data_access/device/device_repository_provider.dart';
 import 'package:idensity_ble_client/data_access/meas_units/meas_units_repository_provider.dart';
 import 'package:idensity_ble_client/models/charts/chart_settings.dart';
 import 'package:idensity_ble_client/models/connection_type.dart';
@@ -15,9 +16,9 @@ import 'package:idensity_ble_client/services/meas_units/meas_unit_service.dart';
 import 'package:idensity_ble_client/services/modbus/modbus_service.dart';
 import 'package:idensity_ble_client/services/scan_service.dart';
 
-final scanServiceProvider = Provider.family
-    .autoDispose<ScanService, ConnectionType>((ref, conType) {
-      final deviceService = ref.read(deviceServiceProvider);
+final scanServiceProvider = FutureProvider.family
+    .autoDispose<ScanService, ConnectionType>((ref, conType) async {
+      final deviceService = await ref.watch(deviceServiceProvider.future);
       ScanService? service;
       switch (conType) {
         case ConnectionType.bluetooth:
@@ -35,10 +36,15 @@ final connectionTypeProvider = StateProvider<ConnectionType>(
   (ref) => ConnectionType.bluetooth,
 );
 
-final deviceServiceProvider = Provider<DeviceService>((ref) {
-  final repo = ref.read(dataLogCellsRepositoryProvider);
-  final service = DeviceService(logCellRepository: repo);
+final deviceServiceProvider = FutureProvider<DeviceService>((ref) async{
+  final logsRepo = ref.read(dataLogCellsRepositoryProvider);
+  final deviceRepo = ref.read(deviceRepositoryProvider);
+  final service = DeviceService(
+    logCellRepository: logsRepo,
+    deviceRepository: deviceRepo,
+  );
   ref.onDispose(() => service.dispose());
+  await service.init();
   return service;
 });
 
@@ -48,9 +54,16 @@ final modbusServiceProvider = Provider<ModbusService>((ref) {
 
 final deviceUpdateProvider = StreamProvider<Device>((ref) {
   // Получаем экземпляр сервиса.
-  final service = ref.watch(deviceServiceProvider);
-  // Возвращаем стрим, который будет слушать этот провайдер.
-  return service.updateStream;
+  final serviceAsyncValue = ref.watch(deviceServiceProvider);
+  if (serviceAsyncValue.hasValue) {
+    final service = serviceAsyncValue.value!;
+    return service.updateStream;
+  }
+  if (serviceAsyncValue.isLoading) {
+    return const Stream.empty();
+  } else {
+    throw Exception('Error loading  device service');
+  }
 });
 
 final measUnitServiceProvider = FutureProvider<MeasUnitService>((ref) async {
@@ -70,8 +83,10 @@ final measUnitServiceProvider = FutureProvider<MeasUnitService>((ref) async {
 final chartSettingsServiceProvider = FutureProvider<ChartsSettingsService>((
   ref,
 ) async {
-  final deviceService = ref.read(deviceServiceProvider);
+  final deviceService = await ref.watch(deviceServiceProvider.future);
+
   final repo = ref.read(chartSettingsRepositoryProvider);
+
   final service = ChartsSettingsService(
     deviceService: deviceService,
     chartSettingsRepository: repo,
@@ -108,9 +123,9 @@ final measUnitsStreamProvider = StreamProvider<List<MeasUnit>>((ref) {
   }
 });
 
-final devicesStreamProvider = StreamProvider<List<Device>>((ref) {
-  final deviceService = ref.watch(deviceServiceProvider);
-  return deviceService.devicesStream;
+final devicesStreamProvider = StreamProvider<List<Device>>((ref) async* {
+  final deviceService = await ref.watch(deviceServiceProvider.future);
+  yield* deviceService.devicesStream;
 });
 
 final selectedDeviceIdProvider = StateProvider<String?>((ref) => null);

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:idensity_ble_client/models/device.dart';
 import 'package:idensity_ble_client/models/providers/services_registration.dart';
 import 'package:idensity_ble_client/models/settings/device_mode.dart';
 import 'package:idensity_ble_client/resources/enums.dart';
+import 'package:idensity_ble_client/services/device_service.dart';
+import 'package:idensity_ble_client/widgets/async_state_handlers/universal_async_handler.dart';
 import 'package:idensity_ble_client/widgets/parameters/combobox_parameter_widget.dart';
 
 class CommonSettingsWidget extends ConsumerWidget {
@@ -10,9 +13,18 @@ class CommonSettingsWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final service = ref.read(deviceServiceProvider);
+    final serviceAsyncState = ref.watch(deviceServiceProvider);
     final device = ref.watch(selectedDeviceProvider);
+    final serviceName = "Сервис устройств";
 
+    return serviceAsyncState.when(
+      data: (service) => _onData(device, service),
+      error: (e, s) => UniversalAsyncHandler.onError(serviceName, e, s),
+      loading: () => UniversalAsyncHandler.onLoading(serviceName),
+    );
+  }
+
+  Widget _onData(Device? device, DeviceService service) {
     return Scaffold(
       appBar: AppBar(title: const Text("Общие настройки")),
       body: StreamBuilder(
@@ -33,7 +45,6 @@ class CommonSettingsWidget extends ConsumerWidget {
                       settings.deviceMode = DeviceMode.values[value];
                       device?.updateDeviceSettings(settings);
                     }
-
                     await service.writeDeviceType(value, device!);
                   },
                 ),
@@ -42,7 +53,7 @@ class CommonSettingsWidget extends ConsumerWidget {
           }
           return const Center(child: Text("Нет устройства"));
         },
-      ),     
+      ),
     );
   }
 }

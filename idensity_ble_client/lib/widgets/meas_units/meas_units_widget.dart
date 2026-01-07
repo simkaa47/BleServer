@@ -1,37 +1,51 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:idensity_ble_client/models/meas_units/meas_unit.dart';
 import 'package:idensity_ble_client/models/providers/services_registration.dart';
+import 'package:idensity_ble_client/services/meas_units/meas_unit_service.dart';
 import 'package:idensity_ble_client/widgets/meas_units/add_edit_meas_unit_widget.dart';
 import 'package:idensity_ble_client/widgets/meas_units/meas_unit_item_widget.dart';
 
-class MeasUnitsWidget extends ConsumerWidget {
+class MeasUnitsWidget extends ConsumerStatefulWidget {
   const MeasUnitsWidget({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MeasUnitsWidget> createState() => _MeasUnitsWidgetState();
+}
+
+class _MeasUnitsWidgetState extends ConsumerState<MeasUnitsWidget> {
+  
+  @override
+  void initState() {
+    super.initState();
+
+    
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      ref.read(appBarActionsProvider.notifier).state = [
+        IconButton(         
+          icon: const Icon(Icons.add),
+          onPressed: _onAddPressed,
+        ),
+      ];
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final unitsStreamValue = ref.watch(measUnitsStreamProvider);
     final serviceAsyncValue = ref.watch(measUnitServiceProvider);
+
+    return _body(unitsStreamValue, serviceAsyncValue);
+  }
+
+  Widget _body(
+    AsyncValue<List<MeasUnit>> unitsStreamValue,
+    AsyncValue<MeasUnitService> serviceAsyncValue,
+  ) {
     return Column(
       children: [
-        IconButton(
-          onPressed: () async {
-            if (serviceAsyncValue.hasValue) {
-              final service = serviceAsyncValue.value!;
-              showModalBottomSheet(
-                context: context,
-                builder: (ctx) {
-                  return AddEditMeasUnitWidget(
-                    measUnitToSave: null,
-                    onSaveMeasUnit: (unit) async {
-                      await service.addMeasUnit(unit);
-                    },
-                  );
-                },
-              );
-            }
-          },
-          icon: const Icon(Icons.add, size: 50),
-        ),
         Expanded(
           child: unitsStreamValue.when(
             loading: () {
@@ -56,6 +70,21 @@ class MeasUnitsWidget extends ConsumerWidget {
           ),
         ),
       ],
+    );
+  }
+
+  void _onAddPressed() async {
+    final serviceAsync = ref.read(measUnitServiceProvider);
+    if (!serviceAsync.hasValue) return;
+    final service = serviceAsync.value!;
+    if (!mounted) return;
+
+    showModalBottomSheet(
+      context: context,
+      builder: (_) => AddEditMeasUnitWidget(
+        measUnitToSave: null,
+        onSaveMeasUnit: service.addMeasUnit,
+      ),
     );
   }
 }

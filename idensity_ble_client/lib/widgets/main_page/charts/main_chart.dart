@@ -63,6 +63,12 @@ class _MainChartState extends ConsumerState<ConsumerStatefulWidget> {
   @override
   Widget build(BuildContext context) {
     final chartAsync = ref.watch(chartInitProvider);
+    final appSettingsAsyncState = ref.read(appSettingsProvider);
+
+    if(appSettingsAsyncState.hasValue){
+      _settings = appSettingsAsyncState.value;
+    }
+
 
     return chartAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),

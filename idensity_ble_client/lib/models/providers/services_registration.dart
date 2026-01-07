@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idensity_ble_client/data_access/chart_setting/chart_settings_repository_provider.dart';
 import 'package:idensity_ble_client/data_access/data_log_cells/data_log_cells_repository_provider.dart';
@@ -15,6 +16,10 @@ import 'package:idensity_ble_client/services/ethernet/ethernet_scan_service.dart
 import 'package:idensity_ble_client/services/meas_units/meas_unit_service.dart';
 import 'package:idensity_ble_client/services/modbus/modbus_service.dart';
 import 'package:idensity_ble_client/services/scan_service.dart';
+
+final appBarActionsProvider = StateProvider.autoDispose<List<Widget>>(
+  (ref) => [],
+);
 
 final scanServiceProvider = FutureProvider.family
     .autoDispose<ScanService, ConnectionType>((ref, conType) async {

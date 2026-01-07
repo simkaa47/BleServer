@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:idensity_ble_client/models/providers/services_registration.dart';
 
-class DrawerItem extends StatelessWidget {
+class DrawerItem extends ConsumerWidget {
   final String title;
   final String routeName;
 
@@ -12,8 +14,8 @@ class DrawerItem extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {    
-    final currentRouteName = GoRouter.of(context).state.matchedLocation;
+  Widget build(BuildContext context, WidgetRef ref) {    
+    final currentRouteName = GoRouter.of(context).state.matchedLocation;   
 
     return ListTile(
       title: Text(title),
@@ -21,6 +23,7 @@ class DrawerItem extends StatelessWidget {
       selected: currentRouteName == routeName || (routeName != "/home" && currentRouteName.startsWith(routeName)),
       onTap: () {                        
         if (currentRouteName != routeName) {
+         ref.read(appBarActionsProvider.notifier).state = [];
           if(Navigator.canPop(context)){
               Navigator.of(context).pop();
           }          

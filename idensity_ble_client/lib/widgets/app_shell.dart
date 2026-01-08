@@ -20,6 +20,7 @@ class AppShell extends ConsumerWidget {
         actions: actions,
         iconTheme: const IconThemeData(size: 40),
         toolbarHeight: 60,
+        surfaceTintColor: Colors.amber,
         actionsIconTheme: const IconThemeData(size: 40),
         actionsPadding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
       ),

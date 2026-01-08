@@ -230,6 +230,7 @@ class _MainChartState extends ConsumerState<ConsumerStatefulWidget> {
     final state = ref.read(chartInitProvider).value;
     if (state == null) return;
     final cutoff = DateTime.now().subtract(_settings!.chartWindow);
+    
     for (final line in state.values) {
       if (line.deviceName != device.name) continue;
 
@@ -255,6 +256,7 @@ class _MainChartState extends ConsumerState<ConsumerStatefulWidget> {
     while (line.points.isNotEmpty && line.points.first.x.isBefore(cutoff)) {
       line.points.removeAt(0);
       removed++;
+      break;
     }
 
     return removed;

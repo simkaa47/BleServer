@@ -8,11 +8,33 @@ import 'package:idensity_ble_client/widgets/async_state_handlers/universal_async
 import 'package:idensity_ble_client/widgets/communication/device_item_widget.dart';
 import 'package:idensity_ble_client/widgets/routes.dart';
 
-class CommunicationTab extends ConsumerWidget {
+class CommunicationTab extends ConsumerStatefulWidget {
   const CommunicationTab({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      _CommunicationTabState();
+}
+
+class _CommunicationTabState extends ConsumerState {
+  
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      ref.read(appBarActionsProvider.notifier).state = [
+        IconButton(icon: const Icon(Icons.scanner_rounded), onPressed: () {
+          context.go(Routes.scanning);
+        }, tooltip: "Сканировать",),
+      ];
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {   
     final deviceServiceAsyncState = ref.watch(deviceServiceProvider);
     final serviceName = "Сервис устройств";
 
@@ -57,7 +79,9 @@ class CommunicationTab extends ConsumerWidget {
                 ),
                 key: ValueKey(data[index]),
                 child: DeviceItemWidget(device: device),
-                onDismissed: (direction) async {},
+                onDismissed: (direction) async {
+                  await _deleteDevice(deviceService, context, device);
+                },
               );
             },
           );
@@ -75,6 +99,42 @@ class CommunicationTab extends ConsumerWidget {
         }
       },
     );
+  }
+
+  Future<void> _deleteDevice(
+    DeviceService deviceService,
+    BuildContext context,
+    Device device,
+  ) async {
+    try {
+      await deviceService.removeDevice(device);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            persist: false,
+            content: const Text("Данные удалены"),
+            duration: const Duration(seconds: 3),
+            action: SnackBarAction(
+              label: "Отменить",
+              onPressed: () async {
+                await deviceService.addDevices([device]);
+              },
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.red,
+            content: Text("Ошибка  - $e"),
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    }
   }
 
   Widget _getBackground(DismissDirection direction) {

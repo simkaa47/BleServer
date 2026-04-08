@@ -167,6 +167,7 @@ class EditChartsSettingsWidget extends ConsumerWidget {
                   if (chartServiceAsyncValue.hasValue) {
                     final service = chartServiceAsyncValue.value!;
                     showModalBottomSheet(
+                      isScrollControlled: true,
                       context: context,
                       builder: (ctx) {
                         return AddEditChartSettingsItemWidget(

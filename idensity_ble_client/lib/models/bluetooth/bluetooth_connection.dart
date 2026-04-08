@@ -38,7 +38,7 @@ class BluetoothConnection {
     final duration = Duration(milliseconds: timeoutMs);
     _readCompleter = Completer<List<int>>();
     try {
-      await _characteristicRead!.write(request);
+      await _characteristicWrite!.write(request);
       final response = await _readCompleter!.future.timeout(duration);
       return response;
     } on TimeoutException {

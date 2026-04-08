@@ -18,6 +18,9 @@ class BluetoothConnection {
   Completer<List<int>>? _readCompleter;
   late StreamSubscription<bool> _connectStateSubscription;
   bool connected = false;
+  int? _expectedReceiveLength = null;
+  int _currentReceiveLen = 0;
+  List<int> _inputBuf = [];
 
   BluetoothConnection({required this.bleDevice}) {
     _connectStateSubscription = bleDevice.connectionStream.listen((
@@ -28,8 +31,14 @@ class BluetoothConnection {
     });
   }
 
-  Future<List<int>> readBytes(List<int> request, {int timeoutMs = 1000}) async {
+  Future<List<int>> readBytes(
+    List<int> request, {
+    int timeoutMs = 1000,
+    int? responseLen,
+  }) async {
     //await connectTest();
+    _expectedReceiveLength = responseLen;
+    _currentReceiveLen = 0;
     if (!(await bleDevice.connectionState == BleConnectionState.connected) ||
         _characteristicWrite == null ||
         _characteristicRead == null) {
@@ -38,6 +47,8 @@ class BluetoothConnection {
     final duration = Duration(milliseconds: timeoutMs);
     _readCompleter = Completer<List<int>>();
     try {
+      debugPrint("request = $request");
+      _inputBuf = [];
       await _characteristicWrite!.write(request);
       final response = await _readCompleter!.future.timeout(duration);
       return response;
@@ -65,10 +76,10 @@ class BluetoothConnection {
     if (connectionState == BleConnectionState.disconnected) {
       try {
         await bleDevice.connect();
-        if (!Platform.isLinux) {
-          var result = await bleDevice.requestMtu(256);
-          debugPrint("MTU = $result bytes");
-        }
+        // if (!Platform.isLinux) {
+        //   var result = await bleDevice.requestMtu(256);
+        //   debugPrint("MTU = $result bytes");
+        // }
       } catch (e) {
         throw Exception("Error with connect method of BleDevice - $e");
       }
@@ -90,8 +101,13 @@ class BluetoothConnection {
       _readSubscription = _characteristicRead!.onValueReceived.listen(
         (value) {
           debugPrint("We've gotten some value $value");
+          _currentReceiveLen += value.length;
+          _inputBuf.addAll(value);
           if (_readCompleter != null && !_readCompleter!.isCompleted) {
-            _readCompleter!.complete(value);
+            if (_expectedReceiveLength == null ||
+                _currentReceiveLen >= (_expectedReceiveLength ?? 0)) {
+              _readCompleter!.complete(_inputBuf);
+            }
           }
         },
         onError: (error) {

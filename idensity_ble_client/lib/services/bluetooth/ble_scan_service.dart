@@ -55,7 +55,7 @@ class BleScanService implements ScanService {
     debugPrint("Старт сканирования");
     try {
       await UniversalBle.startScan(
-        scanFilter: ScanFilter(withServices: services),
+        //scanFilter: ScanFilter(withServices: services),
       );
     } catch (e) {
       debugPrint("Ошибка при запуске сканирования - $e");

@@ -141,7 +141,7 @@ class ModbusService {
     final crc = calculateCrc16(request, 6);
     view.setUint16(6, crc, Endian.little);
 
-    var responce = await connection.readBytes(request);
+    var responce = await connection.readBytes(request, expectedRespLen: 5+count*2);
     if (responce.length != (count * 2 + 5)) {
       throw Exception("Invalid response length");
     }
@@ -182,7 +182,7 @@ class ModbusService {
     final crc = calculateCrc16(request, 7 + count * 2);
     view.setUint16(7 + count * 2, crc, Endian.little);
 
-    var responce = await connection.readBytes(request);
+    var responce = await connection.readBytes(request, expectedRespLen: 5+count*2);
     if (responce.length != 8) throw Exception("Invalid response length");
     if (responce[1] != 16) {
       throw Exception("Write error to write data for modbusId = $unitId");

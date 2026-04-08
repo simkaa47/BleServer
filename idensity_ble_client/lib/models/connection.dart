@@ -15,12 +15,12 @@ class Connection {
     await _bluetoothConnection?.dispose();
   }
 
-  Future<List<int>> readBytes(List<int> request) async {
+  Future<List<int>> readBytes(List<int> request, {int? expectedRespLen}) async {
     if (connectionSettings.connectionType == ConnectionType.bluetooth) {
       _bluetoothConnection ??= BluetoothConnection(
         bleDevice: BleDevice(deviceId: connectionSettings.bluetoothSettings.macAddress, name: connectionSettings.bluetoothSettings.deviceName),
       );      
-      final response = await _bluetoothConnection!.readBytes(request);
+      final response = await _bluetoothConnection!.readBytes(request, responseLen: expectedRespLen);
       return response;
     } else {
       throw Exception("Needs to be implemented");

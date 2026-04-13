@@ -1,4 +1,3 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idensity_ble_client/models/device.dart';
@@ -51,56 +50,49 @@ class MeasResultWidget extends ConsumerWidget {
                         ),
                       ),
                       Expanded(
-                        // Этот Expanded предоставит ограничения для ListTile
                         flex: 5,
                         child: Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               Expanded(
                                 child: FittedBox(
-                                  // Заставляет дочерний элемент заполнить всё доступное пространство
-                                  fit:
-                                      BoxFit
-                                          .contain, // Масштабирует содержимое так, чтобы оно поместилось, сохраняя пропорции
-                                  child: AutoSizeText(
-                                    (result.averageValue*koeff + offset).toStringAsFixed(3),
-                                    // maxLines: 1, // Можно убрать, если FittedBox используется
+                                  fit: BoxFit.contain,
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    (result.averageValue * koeff + offset).toStringAsFixed(3),
+                                    style: const TextStyle(fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ),
                               const Text(
                                 "Усредненное значение",
-                                style: TextStyle(fontSize: 12),
+                                style: TextStyle(fontSize: 11),
                               ),
                             ],
                           ),
                         ),
                       ),
                       Expanded(
-                        // Этот Expanded предоставит ограничения для ListTile
                         flex: 4,
                         child: Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               Expanded(
                                 child: FittedBox(
-                                  // Заставляет дочерний элемент заполнить всё доступное пространство
-                                  fit:
-                                      BoxFit
-                                          .contain, // Масштабирует содержимое так, чтобы оно поместилось, сохраняя пропорции
-                                  child: AutoSizeText(
-                                   (result.currentValue*koeff + offset).toStringAsFixed(3),
-                                    // maxLines: 1, // Можно убрать, если FittedBox используется
+                                  fit: BoxFit.contain,
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    (result.currentValue * koeff + offset).toStringAsFixed(3),
                                   ),
                                 ),
                               ),
                               const Text(
                                 "Мгновенное значение",
-                                style: TextStyle(fontSize: 12),
+                                style: TextStyle(fontSize: 11),
                               ),
                             ],
                           ),

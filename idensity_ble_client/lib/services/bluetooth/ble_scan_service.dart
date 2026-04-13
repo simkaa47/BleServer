@@ -2,12 +2,12 @@ import 'dart:async';
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:idensity_ble_client/config.dart';
-import 'package:idensity_ble_client/models/bluetooth/bluetooth_connection.dart';
 import 'package:idensity_ble_client/models/device.dart';
 import 'package:idensity_ble_client/models/scan_result.dart';
 import 'package:idensity_ble_client/models/scan_state.dart';
 import 'package:idensity_ble_client/services/device_service.dart';
 import 'package:idensity_ble_client/services/scan_service.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:universal_ble/universal_ble.dart';
 
@@ -35,7 +35,6 @@ class BleScanService implements ScanService {
     results.clear();
     _stateController.add(ScanState.scanning);
     debugPrint('Scanning for devices...');
-    var services = [BluetoothConnection.serviceUuid];
     UniversalBle.timeout = const Duration(seconds: 15);
     subscription = UniversalBle.scanStream.listen((BleDevice bleDevice) {
       if (bleDevice.name != null && bleDevice.name!.isNotEmpty) {
@@ -52,10 +51,11 @@ class BleScanService implements ScanService {
         }
       }
     });
+    await [Permission.bluetoothScan, Permission.bluetoothConnect].request();
     debugPrint("Старт сканирования");
     try {
       await UniversalBle.startScan(
-        scanFilter: ScanFilter(withServices: services),
+        //scanFilter: ScanFilter(withServices: services),
       );
     } catch (e) {
       debugPrint("Ошибка при запуске сканирования - $e");

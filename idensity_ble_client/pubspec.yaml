@@ -47,7 +47,8 @@ dependencies:
   flutter_colorpicker: ^1.1.0
   syncfusion_flutter_charts: ^32.1.19
   drift: ^2.30.0
-  drift_flutter: ^0.2.8
+  permission_handler: ^11.4.0
+  drift_flutter: ^0.2.8 
 
 
 dev_dependencies:

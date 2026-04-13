@@ -18,6 +18,8 @@ mono_crash.*
 
 # Build results
 [Dd]ebug/
+!idensity_ble_client/android/app/src/debug/
+!idensity_ble_client/android/app/src/debug/AndroidManifest.xml
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/

@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(flutter analyze:*)",
+      "Read(//c/Users/ASUS/Documents/Konvels/Idensity/Idensity_BLE/**)",
+      "Bash(git add:*)",
+      "Bash(git commit -m ':*)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\ASUS\\Documents\\Konvels\\Idensity\\Idensity_BLE"
+    ]
+  }
+}

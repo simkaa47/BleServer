@@ -39,14 +39,15 @@ class IndicationItemWidget extends StatelessWidget {
                     maxLines: 2,
                     maxFontSize: 18,
                   ),
-                  Text(
+                  AutoSizeText(
                     value,
                     style: const TextStyle(
                       color: Color.fromARGB(255, 1, 63, 50),
                       fontSize: 20,
-                      
                       fontWeight: FontWeight.bold,
                     ),
+                    maxLines: 1,
+                    maxFontSize: 20,
                   ),
                 ],
               ),

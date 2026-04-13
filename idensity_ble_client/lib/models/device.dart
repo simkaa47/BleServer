@@ -6,6 +6,7 @@ import 'package:idensity_ble_client/models/settings/device_settings.dart';
 import 'package:rxdart/rxdart.dart';
 
 class Device {
+  int? id;
   bool connected = false;
   ConnectionSettings connectionSettings = ConnectionSettings();
   IndicationData? _indicationData;

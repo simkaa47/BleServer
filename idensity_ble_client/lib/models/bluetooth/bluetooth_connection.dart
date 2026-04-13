@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:core';
 import 'dart:developer';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:universal_ble/universal_ble.dart';
 
@@ -75,10 +76,10 @@ class BluetoothConnection {
     if (connectionState == BleConnectionState.disconnected) {
       try {
         await bleDevice.connect();
-        // if (!Platform.isLinux) {
-        //   var result = await bleDevice.requestMtu(256);
-        //   debugPrint("MTU = $result bytes");
-        // }
+        if(!Platform.isLinux) {
+          var result = await bleDevice.requestMtu(256);
+          debugPrint("MTU = $result bytes");
+        }
       } catch (e) {
         throw Exception("Error with connect method of BleDevice - $e");
       }

@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:core';
 import 'dart:developer';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:universal_ble/universal_ble.dart';
 
@@ -18,7 +17,7 @@ class BluetoothConnection {
   Completer<List<int>>? _readCompleter;
   late StreamSubscription<bool> _connectStateSubscription;
   bool connected = false;
-  int? _expectedReceiveLength = null;
+  int? _expectedReceiveLength;
   int _currentReceiveLen = 0;
   List<int> _inputBuf = [];
 
@@ -100,10 +99,11 @@ class BluetoothConnection {
       await _characteristicRead!.notifications.subscribe();
       _readSubscription = _characteristicRead!.onValueReceived.listen(
         (value) {
-          debugPrint("We've gotten some value $value");
-          _currentReceiveLen += value.length;
-          _inputBuf.addAll(value);
           if (_readCompleter != null && !_readCompleter!.isCompleted) {
+            debugPrint("We've gotten some value $value");
+            _currentReceiveLen += value.length;
+            debugPrint("_currentReceiveLen =  $_currentReceiveLen");
+            _inputBuf.addAll(value);
             if (_expectedReceiveLength == null ||
                 _currentReceiveLen >= (_expectedReceiveLength ?? 0)) {
               _readCompleter!.complete(_inputBuf);

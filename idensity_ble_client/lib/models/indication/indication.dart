@@ -3,8 +3,10 @@ import 'package:idensity_ble_client/models/indication/analog_output_indication.d
 import 'package:idensity_ble_client/models/indication/meas_result.dart';
 
 class IndicationData {
+  bool isMeasuringState = false;
   double temperature = 0;
   double hv = 0;
+  DateTime rtc = DateTime.now();
   double counters = 0;
   final List<MeasResult> measResults = List.generate(
     2,

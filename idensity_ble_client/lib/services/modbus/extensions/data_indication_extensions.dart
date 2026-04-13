@@ -6,9 +6,11 @@ import 'package:idensity_ble_client/services/modbus/extensions/common_extensions
 
 extension DataIndicationArrayExtensions on IndicationData {
   void updateDataFromModbus(List<int> registers) {
+    isMeasuringState = registers[0] != 0;
     counters = registers.getFloat(2);
     hv = registers.getFloat(30);
-    temperature = registers.getFloat(24);
+    temperature = registers.getFloat(24) / 10;
+    rtc = _getRtcFromRegs(registers, rtc);
     // MeasResults
     for (var i = 0; i < 2; i++) {
       measResults[i] = MeasResult(
@@ -32,5 +34,26 @@ extension DataIndicationArrayExtensions on IndicationData {
         dacValue: registers.getFloat(32 + i * 6 + 4).toInt(),
       );
     }
+  }
+
+  DateTime _getRtcFromRegs(List<int> registers, DateTime defaultValue) {
+    final year = registers[18] + 2000;
+
+    final month = registers[19];
+    final day = registers[20];
+    final hour = registers[21];
+    final minute = registers[22];
+    int second = registers[23];
+
+    if (month < 1 ||
+        month > 12 ||
+        day < 1 ||
+        day > 31 ||
+        hour > 23 ||
+        minute > 59 ||
+        second > 59) {
+      return defaultValue;
+    }
+    return DateTime(year, month, day, hour, minute, second);
   }
 }

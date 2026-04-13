@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
 import 'dart:core';
-import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:idensity_ble_client/data_access/data_log_cells/data_log_cell_repository.dart';
 import 'package:idensity_ble_client/data_access/app_database.dart';
@@ -119,6 +118,7 @@ class DeviceService {
         }
       } catch (e) {
         debugPrint('Ошибка при получении данных устройства: $e');
+        await Future.delayed(const Duration(milliseconds: 500));
       }
     }
   }

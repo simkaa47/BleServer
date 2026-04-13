@@ -102,12 +102,14 @@ class _ScanMainState extends ConsumerState<ScanMainWidget> {
             opacity: _selectedResultsIsNotEmpty ? 1 : 0.4,
             child: FloatingActionButton(
               heroTag: 'save device',
-              onPressed:
-                  _selectedResultsIsNotEmpty
-                      ? () {
-                        scanService.saveDevices(selectedResults);
-                      }
-                      : null,
+              onPressed: _selectedResultsIsNotEmpty
+                  ? () async {
+                      await scanService.stopScan();
+                      await scanService.saveDevices(selectedResults);
+                      if (!mounted) return;
+                      context.go(Routes.home);
+                    }
+                  : null,
               child: const Icon(Icons.add),
             ),
           ),

@@ -54,6 +54,7 @@ class DeviceServiceImpl implements DeviceService {
   Future<void> addDevices(List<Device> newDevices) async {
     for (var newDevice in newDevices) {
       if (!_currentDevices.any((d) => isEqual(d, newDevice))) {
+        newDevice.id = await deviceRepository.add(newDevice);
         _currentDevices.add(newDevice);
         if (_currentDevices.length == 1) {
           askDevices();
@@ -72,6 +73,7 @@ class DeviceServiceImpl implements DeviceService {
 
   @override
   Future<void> removeDevice(Device device) async {
+    await deviceRepository.delete(device);
     await device.dispose();
     var connection =
         _connections.where((c) => c.name == device.name).firstOrNull;

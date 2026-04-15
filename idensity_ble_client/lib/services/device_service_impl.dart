@@ -9,9 +9,9 @@ import 'package:idensity_ble_client/models/charts/chart_type.dart';
 import 'package:idensity_ble_client/models/connection.dart';
 import 'package:idensity_ble_client/models/connection_type.dart';
 import 'package:idensity_ble_client/models/device.dart';
-import 'package:idensity_ble_client/models/indication/indication.dart';
-import 'package:idensity_ble_client/models/settings/device_settings.dart';
+import 'package:idensity_ble_client/services/bluetooth/ble_connection.dart';
 import 'package:idensity_ble_client/services/device_service.dart';
+import 'package:idensity_ble_client/services/ethernet/ethernet_connection.dart';
 import 'package:idensity_ble_client/services/modbus/modbus_service.dart';
 import 'package:rxdart/subjects.dart';
 
@@ -28,14 +28,13 @@ class DeviceServiceImpl implements DeviceService {
 
   final Queue<(Device, Future<void> Function())> _commandQueue = Queue();
   final List<DataLogCellsCompanion> _logCells = [];
-  final List<Connection> _connections = [];
+  final Map<Device, Connection> _connections = {};
 
   final _updateController = StreamController<Device>.broadcast();
   @override
   Stream<Device> get updateStream => _updateController.stream;
 
-  final BehaviorSubject<List<Device>> _devicesController =
-      BehaviorSubject<List<Device>>();
+  final BehaviorSubject<List<Device>> _devicesController = BehaviorSubject();
 
   @override
   Stream<List<Device>> get devicesStream => _devicesController.stream;
@@ -52,17 +51,14 @@ class DeviceServiceImpl implements DeviceService {
 
   @override
   Future<void> addDevices(List<Device> newDevices) async {
-    for (var newDevice in newDevices) {
+    for (final newDevice in newDevices) {
       if (!_currentDevices.any((d) => isEqual(d, newDevice))) {
         newDevice.id = await deviceRepository.add(newDevice);
         _currentDevices.add(newDevice);
+        _connections[newDevice] = _createConnection(newDevice);
         if (_currentDevices.length == 1) {
           askDevices();
         }
-
-        _connections.add(
-          Connection(newDevice.connectionSettings, name: newDevice.name),
-        );
         debugPrint(
           'Устройство добавлено: ${newDevice.name}. Текущих устройств: ${_currentDevices.length}',
         );
@@ -74,14 +70,9 @@ class DeviceServiceImpl implements DeviceService {
   @override
   Future<void> removeDevice(Device device) async {
     await deviceRepository.delete(device);
-    await device.dispose();
-    var connection =
-        _connections.where((c) => c.name == device.name).firstOrNull;
-    if (connection != null) {
-      _connections.remove(connection);
-      await connection.dispose();
-    }
     _currentDevices.remove(device);
+    await _connections.remove(device)?.dispose();
+    await device.dispose();
     _devicesController.add(List.from(_currentDevices));
     debugPrint(
       'Устройство удалено: ${device.name}. Текущих устройств: ${_currentDevices.length}',
@@ -92,14 +83,12 @@ class DeviceServiceImpl implements DeviceService {
     debugPrint('Начало опроса устройств...');
     while (_currentDevices.isNotEmpty) {
       try {
-        final List<Device> devicesToUpdate = List.from(_currentDevices);
-        for (var i = 0; i < devicesToUpdate.length; i++) {
-          final device = devicesToUpdate[i];
-          var connection =
-              _connections.where((c) => c.name == device.name).firstOrNull;
+        final devicesToUpdate = List<Device>.from(_currentDevices);
+        for (final device in devicesToUpdate) {
+          final connection = _connections[device];
           if (connection != null) {
             if (device.shouldReadIndication) {
-              final newIndicationData = await _getIndicationData(connection);
+              final newIndicationData = await modbusService.getIndicationData(connection);
               device.markIndicationRead();
               if (_commandQueue.isEmpty) {
                 device.updateIndicationData(newIndicationData);
@@ -109,7 +98,7 @@ class DeviceServiceImpl implements DeviceService {
               debugPrint('Обновлены данные для ${device.name}');
             }
             if (device.shouldReadSettings) {
-              final newSettings = await _getDeviceSettings(connection);
+              final newSettings = await modbusService.getDeviceSettings(connection);
               device.updateDeviceSettings(newSettings);
               device.markSettingsRead();
             }
@@ -136,110 +125,80 @@ class DeviceServiceImpl implements DeviceService {
     }
   }
 
-  Future<IndicationData> _getIndicationData(Connection connection) async {
-    return await modbusService.getIndicationData(connection);
-  }
-
-  Future<DeviceSettings> _getDeviceSettings(Connection connection) async {
-    return await modbusService.getDeviceSettings(connection);
-  }
-
   Future<void> _log(Device device) async {
     final dt = DateTime.now();
-    _logCells.add(
-      DataLogCellsCompanion.insert(
-        deviceName: device.name,
-        chartType: ChartType.counter.index,
-        dt: dt,
-        value: device.indicationData?.counters ?? 0,
-      ),
-    );
-    _logCells.add(
-      DataLogCellsCompanion.insert(
-        deviceName: device.name,
-        chartType: ChartType.currentValue0.index,
-        dt: dt,
-        value: device.indicationData?.measResults[0].currentValue ?? 0,
-      ),
-    );
-    _logCells.add(
-      DataLogCellsCompanion.insert(
-        deviceName: device.name,
-        chartType: ChartType.averageValue0.index,
-        dt: dt,
-        value: device.indicationData?.measResults[0].averageValue ?? 0,
-      ),
-    );
-    _logCells.add(
-      DataLogCellsCompanion.insert(
-        deviceName: device.name,
-        chartType: ChartType.currentValue1.index,
-        dt: dt,
-        value: device.indicationData?.measResults[1].currentValue ?? 0,
-      ),
-    );
-    _logCells.add(
-      DataLogCellsCompanion.insert(
-        deviceName: device.name,
-        chartType: ChartType.averageValue1.index,
-        dt: dt,
-        value: device.indicationData?.measResults[1].averageValue ?? 0,
-      ),
-    );
-    _logCells.add(
-      DataLogCellsCompanion.insert(
-        deviceName: device.name,
-        chartType: ChartType.aiCurrent0.index,
-        dt: dt,
-        value: device.indicationData?.analogInputIndications[0].current ?? 0,
-      ),
-    );
-    _logCells.add(
-      DataLogCellsCompanion.insert(
-        deviceName: device.name,
-        chartType: ChartType.aoCurrent0.index,
-        dt: dt,
-        value: device.indicationData?.analogOutputIndications[0].current ?? 0,
-      ),
-    );
-    _logCells.add(
-      DataLogCellsCompanion.insert(
-        deviceName: device.name,
-        chartType: ChartType.aiCurrent1.index,
-        dt: dt,
-        value: device.indicationData?.analogInputIndications[1].current ?? 0,
-      ),
-    );
-    _logCells.add(
-      DataLogCellsCompanion.insert(
-        deviceName: device.name,
-        chartType: ChartType.aoCurrent1.index,
-        dt: dt,
-        value: device.indicationData?.analogOutputIndications[1].current ?? 0,
-      ),
-    );
-    _logCells.add(
-      DataLogCellsCompanion.insert(
-        deviceName: device.name,
-        chartType: ChartType.hv.index,
-        dt: dt,
-        value: device.indicationData?.hv ?? 0,
-      ),
-    );
-    _logCells.add(
-      DataLogCellsCompanion.insert(
-        deviceName: device.name,
-        chartType: ChartType.temp.index,
-        dt: dt,
-        value: device.indicationData?.temperature ?? 0,
-      ),
-    );
+    _logCells.add(DataLogCellsCompanion.insert(
+      deviceName: device.name,
+      chartType: ChartType.counter.index,
+      dt: dt,
+      value: device.indicationData?.counters ?? 0,
+    ));
+    _logCells.add(DataLogCellsCompanion.insert(
+      deviceName: device.name,
+      chartType: ChartType.currentValue0.index,
+      dt: dt,
+      value: device.indicationData?.measResults[0].currentValue ?? 0,
+    ));
+    _logCells.add(DataLogCellsCompanion.insert(
+      deviceName: device.name,
+      chartType: ChartType.averageValue0.index,
+      dt: dt,
+      value: device.indicationData?.measResults[0].averageValue ?? 0,
+    ));
+    _logCells.add(DataLogCellsCompanion.insert(
+      deviceName: device.name,
+      chartType: ChartType.currentValue1.index,
+      dt: dt,
+      value: device.indicationData?.measResults[1].currentValue ?? 0,
+    ));
+    _logCells.add(DataLogCellsCompanion.insert(
+      deviceName: device.name,
+      chartType: ChartType.averageValue1.index,
+      dt: dt,
+      value: device.indicationData?.measResults[1].averageValue ?? 0,
+    ));
+    _logCells.add(DataLogCellsCompanion.insert(
+      deviceName: device.name,
+      chartType: ChartType.aiCurrent0.index,
+      dt: dt,
+      value: device.indicationData?.analogInputIndications[0].current ?? 0,
+    ));
+    _logCells.add(DataLogCellsCompanion.insert(
+      deviceName: device.name,
+      chartType: ChartType.aoCurrent0.index,
+      dt: dt,
+      value: device.indicationData?.analogOutputIndications[0].current ?? 0,
+    ));
+    _logCells.add(DataLogCellsCompanion.insert(
+      deviceName: device.name,
+      chartType: ChartType.aiCurrent1.index,
+      dt: dt,
+      value: device.indicationData?.analogInputIndications[1].current ?? 0,
+    ));
+    _logCells.add(DataLogCellsCompanion.insert(
+      deviceName: device.name,
+      chartType: ChartType.aoCurrent1.index,
+      dt: dt,
+      value: device.indicationData?.analogOutputIndications[1].current ?? 0,
+    ));
+    _logCells.add(DataLogCellsCompanion.insert(
+      deviceName: device.name,
+      chartType: ChartType.hv.index,
+      dt: dt,
+      value: device.indicationData?.hv ?? 0,
+    ));
+    _logCells.add(DataLogCellsCompanion.insert(
+      deviceName: device.name,
+      chartType: ChartType.temp.index,
+      dt: dt,
+      value: device.indicationData?.temperature ?? 0,
+    ));
     if (_logCells.length > 100) {
       try {
         logCellRepository.insertBatch(_logCells);
         _logCells.clear();
       } catch (e) {
-        debugPrint("Проблема с записью в БД логов измерения");
+        debugPrint('Проблема с записью в БД логов измерения');
       }
     }
   }
@@ -248,10 +207,10 @@ class DeviceServiceImpl implements DeviceService {
   void dispose() {
     _updateController.close();
     _devicesController.close();
-    for (var device in devices) {
+    for (final device in _currentDevices) {
       device.dispose();
     }
-    for (var connection in _connections) {
+    for (final connection in _connections.values) {
       connection.dispose();
     }
   }
@@ -268,53 +227,57 @@ class DeviceServiceImpl implements DeviceService {
                 second.connectionSettings.ethernetSettings.ip);
   }
 
+  void _enqueue(Device device, Future<void> Function() command) =>
+      _commandQueue.add((device, command));
+
   @override
   Future<void> writeDeviceType(int type, Device device) async {
-    _commandQueue.add((device, () async {
-      final connection = _connections.where((c) => c.name == device.name).firstOrNull;
-      if (connection != null) {
-        await modbusService.writeDeviceType(type, connection);
-      }
-    }));
+    _enqueue(device, () async {
+      await _connection(device)?.let((c) => modbusService.writeDeviceType(type, c));
+    });
   }
 
   @override
   Future<void> writeMeasDuration(double value, int measProcIndex, Device device) async {
-    _commandQueue.add((device, () async {
-      final connection = _connections.where((c) => c.name == device.name).firstOrNull;
-      if (connection != null) {
-        await modbusService.writeMeasDuration(value, measProcIndex, connection);
-      }
-    }));
+    _enqueue(device, () async {
+      await _connection(device)?.let((c) => modbusService.writeMeasDuration(value, measProcIndex, c));
+    });
   }
 
   @override
   Future<void> writeAveragePoints(int value, int measProcIndex, Device device) async {
-    _commandQueue.add((device, () async {
-      final connection = _connections.where((c) => c.name == device.name).firstOrNull;
-      if (connection != null) {
-        await modbusService.writeAveragePoints(value, measProcIndex, connection);
-      }
-    }));
+    _enqueue(device, () async {
+      await _connection(device)?.let((c) => modbusService.writeAveragePoints(value, measProcIndex, c));
+    });
   }
 
   @override
   Future<void> writeCalcType(int value, int measProcIndex, Device device) async {
-    _commandQueue.add((device, () async {
-      final connection = _connections.where((c) => c.name == device.name).firstOrNull;
-      if (connection != null) {
-        await modbusService.writeCalcType(value, measProcIndex, connection);
-      }
-    }));
+    _enqueue(device, () async {
+      await _connection(device)?.let((c) => modbusService.writeCalcType(value, measProcIndex, c));
+    });
   }
 
   @override
   Future<void> writeMeasType(int value, int measProcIndex, Device device) async {
-    _commandQueue.add((device, () async {
-      final connection = _connections.where((c) => c.name == device.name).firstOrNull;
-      if (connection != null) {
-        await modbusService.writeMeasType(value, measProcIndex, connection);
-      }
-    }));
+    _enqueue(device, () async {
+      await _connection(device)?.let((c) => modbusService.writeMeasType(value, measProcIndex, c));
+    });
   }
+
+  Connection? _connection(Device device) => _connections[device];
+
+  Connection _createConnection(Device device) =>
+      switch (device.connectionSettings.connectionType) {
+        ConnectionType.bluetooth => BleConnection(
+            device.connectionSettings.bluetoothSettings,
+          ),
+        ConnectionType.ethernet => EthernetConnection(
+            device.connectionSettings.ethernetSettings,
+          ),
+      };
+}
+
+extension _Nullsafe<T> on T {
+  R let<R>(R Function(T) fn) => fn(this);
 }

@@ -26,7 +26,7 @@ class DeviceServiceImpl implements DeviceService {
   final DeviceRepository deviceRepository;
   final ModbusService modbusService;
 
-  final Queue<Function> _commandQueue = Queue<Function>();
+  final Queue<(Device, Future<void> Function())> _commandQueue = Queue();
   final List<DataLogCellsCompanion> _logCells = [];
   final List<Connection> _connections = [];
 
@@ -98,15 +98,21 @@ class DeviceServiceImpl implements DeviceService {
           var connection =
               _connections.where((c) => c.name == device.name).firstOrNull;
           if (connection != null) {
-            final newIndicationData = await _getIndicationData(connection);
-            final newSettings = await _getDeviceSettings(connection);
-            if (_commandQueue.isEmpty) {
-              device.updateIndicationData(newIndicationData);
-              device.updateDeviceSettings(newSettings);
+            if (device.shouldReadIndication) {
+              final newIndicationData = await _getIndicationData(connection);
+              device.markIndicationRead();
+              if (_commandQueue.isEmpty) {
+                device.updateIndicationData(newIndicationData);
+              }
+              await _log(device);
+              _updateController.add(device);
+              debugPrint('Обновлены данные для ${device.name}');
             }
-            await _log(device);
-            _updateController.add(device);
-            debugPrint('Обновлены данные для ${device.name}');
+            if (device.shouldReadSettings) {
+              final newSettings = await _getDeviceSettings(connection);
+              device.updateDeviceSettings(newSettings);
+              device.markSettingsRead();
+            }
           }
         }
         if (devicesToUpdate.isEmpty) {
@@ -115,9 +121,10 @@ class DeviceServiceImpl implements DeviceService {
           await Future.delayed(const Duration(milliseconds: 50));
         }
         if (_commandQueue.isNotEmpty) {
-          final command = _commandQueue.removeFirst();
+          final (device, command) = _commandQueue.removeFirst();
           try {
             await command();
+            device.invalidateSettings();
           } catch (e) {
             debugPrint('Ошибка при выполнении команды: $e');
           }
@@ -263,76 +270,51 @@ class DeviceServiceImpl implements DeviceService {
 
   @override
   Future<void> writeDeviceType(int type, Device device) async {
-    _commandQueue.add(() async {
-      var connection =
-          _connections.where((c) => c.name == device.name).firstOrNull;
+    _commandQueue.add((device, () async {
+      final connection = _connections.where((c) => c.name == device.name).firstOrNull;
       if (connection != null) {
         await modbusService.writeDeviceType(type, connection);
       }
-    });
+    }));
   }
 
   @override
-  Future<void> writeMeasDuration(
-    double value,
-    int measProcIndex,
-    Device device,
-  ) async {
-    _commandQueue.add(() async {
-      var connection =
-          _connections.where((c) => c.name == device.name).firstOrNull;
+  Future<void> writeMeasDuration(double value, int measProcIndex, Device device) async {
+    _commandQueue.add((device, () async {
+      final connection = _connections.where((c) => c.name == device.name).firstOrNull;
       if (connection != null) {
         await modbusService.writeMeasDuration(value, measProcIndex, connection);
       }
-    });
+    }));
   }
 
   @override
-  Future<void> writeAveragePoints(
-    int value,
-    int measProcIndex,
-    Device device,
-  ) async {
-    _commandQueue.add(() async {
-      var connection =
-          _connections.where((c) => c.name == device.name).firstOrNull;
+  Future<void> writeAveragePoints(int value, int measProcIndex, Device device) async {
+    _commandQueue.add((device, () async {
+      final connection = _connections.where((c) => c.name == device.name).firstOrNull;
       if (connection != null) {
-        await modbusService.writeAveragePoints(
-          value,
-          measProcIndex,
-          connection,
-        );
+        await modbusService.writeAveragePoints(value, measProcIndex, connection);
       }
-    });
+    }));
   }
 
   @override
-  Future<void> writeCalcType(
-    int value,
-    int measProcIndex,
-    Device device,
-  ) async {
-    _commandQueue.add(() async {
-      var connection =
-          _connections.where((c) => c.name == device.name).firstOrNull;
+  Future<void> writeCalcType(int value, int measProcIndex, Device device) async {
+    _commandQueue.add((device, () async {
+      final connection = _connections.where((c) => c.name == device.name).firstOrNull;
       if (connection != null) {
         await modbusService.writeCalcType(value, measProcIndex, connection);
       }
-    });
+    }));
   }
 
   @override
-  Future<void> writeMeasType(
-    int value,
-    int measProcIndex,
-    Device device,
-  ) async {
-    _commandQueue.add(() async {
-      var connection =
-          _connections.where((c) => c.name == device.name).firstOrNull;
+  Future<void> writeMeasType(int value, int measProcIndex, Device device) async {
+    _commandQueue.add((device, () async {
+      final connection = _connections.where((c) => c.name == device.name).firstOrNull;
       if (connection != null) {
         await modbusService.writeMeasType(value, measProcIndex, connection);
       }
-    });
+    }));
   }
 }

@@ -1,18 +1,28 @@
 import 'package:idensity_ble_client/models/indication/analog_input_indication.dart';
 import 'package:idensity_ble_client/models/indication/analog_output_indication.dart';
+import 'package:idensity_ble_client/models/indication/hv_board_telemetry.dart';
 import 'package:idensity_ble_client/models/indication/meas_result.dart';
+import 'package:idensity_ble_client/models/indication/temp_board_telemetry.dart';
 
 class IndicationData {
   bool isMeasuringState = false;
-  double temperature = 0;
-  double hv = 0;
+  bool adcBoardConnectState = false;
   DateTime rtc = DateTime.now();
-  double counters = 0;
+
+  final TempBoardTelemetry tempBoardTelemetry = TempBoardTelemetry();
+  final HvBoardTelemetry hvBoardTelemetry = HvBoardTelemetry();
+
+  // Backward-compatible getters used by existing widgets and services
+  double get temperature => tempBoardTelemetry.temperature;
+  double get hv => hvBoardTelemetry.outputVoltage;
+  double get counters => measResults[0].counterValue;
+
   final List<MeasResult> measResults = List.generate(
     2,
     (i) => MeasResult(
       measProcIndex: 0,
       isActive: false,
+      counterValue: 0,
       currentValue: 0,
       averageValue: 0,
     ),
@@ -20,8 +30,7 @@ class IndicationData {
 
   final List<AnalogInputIndication> analogInputIndications = List.generate(
     2,
-    (i) =>
-        AnalogInputIndication(adcValue: 0, commState: false, pwrState: false),
+    (i) => AnalogInputIndication(adcValue: 0, commState: false, pwrState: false),
   );
 
   final List<AnalogOutputIndication> analogOutputIndications = List.generate(

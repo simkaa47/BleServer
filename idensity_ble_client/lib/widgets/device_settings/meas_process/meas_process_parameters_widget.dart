@@ -17,6 +17,7 @@ class MeasProcessParametersWidget extends ConsumerWidget {
     final deviceServiceAsyncState = ref.watch(deviceServiceProvider);
     final measProcIndex = ref.watch(selectedMeasProcIndexProvider);
     final device = ref.watch(selectedDeviceProvider);
+    
 
     final serviceName = "Сервис устройств";
 

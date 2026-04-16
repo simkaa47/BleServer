@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:idensity_ble_client/config.dart';
 import 'package:idensity_ble_client/models/device.dart';
@@ -51,7 +52,9 @@ class BleScanService implements ScanService {
         }
       }
     });
-    await [Permission.bluetoothScan, Permission.bluetoothConnect].request();
+    if (!Platform.isLinux) {
+      await [Permission.bluetoothScan, Permission.bluetoothConnect].request();
+    }
     debugPrint("Старт сканирования");
     try {
       await UniversalBle.startScan(

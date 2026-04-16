@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:idensity_ble_client/models/meas_units/meas_unit.dart';
 import 'package:idensity_ble_client/models/settings/device_mode.dart';
 import 'package:idensity_ble_client/resources/enums.dart';
+import 'package:idensity_ble_client/resources/platform.dart';
+import 'package:idensity_ble_client/widgets/osk/osk_num_keyboard_widget.dart';
+import 'package:idensity_ble_client/widgets/osk/osk_text_field.dart';
 
 class AddEditMeasUnitWidget extends StatefulWidget {
   const AddEditMeasUnitWidget({
@@ -79,6 +82,44 @@ class _AddEditMeasUnitWidgetState extends State<AddEditMeasUnitWidget> {
     return null;
   }
 
+  Widget _buildNumericField({
+    required TextEditingController controller,
+    required String label,
+  }) {
+    if (!kShowOsk) {
+      return TextFormField(
+        controller: controller,
+        keyboardType: TextInputType.number,
+        validator: _numberValidator,
+        decoration: InputDecoration(label: Text(label)),
+      );
+    }
+    return GestureDetector(
+      onTap: () async {
+        final initial = double.tryParse(controller.text) ?? 0;
+        final result = await showOskNum(
+          context,
+          name: label,
+          initialValue: initial,
+          minValue: -1000000,
+          maxValue: 1000000,
+          isInteger: false,
+        );
+        if (result != null) {
+          setState(() => controller.text = result.toString());
+        }
+      },
+      child: AbsorbPointer(
+        child: TextFormField(
+          controller: controller,
+          keyboardType: TextInputType.number,
+          validator: _numberValidator,
+          decoration: InputDecoration(label: Text(label)),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -89,10 +130,10 @@ class _AddEditMeasUnitWidgetState extends State<AddEditMeasUnitWidget> {
           key: _formKey,
           child: Column(
             children: [
-              TextFormField(              
+              OskFormField(
                 controller: _nameController,
+                label: 'Название',
                 maxLength: 20,
-                decoration: const InputDecoration(label: Text("Название")),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Пожалуйста, введите название';
@@ -103,22 +144,16 @@ class _AddEditMeasUnitWidgetState extends State<AddEditMeasUnitWidget> {
               Row(
                 children: [
                   Expanded(
-                    child: TextFormField(                    
+                    child: _buildNumericField(
                       controller: _coeffController,
-                      keyboardType: TextInputType.number,
-                      validator: _numberValidator,
-                      decoration: const InputDecoration(
-                        label: Text("Коэффициент"),
-                      ),
+                      label: 'Коэффициент',
                     ),
                   ),
                   const SizedBox(width: 40),
-                  Expanded(                  
-                    child: TextFormField(                   
+                  Expanded(
+                    child: _buildNumericField(
                       controller: _offsetController,
-                      keyboardType: TextInputType.number,
-                      validator: _numberValidator,
-                      decoration: const InputDecoration(label: Text("Смещение")),
+                      label: 'Смещение',
                     ),
                   ),
                 ],

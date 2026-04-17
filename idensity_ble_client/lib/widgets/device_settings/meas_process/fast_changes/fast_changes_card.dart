@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:idensity_ble_client/models/settings/fast_change.dart';
+import 'package:idensity_ble_client/widgets/routes.dart';
 
 class FastChangesCard extends StatelessWidget {
   const FastChangesCard({super.key, required this.fastChange});
@@ -18,7 +20,7 @@ class FastChangesCard extends StatelessWidget {
                   "АКТИВЕН",
                   style: TextStyle(color: Colors.lightGreen),
                 ),
-        onTap: () {},
+        onTap: () => context.push(Routes.measProcFastChangeSettings),
       ),
     );
   }

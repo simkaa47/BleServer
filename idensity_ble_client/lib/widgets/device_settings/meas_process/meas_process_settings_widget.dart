@@ -1,19 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:idensity_ble_client/models/providers/services_registration.dart';
 import 'package:idensity_ble_client/models/settings/device_settings.dart';
-import 'package:idensity_ble_client/widgets/device_settings/meas_process/meas_process_parameters_widget.dart';
+import 'package:idensity_ble_client/widgets/routes.dart';
+
+const _titles = {
+  Routes.measProcDeviceSettings: "Измерительные процессы",
+  Routes.measProcFastChangeSettings: "Измерительные процессы - Настройки быстрых изменений",
+};
 
 class MeasProcessSettingsWidget extends ConsumerWidget {
-  const MeasProcessSettingsWidget({super.key});  
+  const MeasProcessSettingsWidget(this.child, {super.key});
+
+  final Widget child;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {    
+  Widget build(BuildContext context, WidgetRef ref) {
+    final path = GoRouterState.of(context).uri.path;
+    final title = _titles[path] ?? "Измерительные процессы";
+    final isNested = path != Routes.measProcDeviceSettings;
+
     return Scaffold(
-      appBar: AppBar(title: const Text("Измерительные процессы"),),
+      appBar: AppBar(
+        title: Text(title),
+        leading: isNested ? BackButton(onPressed: () => context.pop()) : null,
+      ),
       body: Column(
         children: [
-          const Expanded(child: MeasProcessParametersWidget()),
+          Expanded(child: child),
           Focus(
             autofocus: true,
             child: SizedBox(

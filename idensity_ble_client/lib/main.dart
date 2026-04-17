@@ -7,6 +7,8 @@ import 'package:idensity_ble_client/widgets/communication/communication_tab.dart
 import 'package:idensity_ble_client/widgets/device_settings/common/common_settings_widget.dart';
 import 'package:idensity_ble_client/widgets/device_settings/device_settings_main_widget.dart';
 import 'package:idensity_ble_client/widgets/device_settings/device_settings_navigation_widget.dart';
+import 'package:idensity_ble_client/widgets/device_settings/meas_process/fast_changes/fast_changes_parameters_widget.dart';
+import 'package:idensity_ble_client/widgets/device_settings/meas_process/meas_process_parameters_widget.dart';
 import 'package:idensity_ble_client/widgets/device_settings/meas_process/meas_process_settings_widget.dart';
 import 'package:idensity_ble_client/widgets/main_page/main_page_widget.dart';
 import 'package:idensity_ble_client/widgets/meas_units/meas_units_widget.dart';
@@ -49,8 +51,6 @@ final _router = GoRouter(
           state.matchedLocation,
           currentLocale,
         );
-        
-         
         return AppShell(title: currentTitle, child: child);
       },
       routes: [
@@ -83,10 +83,24 @@ final _router = GoRouter(
                       path: "common",
                       builder: (context, state) => const CommonSettingsWidget(),
                     ),
-                    GoRoute(
-                      path: "measProcs",
+                    ShellRoute(
                       builder:
-                          (context, state) => const MeasProcessSettingsWidget(),
+                          (context, state, child) =>
+                              MeasProcessSettingsWidget(child),
+                      routes: [
+                        GoRoute(
+                          path: "measProcs",
+                          builder:
+                              (context, state) =>
+                                  const MeasProcessParametersWidget(),
+                        ),
+                        GoRoute(
+                          path: "measProcs/fastChange",
+                          builder:
+                              (context, state) =>
+                                  const FastChangesParametersWidget(),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -99,8 +113,6 @@ final _router = GoRouter(
   ],
   errorBuilder: (context, state) => const MainPageWidget(),
 );
-
-
 
 final Map<String, Map<String, String>> _localizedTitles = {
   'en': {

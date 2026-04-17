@@ -8,6 +8,7 @@ import 'package:idensity_ble_client/models/modbus/modbus_commands.dart';
 import 'package:idensity_ble_client/models/settings/analog_output_settings.dart';
 import 'package:idensity_ble_client/models/settings/counter_settings.dart';
 import 'package:idensity_ble_client/models/settings/device_settings.dart';
+import 'package:idensity_ble_client/models/settings/fast_change.dart';
 import 'package:idensity_ble_client/models/settings/get_temperature.dart';
 import 'package:idensity_ble_client/models/settings/serial_settings.dart';
 import 'package:idensity_ble_client/models/settings/tcp_settings.dart';
@@ -27,7 +28,9 @@ class ModbusServiceImpl implements ModbusService {
   @override
   Future<IndicationData> getIndicationData(Connection connection) async {
     if (connection.connectionType != ConnectionType.bluetooth) {
-      throw Exception('Modbus service: ethernet interface is not implemented yet');
+      throw Exception(
+        'Modbus service: ethernet interface is not implemented yet',
+      );
     }
     final buffer = List.filled(1000, 0);
     await _readInputRegisters(
@@ -42,7 +45,9 @@ class ModbusServiceImpl implements ModbusService {
   @override
   Future<DeviceSettings> getDeviceSettings(Connection connection) async {
     if (connection.connectionType != ConnectionType.bluetooth) {
-      throw Exception('Modbus service: ethernet interface is not implemented yet');
+      throw Exception(
+        'Modbus service: ethernet interface is not implemented yet',
+      );
     }
     final buffer = List.filled(1000, 0);
     await _readHoldingRegisters(
@@ -60,11 +65,19 @@ class ModbusServiceImpl implements ModbusService {
 
   @override
   Future<void> writeDeviceType(int value, Connection connection) async {
-    await _writeHoldingRegisters(connection: connection, registers: [value], startAddr: 102);
+    await _writeHoldingRegisters(
+      connection: connection,
+      registers: [value],
+      startAddr: 102,
+    );
   }
 
   @override
-  Future<void> writeMeasDuration(double value, int measProcIndex, Connection connection) async {
+  Future<void> writeMeasDuration(
+    double value,
+    int measProcIndex,
+    Connection connection,
+  ) async {
     await _writeHoldingRegisters(
       connection: connection,
       registers: [(value * 10).toInt()],
@@ -73,7 +86,11 @@ class ModbusServiceImpl implements ModbusService {
   }
 
   @override
-  Future<void> writeAveragePoints(int value, int measProcIndex, Connection connection) async {
+  Future<void> writeAveragePoints(
+    int value,
+    int measProcIndex,
+    Connection connection,
+  ) async {
     await _writeHoldingRegisters(
       connection: connection,
       registers: [value],
@@ -82,7 +99,24 @@ class ModbusServiceImpl implements ModbusService {
   }
 
   @override
-  Future<void> writeMeasDiameter(double value, int measProcIndex, Connection connection) async {
+  Future<void> writeFastChanges(
+    FastChange fastChange,
+    int measProcIndex,
+    Connection connection,
+  ) async {
+    await _writeHoldingRegisters(
+      connection: connection,
+      registers: [fastChange.isActive ? 1 : 0, fastChange.threshold],
+      startAddr: 200 + measProcIndex * 180 + 10,
+    );
+  }
+
+  @override
+  Future<void> writeMeasDiameter(
+    double value,
+    int measProcIndex,
+    Connection connection,
+  ) async {
     await _writeHoldingRegisters(
       connection: connection,
       registers: [(value * 10).toInt()],
@@ -91,7 +125,11 @@ class ModbusServiceImpl implements ModbusService {
   }
 
   @override
-  Future<void> writeMeasActivity(bool value, int measProcIndex, Connection connection) async {
+  Future<void> writeMeasActivity(
+    bool value,
+    int measProcIndex,
+    Connection connection,
+  ) async {
     await _writeHoldingRegisters(
       connection: connection,
       registers: [value ? 1 : 0],
@@ -100,7 +138,11 @@ class ModbusServiceImpl implements ModbusService {
   }
 
   @override
-  Future<void> writeCalcType(int value, int measProcIndex, Connection connection) async {
+  Future<void> writeCalcType(
+    int value,
+    int measProcIndex,
+    Connection connection,
+  ) async {
     await _writeHoldingRegisters(
       connection: connection,
       registers: [value],
@@ -109,7 +151,11 @@ class ModbusServiceImpl implements ModbusService {
   }
 
   @override
-  Future<void> writeMeasType(int value, int measProcIndex, Connection connection) async {
+  Future<void> writeMeasType(
+    int value,
+    int measProcIndex,
+    Connection connection,
+  ) async {
     await _writeHoldingRegisters(
       connection: connection,
       registers: [value],
@@ -118,7 +164,11 @@ class ModbusServiceImpl implements ModbusService {
   }
 
   @override
-  Future<void> writeDensityLiquid(double value, int measProcIndex, Connection connection) async {
+  Future<void> writeDensityLiquid(
+    double value,
+    int measProcIndex,
+    Connection connection,
+  ) async {
     await _writeHoldingRegisters(
       connection: connection,
       registers: _floatToRegisters(value),
@@ -127,7 +177,11 @@ class ModbusServiceImpl implements ModbusService {
   }
 
   @override
-  Future<void> writeDensitySolid(double value, int measProcIndex, Connection connection) async {
+  Future<void> writeDensitySolid(
+    double value,
+    int measProcIndex,
+    Connection connection,
+  ) async {
     await _writeHoldingRegisters(
       connection: connection,
       registers: _floatToRegisters(value),
@@ -141,23 +195,41 @@ class ModbusServiceImpl implements ModbusService {
 
   @override
   Future<void> writeModbusId(int value, Connection connection) async {
-    await _writeHoldingRegisters(connection: connection, registers: [value], startAddr: 0);
+    await _writeHoldingRegisters(
+      connection: connection,
+      registers: [value],
+      startAddr: 0,
+    );
   }
 
   @override
-  Future<void> writeTcpSettings(TcpSettings settings, Connection connection) async {
+  Future<void> writeTcpSettings(
+    TcpSettings settings,
+    Connection connection,
+  ) async {
     await _writeHoldingRegisters(
       connection: connection,
-      registers: [...settings.address, ...settings.mask, ...settings.gateway, ...settings.macAddress],
+      registers: [
+        ...settings.address,
+        ...settings.mask,
+        ...settings.gateway,
+        ...settings.macAddress,
+      ],
       startAddr: 48,
     );
   }
 
   @override
-  Future<void> writeSerialSettings(SerialSettings settings, Connection connection) async {
+  Future<void> writeSerialSettings(
+    SerialSettings settings,
+    Connection connection,
+  ) async {
     await _writeHoldingRegisters(
       connection: connection,
-      registers: [..._uint32ToRegisters(settings.baudrate), settings.mode.index],
+      registers: [
+        ..._uint32ToRegisters(settings.baudrate),
+        settings.mode.index,
+      ],
       startAddr: 66,
     );
   }
@@ -323,13 +395,19 @@ class ModbusServiceImpl implements ModbusService {
     final crc = _calculateCrc16(request, 6);
     view.setUint16(6, crc, Endian.little);
 
-    final response = await connection.readBytes(request, expectedRespLen: 5 + count * 2);
-    if (response.length != count * 2 + 5) throw Exception('Invalid response length');
-    if (response[1] != command.code) throw Exception('Invalid command in response');
+    final response = await connection.readBytes(
+      request,
+      expectedRespLen: 5 + count * 2,
+    );
+    if (response.length != count * 2 + 5)
+      throw Exception('Invalid response length');
+    if (response[1] != command.code)
+      throw Exception('Invalid command in response');
 
     final byteList = Uint8List.fromList(response);
     final responseCrc = _calculateCrc16(byteList, response.length - 2);
-    final realCrc = (response[response.length - 1] << 8) | response[response.length - 2];
+    final realCrc =
+        (response[response.length - 1] << 8) | response[response.length - 2];
     if (realCrc != responseCrc) throw Exception('CRC error in response');
 
     final byteData = ByteData.sublistView(byteList);
@@ -364,7 +442,8 @@ class ModbusServiceImpl implements ModbusService {
 
     final byteList = Uint8List.fromList(response);
     final responseCrc = _calculateCrc16(byteList, response.length - 2);
-    final realCrc = (response[response.length - 1] << 8) | response[response.length - 2];
+    final realCrc =
+        (response[response.length - 1] << 8) | response[response.length - 2];
     if (realCrc != responseCrc) throw Exception('CRC error in response');
   }
 

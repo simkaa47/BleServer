@@ -9,6 +9,7 @@ import 'package:idensity_ble_client/models/charts/chart_type.dart';
 import 'package:idensity_ble_client/models/connection.dart';
 import 'package:idensity_ble_client/models/connection_type.dart';
 import 'package:idensity_ble_client/models/device.dart';
+import 'package:idensity_ble_client/models/settings/fast_change.dart';
 import 'package:idensity_ble_client/services/bluetooth/ble_connection.dart';
 import 'package:idensity_ble_client/services/device_service.dart';
 import 'package:idensity_ble_client/services/ethernet/ethernet_connection.dart';
@@ -276,6 +277,13 @@ class DeviceServiceImpl implements DeviceService {
             device.connectionSettings.ethernetSettings,
           ),
       };
+
+  @override
+  Future<void> writeFastChanges(FastChange fastChange, int measProcIndex, Device device) async{
+    _enqueue(device, () async {
+      await _connection(device)?.let((c) => modbusService.writeFastChanges(fastChange, measProcIndex, c));
+    });
+  }
 }
 
 extension _Nullsafe<T> on T {

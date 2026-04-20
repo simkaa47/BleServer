@@ -284,6 +284,13 @@ class DeviceServiceImpl implements DeviceService {
       await _connection(device)?.let((c) => modbusService.writeFastChanges(fastChange, measProcIndex, c));
     });
   }
+  
+  @override
+  Future<void> writeMeasProcActivity(bool activity, int measProcIndex, Device device) async{
+     _enqueue(device, () async {
+      await _connection(device)?.let((c) => modbusService.writeMeasProcActivity(activity, measProcIndex, c));
+    });
+  }
 }
 
 extension _Nullsafe<T> on T {

@@ -25,6 +25,7 @@ abstract interface class ModbusService {
   Future<void> writeDensityLiquid(double value, int measProcIndex, Connection connection);
   Future<void> writeDensitySolid(double value, int measProcIndex, Connection connection);
   Future<void> writeFastChanges(FastChange fastChange, int measProcIndex, Connection connection);
+  Future<void> writeMeasProcActivity(bool activity, int measProcIndex, Connection connection);
 
   // Communication settings
   Future<void> writeModbusId(int value, Connection connection);

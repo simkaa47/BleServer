@@ -15,9 +15,9 @@ class FastChangesCard extends StatelessWidget {
         title: const Text("Настройки быстрых изменений"),
         subtitle:
             !fastChange.isActive
-                ? const Text("НЕАКТИВЕН")
+                ? const Text("Неактивен")
                 : const Text(
-                  "АКТИВЕН",
+                  "Активен",
                   style: TextStyle(color: Colors.lightGreen),
                 ),
         onTap: () => context.push(Routes.measProcFastChangeSettings),

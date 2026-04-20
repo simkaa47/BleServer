@@ -16,6 +16,7 @@ abstract interface class DeviceService {
   Future<void> writeCalcType(int value, int measProcIndex, Device device);
   Future<void> writeMeasType(int value, int measProcIndex, Device device);
   Future<void> writeFastChanges(FastChange fastChange, int measProcIndex, Device device);
+  Future<void> writeMeasProcActivity(bool activity, int measProcIndex, Device device);
 
   void dispose();
 }

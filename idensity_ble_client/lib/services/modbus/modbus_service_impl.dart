@@ -112,6 +112,19 @@ class ModbusServiceImpl implements ModbusService {
   }
 
   @override
+  Future<void> writeMeasProcActivity(
+    bool activity,
+    int measProcIndex,
+    Connection connection,
+  ) async {
+    await _writeHoldingRegisters(
+      connection: connection,
+      registers: [activity ? 1 : 0],
+      startAddr: 200 + measProcIndex * 180 + 3,
+    );
+  }
+
+  @override
   Future<void> writeMeasDiameter(
     double value,
     int measProcIndex,

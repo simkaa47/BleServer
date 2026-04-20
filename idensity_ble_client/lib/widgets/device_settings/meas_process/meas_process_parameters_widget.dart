@@ -18,7 +18,6 @@ class MeasProcessParametersWidget extends ConsumerWidget {
     final deviceServiceAsyncState = ref.watch(deviceServiceProvider);
     final measProcIndex = ref.watch(selectedMeasProcIndexProvider);
     final device = ref.watch(selectedDeviceProvider);
-    
 
     final serviceName = "Сервис устройств";
 
@@ -45,6 +44,18 @@ class MeasProcessParametersWidget extends ConsumerWidget {
               if (measProc != null) {
                 return ListView(
                   children: [
+                    ComboboxParameterWidget(
+                      name: "Активность изм. процесса",
+                      value: measProc.isActive ? 1 : 0,
+                      onConfirm: (value) async {                        
+                        await deviceService.writeMeasProcActivity(
+                          value != 0,
+                          measProcIndex,
+                          device,
+                        );
+                      },
+                      options: const ['Неактивен', "Активен"],
+                    ),
                     TextParameterWidget(
                       minValue: 0.1,
                       maxValue: 1000,
@@ -98,7 +109,7 @@ class MeasProcessParametersWidget extends ConsumerWidget {
                       },
                       options: calcTypes,
                     ),
-                    FastChangesCard(fastChange: measProc.fastChange)
+                    FastChangesCard(fastChange: measProc.fastChange),
                   ],
                 );
               }

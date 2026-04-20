@@ -1,3 +1,4 @@
+import 'package:idensity_ble_client/models/device.dart';
 import 'package:idensity_ble_client/models/settings/adc_board_mode.dart';
 import 'package:idensity_ble_client/models/settings/analog_out_meas_type.dart';
 import 'package:idensity_ble_client/models/settings/analog_output_mode.dart';
@@ -98,7 +99,7 @@ extension DeviceSettingsExtensions on DeviceSettings {
     const singleMeasRegCnt = 8;
     const singleMeasCnt = 10;
 
-    for (var i = 0; i < DeviceSettings.measProcCount; i++) {
+    for (var i = 0; i < Device.measProcCnt; i++) {
       final base = mpOffset + mpStep * i;
       measProcesses[i].measDuration = registers[base] / 10;
       measProcesses[i].averagePoints = registers[base + 1];

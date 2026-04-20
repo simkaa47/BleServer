@@ -1,6 +1,10 @@
+import 'dart:nativewrappers/_internal/vm/lib/math_patch.dart';
+
+import 'package:idensity_ble_client/models/device.dart';
 import 'package:idensity_ble_client/models/indication/analog_input_indication.dart';
 import 'package:idensity_ble_client/models/indication/analog_output_indication.dart';
 import 'package:idensity_ble_client/models/indication/hv_board_telemetry.dart';
+import 'package:idensity_ble_client/models/indication/meas_process_indication.dart';
 import 'package:idensity_ble_client/models/indication/meas_result.dart';
 import 'package:idensity_ble_client/models/indication/temp_board_telemetry.dart';
 
@@ -12,13 +16,15 @@ class IndicationData {
   final TempBoardTelemetry tempBoardTelemetry = TempBoardTelemetry();
   final HvBoardTelemetry hvBoardTelemetry = HvBoardTelemetry();
 
+  final measProcessIndications = List.generate(Device.measProcCnt, (i)=> MeasProcessIndication());
+
   // Backward-compatible getters used by existing widgets and services
   double get temperature => tempBoardTelemetry.temperature;
   double get hv => hvBoardTelemetry.outputVoltage;
   double get counters => measResults[0].counterValue;
 
   final List<MeasResult> measResults = List.generate(
-    2,
+    min(2, Device.measProcCnt),
     (i) => MeasResult(
       measProcIndex: 0,
       isActive: false,
@@ -29,12 +35,12 @@ class IndicationData {
   );
 
   final List<AnalogInputIndication> analogInputIndications = List.generate(
-    2,
+    min(2, Device.measProcCnt),
     (i) => AnalogInputIndication(adcValue: 0, commState: false, pwrState: false),
   );
 
   final List<AnalogOutputIndication> analogOutputIndications = List.generate(
-    2,
+    min(2, Device.measProcCnt),
     (i) => AnalogOutputIndication(
       adcValue: 0,
       commState: false,

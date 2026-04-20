@@ -222,13 +222,32 @@ class ModbusServiceImpl implements ModbusService {
         stand.lastStandDate.month,
         stand.lastStandDate.day,
         ..._floatToRegisters(stand.result),
-         ..._floatToRegisters(stand.halfLifeResult)
+        ..._floatToRegisters(stand.halfLifeResult),
       ],
       startAddr:
           200 +
           measProcIndex * _measProcRegisterCnt +
           _standRegisterOffset +
           standIndex * _standRegisterCnt,
+    );
+  }
+
+  @override
+  Future<void> makeStandartization(
+    StandSettings stand,
+    int standIndex,
+    int measProcIndex,
+    Connection connection,
+  ) async {
+    await _writeHoldingRegisters(
+      connection: connection,
+      registers: [1],
+      startAddr:
+          200 +
+          measProcIndex * _measProcRegisterCnt +
+          _standRegisterOffset +
+          standIndex * _standRegisterCnt +
+          8,
     );
   }
 
@@ -340,6 +359,16 @@ class ModbusServiceImpl implements ModbusService {
         ..._floatToRegisters(settings.coeffs[1].b),
       ],
       startAddr: 103,
+    );
+  }
+
+
+  @override
+  Future<void> switchMeasState(bool value, Connection connection) async{
+    await _writeHoldingRegisters(
+      connection: connection,
+      registers: [value ? 1:0],
+      startAddr: 114,
     );
   }
 
@@ -507,4 +536,6 @@ class ModbusServiceImpl implements ModbusService {
     }
     return crc;
   }
+  
+  
 }

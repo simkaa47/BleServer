@@ -16,6 +16,8 @@ abstract interface class ModbusService {
   // Device type
   Future<void> writeDeviceType(int value, Connection connection);
 
+  Future<void> switchMeasState(bool value, Connection connection);
+
   // Meas process settings
   Future<void> writeMeasDuration(double value, int measProcIndex, Connection connection);
   Future<void> writeAveragePoints(int value, int measProcIndex, Connection connection);
@@ -28,6 +30,7 @@ abstract interface class ModbusService {
   Future<void> writeFastChanges(FastChange fastChange, int measProcIndex, Connection connection);
   Future<void> writeMeasProcActivity(bool activity, int measProcIndex, Connection connection);
   Future<void> writeMeasProcStandartization(StandSettings stand, int standIndex, int measProcIndex, Connection connection);
+  Future<void> makeStandartization(StandSettings stand, int standIndex, int measProcIndex, Connection connection);
 
   // Communication settings
   Future<void> writeModbusId(int value, Connection connection);

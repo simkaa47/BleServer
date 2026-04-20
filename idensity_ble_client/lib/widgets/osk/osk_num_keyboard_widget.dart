@@ -13,6 +13,7 @@ class OskNumKeyboardWidget extends StatefulWidget {
     required this.maxValue,
     required this.isInteger,
     required this.onConfirm,
+    this.fractionDigits,
   });
 
   final String name;
@@ -21,6 +22,7 @@ class OskNumKeyboardWidget extends StatefulWidget {
   final num maxValue;
   final bool isInteger;
   final void Function(num value) onConfirm;
+  final int? fractionDigits;
 
   @override
   State<OskNumKeyboardWidget> createState() => _OskNumKeyboardWidgetState();
@@ -33,7 +35,9 @@ class _OskNumKeyboardWidgetState extends State<OskNumKeyboardWidget> {
   @override
   void initState() {
     super.initState();
-    _input = widget.initialValue.toString();
+    _input = widget.fractionDigits != null
+        ? widget.initialValue.toStringAsFixed(widget.fractionDigits!)
+        : widget.initialValue.toString();
     _validate(_input);
   }
 
@@ -208,6 +212,7 @@ Future<num?> showOskNum(
   required num minValue,
   required num maxValue,
   bool isInteger = false,
+  int? fractionDigits,
 }) async {
   num? result;
   await showModalBottomSheet<void>(
@@ -219,6 +224,7 @@ Future<num?> showOskNum(
       minValue: minValue,
       maxValue: maxValue,
       isInteger: isInteger,
+      fractionDigits: fractionDigits,
       onConfirm: (v) {
         result = v;
         Navigator.of(context).pop();

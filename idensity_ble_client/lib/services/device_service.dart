@@ -19,6 +19,11 @@ abstract interface class DeviceService {
   Future<void> writeFastChanges(FastChange fastChange, int measProcIndex, Device device);
   Future<void> writeMeasProcActivity(bool activity, int measProcIndex, Device device);
   Future<void> writeMeasProcStandartization(StandSettings stand, int standIndex, int measProcIndex, Device device);
+  Future<void> makeStandartization(StandSettings stand, int standIndex, int measProcIndex, Device device); 
+
+
+
+  Future<void> switchMeasState(bool value, Device device);
 
   void dispose();
 }

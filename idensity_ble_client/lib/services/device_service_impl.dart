@@ -376,6 +376,38 @@ class DeviceServiceImpl implements DeviceService {
       );
     });
   }
+
+  @override
+  Future<void> makeStandartization(
+    StandSettings stand,
+    int standIndex,
+    int measProcIndex,
+    Device device,
+  ) async {
+    if (device.indicationData != null &&
+        !device.indicationData!.isMeasuringState) {
+      _enqueue(device, () async {
+        device.indicationData!.measProcessIndications[measProcIndex].standIndications[standIndex].activate();
+        await _connection(device)?.let(
+          (c) => modbusService.makeStandartization(
+            stand,
+            standIndex,
+            measProcIndex,
+            c,
+          ),
+        );
+      });
+    }
+  }
+  
+  @override
+  Future<void> switchMeasState(bool value, Device device) async{
+     _enqueue(device, () async {
+      await _connection(device)?.let(
+        (c) =>  modbusService.switchMeasState(value, c)
+      );
+    });
+  }
 }
 
 extension _Nullsafe<T> on T {

@@ -9,6 +9,7 @@ class NumericParameterFloatingWidget extends StatefulWidget {
     required this.name,
     required this.value,
     required this.onConfirm,
+    this.fractionDigits,
   });
 
   final num minValue;
@@ -16,6 +17,7 @@ class NumericParameterFloatingWidget extends StatefulWidget {
   final String name;
   final num value;
   final Future<void> Function(num value) onConfirm;
+  final int? fractionDigits;
 
   @override
   State<NumericParameterFloatingWidget> createState() {
@@ -31,7 +33,9 @@ class _NumericParameterFloatingWidgetState
   @override
   void initState() {
     super.initState();
-    _controller.text = widget.value.toString();
+    _controller.text = widget.fractionDigits != null
+        ? widget.value.toStringAsFixed(widget.fractionDigits!)
+        : widget.value.toString();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _formKey.currentState?.validate();
     });

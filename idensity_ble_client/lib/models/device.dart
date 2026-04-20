@@ -8,6 +8,7 @@ import 'package:rxdart/rxdart.dart';
 class Device {
   static const settingsPollInterval = Duration(seconds: 5);
   static const indicationPollInterval = Duration(milliseconds: 500);
+  static const measProcCnt = 2;
 
   int? id;
   bool connected = false;
@@ -33,19 +34,15 @@ class Device {
       _lastSettingsReadTime = DateTime.fromMillisecondsSinceEpoch(0);
 
   bool get shouldReadIndication =>
-      DateTime.now().difference(_lastIndicationReadTime) >= indicationPollInterval;
+      DateTime.now().difference(_lastIndicationReadTime) >=
+      indicationPollInterval;
 
   void markIndicationRead() => _lastIndicationReadTime = DateTime.now();
 
-
-  
-
-  final _indicationDataController =
-      BehaviorSubject<IndicationData>();
+  final _indicationDataController = BehaviorSubject<IndicationData>();
   Stream<IndicationData> get dataStream => _indicationDataController.stream;
 
-  final _deviceSettingsController =
-      BehaviorSubject<DeviceSettings>();
+  final _deviceSettingsController = BehaviorSubject<DeviceSettings>();
   Stream<DeviceSettings> get settingsStream => _deviceSettingsController.stream;
 
   dispose() {
@@ -54,11 +51,49 @@ class Device {
   }
 
   void updateIndicationData(IndicationData data) {
+    if (_indicationData != null) {
+      final ftMeasure =
+          _indicationData!.isMeasuringState && !data.isMeasuringState;
+
+      for (var i = 0; i < Device.measProcCnt; i++) {
+        final standsLen =
+            _indicationData!.measProcessIndications[i].standIndications.length;
+        final singlesLen =
+            _indicationData!
+                .measProcessIndications[i]
+                .singleMeasureIndications
+                .length;
+        for (var j = 0; j < standsLen; j++) {
+          data.measProcessIndications[i].standIndications[j] =
+              _indicationData!.measProcessIndications[i].standIndications[j];
+          data.measProcessIndications[i].standIndications[j].updateTime(
+            _deviceSettings?.measProcesses[i].standSettings[j].standDuration,
+          );
+          if (ftMeasure) {
+            data.measProcessIndications[i].standIndications[j].disactivate();
+          }
+        }
+        for (var j = 0; j < singlesLen; j++) {
+          data.measProcessIndications[i].singleMeasureIndications[j] =
+              _indicationData!
+                  .measProcessIndications[i]
+                  .singleMeasureIndications[j];
+          data.measProcessIndications[i].singleMeasureIndications[j].updateTime(
+            _deviceSettings?.measProcesses[i].singleMeasTime,
+          );
+          if (ftMeasure) {
+            data.measProcessIndications[i].singleMeasureIndications[j]
+                .disactivate();
+          }
+        }
+      }
+    }
+
     _indicationData = data;
     _indicationDataController.add(data);
   }
 
-  void updateDeviceSettings(DeviceSettings settings){
+  void updateDeviceSettings(DeviceSettings settings) {
     _deviceSettings = settings;
     _deviceSettingsController.add(settings);
   }

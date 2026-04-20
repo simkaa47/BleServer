@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:idensity_ble_client/models/device.dart';
 import 'package:idensity_ble_client/models/providers/services_registration.dart';
 import 'package:idensity_ble_client/models/settings/device_settings.dart';
 import 'package:idensity_ble_client/widgets/routes.dart';
@@ -37,12 +38,12 @@ class MeasProcessSettingsWidget extends ConsumerWidget {
               child: PageView.builder(
                 scrollDirection: Axis.horizontal,
                 onPageChanged: (value) {
-                  if (value < DeviceSettings.measProcCount) {
+                  if (value < Device.measProcCnt) {
                     ref.read(selectedMeasProcIndexProvider.notifier).state =
                         value;
                   }
                 },
-                itemCount: DeviceSettings.measProcCount,
+                itemCount: Device.measProcCnt,
                 itemBuilder: (context, index) {
                   return Card(
                     child: Center(

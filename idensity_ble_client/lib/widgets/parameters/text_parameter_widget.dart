@@ -11,6 +11,8 @@ class TextParameterWidget extends StatelessWidget {
     required this.name,
     required this.value,
     required this.onConfirm,
+    this.fractionDigits,
+    this.showCard = true,
   });
 
   final num minValue;
@@ -18,24 +20,26 @@ class TextParameterWidget extends StatelessWidget {
   final String name;
   final num value;
   final Future<void> Function(num value) onConfirm;
+  final int? fractionDigits;
+  final bool showCard;
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: ListTile(
-        title: Text(name),
-        subtitle: Text(
-          value.toString(),
-          style: TextStyle(
-            color:
-                (value > maxValue || value < minValue)
-                    ? Colors.red
-                    : Colors.black,
-          ),
+    final tile = ListTile(
+      title: Text(name),
+      subtitle: Text(
+        fractionDigits != null
+            ? value.toStringAsFixed(fractionDigits!)
+            : value.toString(),
+        style: TextStyle(
+          color: (value > maxValue || value < minValue)
+              ? Colors.red
+              : Colors.black,
         ),
-        onTap: () => _openInput(context),
       ),
+      onTap: () => _openInput(context),
     );
+    return showCard ? Card(child: tile) : tile;
   }
 
   Future<void> _openInput(BuildContext context) async {
@@ -47,6 +51,7 @@ class TextParameterWidget extends StatelessWidget {
         minValue: minValue,
         maxValue: maxValue,
         isInteger: value is int,
+        fractionDigits: fractionDigits,
       );
       if (result != null) await onConfirm(result);
     } else {
@@ -59,6 +64,7 @@ class TextParameterWidget extends StatelessWidget {
           name: name,
           onConfirm: onConfirm,
           value: value,
+          fractionDigits: fractionDigits,
         ),
       );
     }

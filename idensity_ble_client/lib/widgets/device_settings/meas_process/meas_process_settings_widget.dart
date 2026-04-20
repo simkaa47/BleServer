@@ -8,6 +8,7 @@ import 'package:idensity_ble_client/widgets/routes.dart';
 const _titles = {
   Routes.measProcDeviceSettings: "Измерительные процессы",
   Routes.measProcFastChangeSettings: "Измерительные процессы - Настройки быстрых изменений",
+  Routes.measProcStandSettings: "Измерительные процессы - Данные стандартизаций",
 };
 
 class MeasProcessSettingsWidget extends ConsumerWidget {

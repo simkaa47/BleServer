@@ -7,6 +7,7 @@ import 'package:idensity_ble_client/resources/enums.dart';
 import 'package:idensity_ble_client/services/device_service.dart';
 import 'package:idensity_ble_client/widgets/async_state_handlers/universal_async_handler.dart';
 import 'package:idensity_ble_client/widgets/device_settings/meas_process/fast_changes/fast_changes_card.dart';
+import 'package:idensity_ble_client/widgets/device_settings/meas_process/standarization/stand_settings_card.dart';
 import 'package:idensity_ble_client/widgets/parameters/combobox_parameter_widget.dart';
 import 'package:idensity_ble_client/widgets/parameters/text_parameter_widget.dart';
 
@@ -110,6 +111,7 @@ class MeasProcessParametersWidget extends ConsumerWidget {
                       options: calcTypes,
                     ),
                     FastChangesCard(fastChange: measProc.fastChange),
+                    StandSettingsCard(standSettings: measProc.standSettings)
                   ],
                 );
               }

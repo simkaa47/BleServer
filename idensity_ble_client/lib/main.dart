@@ -10,6 +10,7 @@ import 'package:idensity_ble_client/widgets/device_settings/device_settings_navi
 import 'package:idensity_ble_client/widgets/device_settings/meas_process/fast_changes/fast_changes_parameters_widget.dart';
 import 'package:idensity_ble_client/widgets/device_settings/meas_process/meas_process_parameters_widget.dart';
 import 'package:idensity_ble_client/widgets/device_settings/meas_process/meas_process_settings_widget.dart';
+import 'package:idensity_ble_client/widgets/device_settings/meas_process/standarization/stand_settings_widget.dart';
 import 'package:idensity_ble_client/widgets/main_page/main_page_widget.dart';
 import 'package:idensity_ble_client/widgets/meas_units/meas_units_widget.dart';
 import 'package:idensity_ble_client/widgets/routes.dart';
@@ -99,6 +100,12 @@ final _router = GoRouter(
                           builder:
                               (context, state) =>
                                   const FastChangesParametersWidget(),
+                        ),
+                        GoRoute(
+                          path: "measProcs/stands",
+                          builder:
+                              (context, state) =>
+                                  const StandSettingsWidget(),
                         ),
                       ],
                     ),

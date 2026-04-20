@@ -1,5 +1,6 @@
 import 'package:idensity_ble_client/models/device.dart';
 import 'package:idensity_ble_client/models/settings/fast_change.dart';
+import 'package:idensity_ble_client/models/settings/stand_settings.dart';
 
 abstract interface class DeviceService {
   Stream<Device> get updateStream;
@@ -17,6 +18,7 @@ abstract interface class DeviceService {
   Future<void> writeMeasType(int value, int measProcIndex, Device device);
   Future<void> writeFastChanges(FastChange fastChange, int measProcIndex, Device device);
   Future<void> writeMeasProcActivity(bool activity, int measProcIndex, Device device);
+  Future<void> writeMeasProcStandartization(StandSettings stand, int standIndex, int measProcIndex, Device device);
 
   void dispose();
 }

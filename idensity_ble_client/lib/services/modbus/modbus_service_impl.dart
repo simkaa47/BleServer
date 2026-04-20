@@ -11,6 +11,7 @@ import 'package:idensity_ble_client/models/settings/device_settings.dart';
 import 'package:idensity_ble_client/models/settings/fast_change.dart';
 import 'package:idensity_ble_client/models/settings/get_temperature.dart';
 import 'package:idensity_ble_client/models/settings/serial_settings.dart';
+import 'package:idensity_ble_client/models/settings/stand_settings.dart';
 import 'package:idensity_ble_client/models/settings/tcp_settings.dart';
 import 'package:idensity_ble_client/services/modbus/extensions/data_indication_extensions.dart';
 import 'package:idensity_ble_client/services/modbus/extensions/device_settings_extensions.dart';
@@ -20,6 +21,10 @@ class ModbusServiceImpl implements ModbusService {
   static const int _maxChunkSize = 100;
   static const int _settingsRegisterCount = 560;
   static const int _indicationRegisterCount = 60;
+
+  static const int _measProcRegisterCnt = 180;
+  static const int _standRegisterOffset = 24;
+  static const int _standRegisterCnt = 12;
 
   // ---------------------------------------------------------------------------
   // Read operations
@@ -81,7 +86,7 @@ class ModbusServiceImpl implements ModbusService {
     await _writeHoldingRegisters(
       connection: connection,
       registers: [(value * 10).toInt()],
-      startAddr: 200 + measProcIndex * 180,
+      startAddr: 200 + measProcIndex * _measProcRegisterCnt,
     );
   }
 
@@ -94,7 +99,7 @@ class ModbusServiceImpl implements ModbusService {
     await _writeHoldingRegisters(
       connection: connection,
       registers: [value],
-      startAddr: 200 + measProcIndex * 180 + 1,
+      startAddr: 200 + measProcIndex * _measProcRegisterCnt + 1,
     );
   }
 
@@ -107,7 +112,7 @@ class ModbusServiceImpl implements ModbusService {
     await _writeHoldingRegisters(
       connection: connection,
       registers: [fastChange.isActive ? 1 : 0, fastChange.threshold],
-      startAddr: 200 + measProcIndex * 180 + 10,
+      startAddr: 200 + measProcIndex * _measProcRegisterCnt + 10,
     );
   }
 
@@ -120,7 +125,7 @@ class ModbusServiceImpl implements ModbusService {
     await _writeHoldingRegisters(
       connection: connection,
       registers: [activity ? 1 : 0],
-      startAddr: 200 + measProcIndex * 180 + 3,
+      startAddr: 200 + measProcIndex * _measProcRegisterCnt + 3,
     );
   }
 
@@ -133,7 +138,7 @@ class ModbusServiceImpl implements ModbusService {
     await _writeHoldingRegisters(
       connection: connection,
       registers: [(value * 10).toInt()],
-      startAddr: 200 + measProcIndex * 180 + 2,
+      startAddr: 200 + measProcIndex * _measProcRegisterCnt + 2,
     );
   }
 
@@ -146,7 +151,7 @@ class ModbusServiceImpl implements ModbusService {
     await _writeHoldingRegisters(
       connection: connection,
       registers: [value ? 1 : 0],
-      startAddr: 200 + measProcIndex * 180 + 3,
+      startAddr: 200 + measProcIndex * _measProcRegisterCnt + 3,
     );
   }
 
@@ -159,7 +164,7 @@ class ModbusServiceImpl implements ModbusService {
     await _writeHoldingRegisters(
       connection: connection,
       registers: [value],
-      startAddr: 200 + measProcIndex * 180 + 4,
+      startAddr: 200 + measProcIndex * _measProcRegisterCnt + 4,
     );
   }
 
@@ -172,7 +177,7 @@ class ModbusServiceImpl implements ModbusService {
     await _writeHoldingRegisters(
       connection: connection,
       registers: [value],
-      startAddr: 200 + measProcIndex * 180 + 5,
+      startAddr: 200 + measProcIndex * _measProcRegisterCnt + 5,
     );
   }
 
@@ -185,7 +190,7 @@ class ModbusServiceImpl implements ModbusService {
     await _writeHoldingRegisters(
       connection: connection,
       registers: _floatToRegisters(value),
-      startAddr: 200 + measProcIndex * 180 + 6,
+      startAddr: 200 + measProcIndex * _measProcRegisterCnt + 6,
     );
   }
 
@@ -198,7 +203,32 @@ class ModbusServiceImpl implements ModbusService {
     await _writeHoldingRegisters(
       connection: connection,
       registers: _floatToRegisters(value),
-      startAddr: 200 + measProcIndex * 180 + 8,
+      startAddr: 200 + measProcIndex * _measProcRegisterCnt + 8,
+    );
+  }
+
+  @override
+  Future<void> writeMeasProcStandartization(
+    StandSettings stand,
+    int standIndex,
+    int measProcIndex,
+    Connection connection,
+  ) async {
+    await _writeHoldingRegisters(
+      connection: connection,
+      registers: [
+        stand.standDuration * 10,
+        stand.lastStandDate.year - 2000,
+        stand.lastStandDate.month,
+        stand.lastStandDate.day,
+        ..._floatToRegisters(stand.result),
+         ..._floatToRegisters(stand.halfLifeResult)
+      ],
+      startAddr:
+          200 +
+          measProcIndex * _measProcRegisterCnt +
+          _standRegisterOffset +
+          standIndex * _standRegisterCnt,
     );
   }
 
@@ -412,10 +442,12 @@ class ModbusServiceImpl implements ModbusService {
       request,
       expectedRespLen: 5 + count * 2,
     );
-    if (response.length != count * 2 + 5)
+    if (response.length != count * 2 + 5) {
       throw Exception('Invalid response length');
-    if (response[1] != command.code)
+    }
+    if (response[1] != command.code) {
       throw Exception('Invalid command in response');
+    }
 
     final byteList = Uint8List.fromList(response);
     final responseCrc = _calculateCrc16(byteList, response.length - 2);

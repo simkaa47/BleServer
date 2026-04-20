@@ -1,4 +1,4 @@
-import 'dart:nativewrappers/_internal/vm/lib/math_patch.dart';
+import 'dart:math';
 
 import 'package:idensity_ble_client/models/device.dart';
 import 'package:idensity_ble_client/models/indication/analog_input_indication.dart';

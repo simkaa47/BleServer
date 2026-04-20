@@ -384,10 +384,17 @@ class DeviceServiceImpl implements DeviceService {
     int measProcIndex,
     Device device,
   ) async {
-    if (device.indicationData != null &&
-        !device.indicationData!.isMeasuringState) {
+    final indications = device.indicationData;
+    final anyMeasureActive = indications?.measProcessIndications.any(
+          (proc) =>
+              proc.standIndications.any((s) => s.isActive) ||
+              proc.singleMeasureIndications.any((s) => s.isActive),
+        ) ??
+        false;
+
+    if (indications != null && !indications.isMeasuringState && !anyMeasureActive) {
       _enqueue(device, () async {
-        device.indicationData!.measProcessIndications[measProcIndex].standIndications[standIndex].activate();
+        indications.measProcessIndications[measProcIndex].standIndications[standIndex].activate();
         await _connection(device)?.let(
           (c) => modbusService.makeStandartization(
             stand,

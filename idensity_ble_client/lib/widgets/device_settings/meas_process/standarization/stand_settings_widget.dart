@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idensity_ble_client/models/device.dart';
+import 'package:idensity_ble_client/models/indication/indication.dart';
 import 'package:idensity_ble_client/models/providers/services_registration.dart';
+import 'package:idensity_ble_client/models/settings/device_settings.dart';
 import 'package:idensity_ble_client/services/device_service.dart';
 import 'package:idensity_ble_client/widgets/async_state_handlers/universal_async_handler.dart';
 import 'package:idensity_ble_client/widgets/device_settings/meas_process/standarization/stand_widget.dart';
+import 'package:rxdart/rxdart.dart';
 
 const _standNames = ['Фон', 'Источник'];
 
@@ -31,14 +34,23 @@ class StandSettingsWidget extends ConsumerWidget {
   ) {
     if (device == null) return const Text("Ожидание данных");
 
+    final combined = Rx.combineLatest2(
+      device.settingsStream,
+      device.dataStream,
+      (DeviceSettings settings, IndicationData indication) =>
+          (settings, indication),
+    );
+
     return StreamBuilder(
-      stream: device.settingsStream,
+      stream: combined,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.active ||
             snapshot.connectionState == ConnectionState.done &&
                 snapshot.data != null) {
-          final measProc = snapshot.data?.measProcesses[measProcIndex];
-          if (measProc != null) {
+          final measProc =
+              snapshot.data?.$1.measProcesses[measProcIndex];
+          final indication = snapshot.data?.$2;
+          if (measProc != null && indication != null) {
             return ListView.builder(
               padding: const EdgeInsets.all(8),
               itemCount: _standNames.length,
@@ -49,6 +61,9 @@ class StandSettingsWidget extends ConsumerWidget {
                   child: StandWidget(
                     name: _standNames[standIndex],
                     stand: stand,
+                    standIndication: indication
+                        .measProcessIndications[measProcIndex]
+                        .standIndications[standIndex],
                     onWrite: (updated) async {
                       await deviceService.writeMeasProcStandartization(
                         updated,
@@ -56,6 +71,17 @@ class StandSettingsWidget extends ConsumerWidget {
                         measProcIndex,
                         device,
                       );
+                    },
+                    onStart: () async {
+                      await deviceService.makeStandartization(
+                        stand,
+                        standIndex,
+                        measProcIndex,
+                        device,
+                      );
+                    },
+                    onStop: () async {
+                      await deviceService.switchMeasState(false, device);
                     },
                   ),
                 );

@@ -71,6 +71,7 @@ class Device {
           );
           if (ftMeasure) {
             data.measProcessIndications[i].standIndications[j].disactivate();
+            invalidateSettings();
           }
         }
         for (var j = 0; j < singlesLen; j++) {
@@ -84,6 +85,7 @@ class Device {
           if (ftMeasure) {
             data.measProcessIndications[i].singleMeasureIndications[j]
                 .disactivate();
+            invalidateSettings();
           }
         }
       }

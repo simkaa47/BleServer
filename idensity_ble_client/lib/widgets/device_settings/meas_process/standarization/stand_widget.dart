@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:idensity_ble_client/models/indication/measure_indication.dart';
 import 'package:idensity_ble_client/models/settings/stand_settings.dart';
 import 'package:idensity_ble_client/widgets/parameters/text_parameter_widget.dart';
 
@@ -7,12 +8,18 @@ class StandWidget extends StatelessWidget {
     super.key,
     required this.name,
     required this.stand,
+    required this.standIndication,
     required this.onWrite,
+    required this.onStart,
+    required this.onStop,
   });
 
   final String name;
   final StandSettings stand;
+  final MeasureIndication standIndication;
   final Future<void> Function(StandSettings) onWrite;
+  final Future<void> Function() onStart;
+  final Future<void> Function() onStop;
 
   StandSettings _copy() => StandSettings()
     ..standDuration = stand.standDuration
@@ -32,19 +39,29 @@ class StandWidget extends StatelessWidget {
       children: [
         ListTile(
           title: Text(name, style: Theme.of(context).textTheme.titleMedium),
-          trailing: TextButton(
-            child: Text(dateStr),
-            onPressed: () async {
-              final picked = await showDatePicker(
-                context: context,
-                initialDate: stand.lastStandDate,
-                firstDate: DateTime(2000),
-                lastDate: DateTime(2100),
-              );
-              if (picked != null) {
-                await onWrite(_copy()..lastStandDate = picked);
-              }
-            },
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _StandartizationButton(
+                indication: standIndication,
+                onStart: onStart,
+                onStop: onStop,
+              ),
+              TextButton(
+                child: Text(dateStr),
+                onPressed: () async {
+                  final picked = await showDatePicker(
+                    context: context,
+                    initialDate: stand.lastStandDate,
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2100),
+                  );
+                  if (picked != null) {
+                    await onWrite(_copy()..lastStandDate = picked);
+                  }
+                },
+              ),
+            ],
           ),
         ),
         TextParameterWidget(
@@ -80,6 +97,40 @@ class StandWidget extends StatelessWidget {
           },
         ),
       ],
+    );
+  }
+}
+
+class _StandartizationButton extends StatelessWidget {
+  const _StandartizationButton({
+    required this.indication,
+    required this.onStart,
+    required this.onStop,
+  });
+
+  final MeasureIndication indication;
+  final Future<void> Function() onStart;
+  final Future<void> Function() onStop;
+
+  @override
+  Widget build(BuildContext context) {
+    final isActive = indication.isActive;
+
+    return ElevatedButton(
+      style: isActive
+          ? ElevatedButton.styleFrom(backgroundColor: Colors.red)
+          : null,
+      onPressed: isActive ? onStop : onStart,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(isActive ? Icons.stop : Icons.play_arrow),
+          if (isActive) ...[
+            const SizedBox(width: 4),
+            Text('${indication.secondsLasted} с'),
+          ],
+        ],
+      ),
     );
   }
 }

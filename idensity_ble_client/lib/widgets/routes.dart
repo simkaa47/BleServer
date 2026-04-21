@@ -7,6 +7,7 @@ class Routes {
   static const String measProcDeviceSettings = '/home/deviceSettings/measProcs';
   static const String measProcFastChangeSettings = '/home/deviceSettings/measProcs/fastChange';
   static const String measProcStandSettings = '/home/deviceSettings/measProcs/stands';
-   static const String measProcCalibrCurve = '/home/deviceSettings/measProcs/calibrCurve';
+  static const String measProcCalibrCurve = '/home/deviceSettings/measProcs/calibrCurve';
+  static const String measProcCalibration = '/home/deviceSettings/measProcs/calibration';
   static const String communication = '/home/communication';
 }

@@ -10,6 +10,7 @@ const _titles = {
   Routes.measProcFastChangeSettings: "Измерительные процессы - Настройки быстрых изменений",
   Routes.measProcStandSettings: "Измерительные процессы - Данные стандартизаций",
   Routes.measProcCalibrCurve: "Измерительные процессы - Кривая калибровки",
+   Routes.measProcCalibration: "Измерительные процессы - Калибровка",
 };
 
 class MeasProcessSettingsWidget extends ConsumerWidget {

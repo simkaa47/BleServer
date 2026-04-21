@@ -638,6 +638,12 @@ void setMeasProcess(uint16_t address, uint16_t value) {
     case 12:
       settings.adc_module.meas_single_time = value;
       break;
+    // Активности ед изм
+    case 156:
+      for (int i = 0; i < single_meas_cnt; ++i) {
+        settings.adc_module.meas_process[meas_proc_num].calib_src_values[i].is_checked = (value >> i) & 1;
+      }
+      break;
     default:
       if (offset >= stand_start_reg_num && offset < (stand_start_reg_num + stand_cnt * stand_reg_cnt)) {
         setStandData(meas_proc_num, offset, value);
@@ -1143,6 +1149,12 @@ uint16_t GetMeasProcData(uint16_t address)
 				settings.adc_module.meas_single_time = 300;
 			}
 			result = settings.adc_module.meas_single_time;
+			break;
+		// Активности ед изм
+		case 156:
+			for (int i = 0; i < single_meas_cnt; ++i) {
+				result |= settings.adc_module.meas_process[meas_proc_num].calib_src_values[i].is_checked << i;
+			}
 			break;
 		default:
 			if(offset >= stand_start_reg_num && offset < (stand_start_reg_num + stand_cnt * stand_reg_cnt))

@@ -179,6 +179,7 @@ typedef struct
 	RTC_DateTypeDef date;
 	float attenuation;
 	float phys_value;
+	uint8_t is_checked;
 } TCalib_Curve_Src_Value;
 
 typedef struct

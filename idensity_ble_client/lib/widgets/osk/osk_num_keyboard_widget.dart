@@ -9,8 +9,8 @@ class OskNumKeyboardWidget extends StatefulWidget {
     super.key,
     required this.name,
     required this.initialValue,
-    required this.minValue,
-    required this.maxValue,
+    this.minValue,
+    this.maxValue,
     required this.isInteger,
     required this.onConfirm,
     this.fractionDigits,
@@ -18,8 +18,8 @@ class OskNumKeyboardWidget extends StatefulWidget {
 
   final String name;
   final num initialValue;
-  final num minValue;
-  final num maxValue;
+  final num? minValue;
+  final num? maxValue;
   final bool isInteger;
   final void Function(num value) onConfirm;
   final int? fractionDigits;
@@ -47,8 +47,10 @@ class _OskNumKeyboardWidgetState extends State<OskNumKeyboardWidget> {
       _error = 'Введите число';
       return;
     }
-    if (number < widget.minValue || number > widget.maxValue) {
-      _error = 'Диапазон: ${widget.minValue} – ${widget.maxValue}';
+    final min = widget.minValue ?? double.negativeInfinity;
+    final max = widget.maxValue ?? double.infinity;
+    if (number < min || number > max) {
+      _error = 'Диапазон: $min – $max';
       return;
     }
     _error = null;
@@ -209,8 +211,8 @@ Future<num?> showOskNum(
   BuildContext context, {
   required String name,
   required num initialValue,
-  required num minValue,
-  required num maxValue,
+  num? minValue,
+  num? maxValue,
   bool isInteger = false,
   int? fractionDigits,
 }) async {

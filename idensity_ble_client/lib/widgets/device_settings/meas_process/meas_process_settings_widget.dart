@@ -3,13 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:idensity_ble_client/models/device.dart';
 import 'package:idensity_ble_client/models/providers/services_registration.dart';
-import 'package:idensity_ble_client/models/settings/device_settings.dart';
 import 'package:idensity_ble_client/widgets/routes.dart';
 
 const _titles = {
   Routes.measProcDeviceSettings: "Измерительные процессы",
   Routes.measProcFastChangeSettings: "Измерительные процессы - Настройки быстрых изменений",
   Routes.measProcStandSettings: "Измерительные процессы - Данные стандартизаций",
+  Routes.measProcCalibrCurve: "Измерительные процессы - Кривая калибровки",
 };
 
 class MeasProcessSettingsWidget extends ConsumerWidget {

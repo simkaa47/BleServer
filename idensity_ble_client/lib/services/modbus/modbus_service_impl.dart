@@ -6,6 +6,7 @@ import 'package:idensity_ble_client/models/connection_type.dart';
 import 'package:idensity_ble_client/models/indication/indication.dart';
 import 'package:idensity_ble_client/models/modbus/modbus_commands.dart';
 import 'package:idensity_ble_client/models/settings/analog_output_settings.dart';
+import 'package:idensity_ble_client/models/settings/calibr_curve.dart';
 import 'package:idensity_ble_client/models/settings/counter_settings.dart';
 import 'package:idensity_ble_client/models/settings/device_settings.dart';
 import 'package:idensity_ble_client/models/settings/fast_change.dart';
@@ -233,6 +234,19 @@ class ModbusServiceImpl implements ModbusService {
   }
 
   @override
+  Future<void> writeMeasProcCalibrCurve(
+    CalibrCurve calibrCurve,
+    int measProcIndex,
+    Connection connection,
+  ) async {
+    await _writeHoldingRegisters(
+      connection: connection,
+      registers: [calibrCurve.type.index, 0, ...calibrCurve.coefficients.expand((c) => _floatToRegisters(c))],
+      startAddr: 200 + measProcIndex * _measProcRegisterCnt + 60,
+    );
+  }
+
+  @override
   Future<void> makeStandartization(
     StandSettings stand,
     int standIndex,
@@ -362,12 +376,11 @@ class ModbusServiceImpl implements ModbusService {
     );
   }
 
-
   @override
-  Future<void> switchMeasState(bool value, Connection connection) async{
+  Future<void> switchMeasState(bool value, Connection connection) async {
     await _writeHoldingRegisters(
       connection: connection,
-      registers: [value ? 1:0],
+      registers: [value ? 1 : 0],
       startAddr: 114,
     );
   }
@@ -536,6 +549,4 @@ class ModbusServiceImpl implements ModbusService {
     }
     return crc;
   }
-  
-  
 }

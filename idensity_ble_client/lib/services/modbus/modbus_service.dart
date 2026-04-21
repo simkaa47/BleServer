@@ -1,6 +1,7 @@
 import 'package:idensity_ble_client/models/connection.dart';
 import 'package:idensity_ble_client/models/indication/indication.dart';
 import 'package:idensity_ble_client/models/settings/analog_output_settings.dart';
+import 'package:idensity_ble_client/models/settings/calibr_curve.dart';
 import 'package:idensity_ble_client/models/settings/counter_settings.dart';
 import 'package:idensity_ble_client/models/settings/device_settings.dart';
 import 'package:idensity_ble_client/models/settings/fast_change.dart';
@@ -30,6 +31,7 @@ abstract interface class ModbusService {
   Future<void> writeFastChanges(FastChange fastChange, int measProcIndex, Connection connection);
   Future<void> writeMeasProcActivity(bool activity, int measProcIndex, Connection connection);
   Future<void> writeMeasProcStandartization(StandSettings stand, int standIndex, int measProcIndex, Connection connection);
+  Future<void> writeMeasProcCalibrCurve(CalibrCurve calibrCurve,  int measProcIndex, Connection connection);
   Future<void> makeStandartization(StandSettings stand, int standIndex, int measProcIndex, Connection connection);
 
   // Communication settings

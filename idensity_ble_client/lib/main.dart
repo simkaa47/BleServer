@@ -7,6 +7,7 @@ import 'package:idensity_ble_client/widgets/communication/communication_tab.dart
 import 'package:idensity_ble_client/widgets/device_settings/common/common_settings_widget.dart';
 import 'package:idensity_ble_client/widgets/device_settings/device_settings_main_widget.dart';
 import 'package:idensity_ble_client/widgets/device_settings/device_settings_navigation_widget.dart';
+import 'package:idensity_ble_client/widgets/device_settings/meas_process/calibr_curve/calibr_curve_widget.dart';
 import 'package:idensity_ble_client/widgets/device_settings/meas_process/fast_changes/fast_changes_parameters_widget.dart';
 import 'package:idensity_ble_client/widgets/device_settings/meas_process/meas_process_parameters_widget.dart';
 import 'package:idensity_ble_client/widgets/device_settings/meas_process/meas_process_settings_widget.dart';
@@ -106,6 +107,12 @@ final _router = GoRouter(
                           builder:
                               (context, state) =>
                                   const StandSettingsWidget(),
+                        ),
+                        GoRoute(
+                          path: "measProcs/calibrCurve",
+                          builder:
+                              (context, state) =>
+                                  const CalibrCurveWidget(),
                         ),
                       ],
                     ),

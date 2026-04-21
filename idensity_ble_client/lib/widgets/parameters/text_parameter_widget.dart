@@ -6,8 +6,8 @@ import 'package:idensity_ble_client/widgets/parameters/numeric_parameter_floatin
 class TextParameterWidget extends StatelessWidget {
   const TextParameterWidget({
     super.key,
-    required this.minValue,
-    required this.maxValue,
+    this.minValue,
+    this.maxValue,
     required this.name,
     required this.value,
     required this.onConfirm,
@@ -15,8 +15,8 @@ class TextParameterWidget extends StatelessWidget {
     this.showCard = true,
   });
 
-  final num minValue;
-  final num maxValue;
+  final num? minValue;
+  final num? maxValue;
   final String name;
   final num value;
   final Future<void> Function(num value) onConfirm;
@@ -32,7 +32,7 @@ class TextParameterWidget extends StatelessWidget {
             ? value.toStringAsFixed(fractionDigits!)
             : value.toString(),
         style: TextStyle(
-          color: (value > maxValue || value < minValue)
+          color: (value > (maxValue ?? double.infinity) || value < (minValue ?? double.negativeInfinity))
               ? Colors.red
               : Colors.black,
         ),

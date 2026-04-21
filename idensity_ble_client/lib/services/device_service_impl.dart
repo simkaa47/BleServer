@@ -9,6 +9,7 @@ import 'package:idensity_ble_client/models/charts/chart_type.dart';
 import 'package:idensity_ble_client/models/connection.dart';
 import 'package:idensity_ble_client/models/connection_type.dart';
 import 'package:idensity_ble_client/models/device.dart';
+import 'package:idensity_ble_client/models/settings/calibr_curve.dart';
 import 'package:idensity_ble_client/models/settings/fast_change.dart';
 import 'package:idensity_ble_client/models/settings/stand_settings.dart';
 import 'package:idensity_ble_client/services/bluetooth/ble_connection.dart';
@@ -412,6 +413,15 @@ class DeviceServiceImpl implements DeviceService {
      _enqueue(device, () async {
       await _connection(device)?.let(
         (c) =>  modbusService.switchMeasState(value, c)
+      );
+    });
+  }
+
+  @override
+  Future<void> writeMeasProcCalibrCurve(CalibrCurve calibrCurve, int measProcIndex, Device device) async{
+    _enqueue(device, () async {
+      await _connection(device)?.let(
+        (c) =>  modbusService.writeMeasProcCalibrCurve(calibrCurve, measProcIndex, c)
       );
     });
   }

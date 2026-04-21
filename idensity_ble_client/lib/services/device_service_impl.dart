@@ -425,6 +425,15 @@ class DeviceServiceImpl implements DeviceService {
       );
     });
   }
+  
+  @override
+  Future<void> writeMeasProcSingleMeasDuration(int duration, int measProcIndex, Device device) async{
+    _enqueue(device, () async {
+      await _connection(device)?.let(
+        (c) =>  modbusService.writeMeasProcSingleMeasDuration(duration, measProcIndex, c)
+      );
+    });
+  }
 }
 
 extension _Nullsafe<T> on T {

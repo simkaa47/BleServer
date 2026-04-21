@@ -4,6 +4,7 @@ import 'package:idensity_ble_client/models/device.dart';
 import 'package:idensity_ble_client/models/providers/services_registration.dart';
 import 'package:idensity_ble_client/services/device_service.dart';
 import 'package:idensity_ble_client/widgets/async_state_handlers/universal_async_handler.dart';
+import 'package:idensity_ble_client/widgets/parameters/text_parameter_widget.dart';
 
 class CalibrationWidget extends ConsumerWidget {
   const CalibrationWidget({super.key});
@@ -23,7 +24,6 @@ class CalibrationWidget extends ConsumerWidget {
     );
   }
 
-
   Widget _onDeviceServiceData(
     Device? device,
     int measProcIndex,
@@ -39,7 +39,20 @@ class CalibrationWidget extends ConsumerWidget {
               final measProc = snapshot.data?.measProcesses[measProcIndex];
               if (measProc != null) {
                 return ListView(
-                  children: const [
+                  children: [
+                    TextParameterWidget(
+                      name: "Время ед. измерения. с.",
+                      maxValue: 999,
+                      minValue: 1,
+                      value: measProc.singleMeasTime,
+                      onConfirm: (value) async {
+                        await deviceService.writeMeasProcSingleMeasDuration(
+                          value.toInt(),
+                          measProcIndex,
+                          device,
+                        );
+                      },
+                    ),
                   ],
                 );
               }

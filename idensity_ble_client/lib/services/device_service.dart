@@ -22,7 +22,7 @@ abstract interface class DeviceService {
   Future<void> writeMeasProcStandartization(StandSettings stand, int standIndex, int measProcIndex, Device device);
   Future<void> writeMeasProcCalibrCurve(CalibrCurve calibrCurve,  int measProcIndex, Device device);
   Future<void> makeStandartization(StandSettings stand, int standIndex, int measProcIndex, Device device); 
-
+  Future<void> writeMeasProcSingleMeasDuration(int duration, int measProcIndex, Device device);
 
 
   Future<void> switchMeasState(bool value, Device device);

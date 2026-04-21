@@ -33,6 +33,7 @@ abstract interface class ModbusService {
   Future<void> writeMeasProcStandartization(StandSettings stand, int standIndex, int measProcIndex, Connection connection);
   Future<void> writeMeasProcCalibrCurve(CalibrCurve calibrCurve,  int measProcIndex, Connection connection);
   Future<void> makeStandartization(StandSettings stand, int standIndex, int measProcIndex, Connection connection);
+   Future<void> writeMeasProcSingleMeasDuration(int duration, int measProcIndex, Connection connection);
 
   // Communication settings
   Future<void> writeModbusId(int value, Connection connection);

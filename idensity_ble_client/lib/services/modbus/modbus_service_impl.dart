@@ -241,7 +241,11 @@ class ModbusServiceImpl implements ModbusService {
   ) async {
     await _writeHoldingRegisters(
       connection: connection,
-      registers: [calibrCurve.type.index, 0, ...calibrCurve.coefficients.expand((c) => _floatToRegisters(c))],
+      registers: [
+        calibrCurve.type.index,
+        0,
+        ...calibrCurve.coefficients.expand((c) => _floatToRegisters(c)),
+      ],
       startAddr: 200 + measProcIndex * _measProcRegisterCnt + 60,
     );
   }
@@ -262,6 +266,19 @@ class ModbusServiceImpl implements ModbusService {
           _standRegisterOffset +
           standIndex * _standRegisterCnt +
           8,
+    );
+  }
+
+  @override
+  Future<void> writeMeasProcSingleMeasDuration(
+    int duration,
+    int measProcIndex,
+    Connection connection,
+  ) async {
+    await _writeHoldingRegisters(
+      connection: connection,
+      registers: [duration*10],
+      startAddr: 200 + measProcIndex * _measProcRegisterCnt + 12,
     );
   }
 

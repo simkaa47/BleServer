@@ -34,6 +34,13 @@ class DeviceSettingsNavigationWidget extends StatelessWidget {
             onTap: () => context.push(Routes.counters),
           ),
         ),
+        Card(
+          child: ListTile(
+            title: const Text("Настройки связи"),
+            leading: const Icon(Icons.settings_ethernet),
+            onTap: () => context.push(Routes.deviceCommunicationSettings),
+          ),
+        ),
       ],
     );
   }

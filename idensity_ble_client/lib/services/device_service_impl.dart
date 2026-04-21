@@ -12,8 +12,10 @@ import 'package:idensity_ble_client/models/device.dart';
 import 'package:idensity_ble_client/models/settings/calibr_curve.dart';
 import 'package:idensity_ble_client/models/settings/counter_settings.dart';
 import 'package:idensity_ble_client/models/settings/fast_change.dart';
+import 'package:idensity_ble_client/models/settings/serial_settings.dart';
 import 'package:idensity_ble_client/models/settings/single_meas_result.dart';
 import 'package:idensity_ble_client/models/settings/stand_settings.dart';
+import 'package:idensity_ble_client/models/settings/tcp_settings.dart';
 import 'package:idensity_ble_client/services/bluetooth/ble_connection.dart';
 import 'package:idensity_ble_client/services/device_service.dart';
 import 'package:idensity_ble_client/services/ethernet/ethernet_connection.dart';
@@ -433,6 +435,24 @@ class DeviceServiceImpl implements DeviceService {
     _enqueue(device, () async {
       await _connection(device)?.let(
         (c) => modbusService.writeCounterSettings(settings, counterIndex, c),
+      );
+    });
+  }
+
+  @override
+  Future<void> writeTcpSettings(TcpSettings settings, Device device) async {
+    _enqueue(device, () async {
+      await _connection(device)?.let(
+        (c) => modbusService.writeTcpSettings(settings, c),
+      );
+    });
+  }
+
+  @override
+  Future<void> writeSerialSettings(SerialSettings settings, Device device) async {
+    _enqueue(device, () async {
+      await _connection(device)?.let(
+        (c) => modbusService.writeSerialSettings(settings, c),
       );
     });
   }

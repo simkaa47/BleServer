@@ -13,6 +13,7 @@ import 'package:idensity_ble_client/widgets/device_settings/meas_process/fast_ch
 import 'package:idensity_ble_client/widgets/device_settings/meas_process/meas_process_parameters_widget.dart';
 import 'package:idensity_ble_client/widgets/device_settings/meas_process/meas_process_settings_widget.dart';
 import 'package:idensity_ble_client/widgets/device_settings/meas_process/standarization/stand_settings_widget.dart';
+import 'package:idensity_ble_client/widgets/device_settings/communication/communication_settings_widget.dart';
 import 'package:idensity_ble_client/widgets/device_settings/counters/counter_settings_widget.dart';
 import 'package:idensity_ble_client/widgets/main_page/main_page_widget.dart';
 import 'package:idensity_ble_client/widgets/meas_units/meas_units_widget.dart';
@@ -90,6 +91,10 @@ final _router = GoRouter(
                     GoRoute(
                       path: "counters",
                       builder: (context, state) => const CounterSettingsWidget(),
+                    ),
+                    GoRoute(
+                      path: "communication",
+                      builder: (context, state) => const CommunicationSettingsWidget(),
                     ),
                     ShellRoute(
                       builder:

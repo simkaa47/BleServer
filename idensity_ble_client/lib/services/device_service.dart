@@ -2,8 +2,10 @@ import 'package:idensity_ble_client/models/device.dart';
 import 'package:idensity_ble_client/models/settings/calibr_curve.dart';
 import 'package:idensity_ble_client/models/settings/counter_settings.dart';
 import 'package:idensity_ble_client/models/settings/fast_change.dart';
+import 'package:idensity_ble_client/models/settings/serial_settings.dart';
 import 'package:idensity_ble_client/models/settings/single_meas_result.dart';
 import 'package:idensity_ble_client/models/settings/stand_settings.dart';
+import 'package:idensity_ble_client/models/settings/tcp_settings.dart';
 
 abstract interface class DeviceService {
   Stream<Device> get updateStream;
@@ -30,6 +32,8 @@ abstract interface class DeviceService {
 
 
   Future<void> writeCounterSettings(CounterSettings settings, int counterIndex, Device device);
+  Future<void> writeTcpSettings(TcpSettings settings, Device device);
+  Future<void> writeSerialSettings(SerialSettings settings, Device device);
 
   Future<void> switchMeasState(bool value, Device device);
 

@@ -144,7 +144,9 @@ extension DeviceSettingsExtensions on DeviceSettings {
         measProcesses[i].singleMeasResults[m].date = DateTime(year, month, day);
         measProcesses[i].singleMeasResults[m].weak = registers.getFloat(mb + 4);
         measProcesses[i].singleMeasResults[m].physValue = registers.getFloat(mb + 6);
+        measProcesses[i].singleMeasResults[m].isChecked = (registers[base + 156] & (1 << m)) > 0;
       }
+
     }
   }
 }

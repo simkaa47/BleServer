@@ -11,6 +11,7 @@ import 'package:idensity_ble_client/models/connection_type.dart';
 import 'package:idensity_ble_client/models/device.dart';
 import 'package:idensity_ble_client/models/settings/calibr_curve.dart';
 import 'package:idensity_ble_client/models/settings/fast_change.dart';
+import 'package:idensity_ble_client/models/settings/single_meas_result.dart';
 import 'package:idensity_ble_client/models/settings/stand_settings.dart';
 import 'package:idensity_ble_client/services/bluetooth/ble_connection.dart';
 import 'package:idensity_ble_client/services/device_service.dart';
@@ -378,6 +379,14 @@ class DeviceServiceImpl implements DeviceService {
     });
   }
 
+  bool _anyMeasureActive(Device device) =>
+      device.indicationData?.measProcessIndications.any(
+        (proc) =>
+            proc.standIndications.any((s) => s.isActive) ||
+            proc.singleMeasureIndications.any((s) => s.isActive),
+      ) ??
+      false;
+
   @override
   Future<void> makeStandartization(
     StandSettings stand,
@@ -386,14 +395,7 @@ class DeviceServiceImpl implements DeviceService {
     Device device,
   ) async {
     final indications = device.indicationData;
-    final anyMeasureActive = indications?.measProcessIndications.any(
-          (proc) =>
-              proc.standIndications.any((s) => s.isActive) ||
-              proc.singleMeasureIndications.any((s) => s.isActive),
-        ) ??
-        false;
-
-    if (indications != null && !indications.isMeasuringState && !anyMeasureActive) {
+    if (indications != null && !indications.isMeasuringState && !_anyMeasureActive(device)) {
       _enqueue(device, () async {
         indications.measProcessIndications[measProcIndex].standIndications[standIndex].activate();
         await _connection(device)?.let(
@@ -408,6 +410,23 @@ class DeviceServiceImpl implements DeviceService {
     }
   }
   
+  @override
+  Future<void> makeSingleMeasurement(
+    int measIndex,
+    int measProcIndex,
+    Device device,
+  ) async {
+    final indications = device.indicationData;
+    if (indications != null && !indications.isMeasuringState && !_anyMeasureActive(device)) {
+      _enqueue(device, () async {
+        indications.measProcessIndications[measProcIndex].singleMeasureIndications[measIndex].activate();
+        await _connection(device)?.let(
+          (c) => modbusService.makeSingleMeasurement(measIndex, measProcIndex, c),
+        );
+      });
+    }
+  }
+
   @override
   Future<void> switchMeasState(bool value, Device device) async{
      _enqueue(device, () async {
@@ -431,6 +450,27 @@ class DeviceServiceImpl implements DeviceService {
     _enqueue(device, () async {
       await _connection(device)?.let(
         (c) =>  modbusService.writeMeasProcSingleMeasDuration(duration, measProcIndex, c)
+      );
+    });
+  }
+
+  @override
+  Future<void> writeSingleMeasResult(
+    SingleMeasResult result,
+    int measIndex,
+    int measProcIndex,
+    Device device,
+  ) async {
+    _enqueue(device, () async {
+      final results = device.deviceSettings?.measProcesses[measProcIndex].singleMeasResults;
+      if (results == null) return;
+      int mask = 0;
+      for (var i = 0; i < results.length; i++) {
+        final isChecked = i == measIndex ? result.isChecked : results[i].isChecked;
+        if (isChecked) mask |= (1 << i);
+      }
+      await _connection(device)?.let(
+        (c) => modbusService.writeSingleMeasResult(result, measIndex, measProcIndex, mask, c),
       );
     });
   }

@@ -12,6 +12,7 @@ import 'package:idensity_ble_client/models/settings/device_settings.dart';
 import 'package:idensity_ble_client/models/settings/fast_change.dart';
 import 'package:idensity_ble_client/models/settings/get_temperature.dart';
 import 'package:idensity_ble_client/models/settings/serial_settings.dart';
+import 'package:idensity_ble_client/models/settings/single_meas_result.dart';
 import 'package:idensity_ble_client/models/settings/stand_settings.dart';
 import 'package:idensity_ble_client/models/settings/tcp_settings.dart';
 import 'package:idensity_ble_client/services/modbus/extensions/data_indication_extensions.dart';
@@ -26,6 +27,9 @@ class ModbusServiceImpl implements ModbusService {
   static const int _measProcRegisterCnt = 180;
   static const int _standRegisterOffset = 24;
   static const int _standRegisterCnt = 12;
+  static const int _singleMeasOffset = 76;
+  static const int _singleMeasRegCnt = 8;
+  static const int _isCheckedOffset = 156;
 
   // ---------------------------------------------------------------------------
   // Read operations
@@ -266,6 +270,46 @@ class ModbusServiceImpl implements ModbusService {
           _standRegisterOffset +
           standIndex * _standRegisterCnt +
           8,
+    );
+  }
+
+  @override
+  Future<void> makeSingleMeasurement(
+    int measIndex,
+    int measProcIndex,
+    Connection connection,
+  ) async {
+    await _writeHoldingRegisters(
+      connection: connection,
+      registers: [1],
+      startAddr: 200 + measProcIndex * _measProcRegisterCnt + _singleMeasOffset + measIndex * _singleMeasRegCnt + 3,
+    );
+  }
+
+  @override
+  Future<void> writeSingleMeasResult(
+    SingleMeasResult result,
+    int measIndex,
+    int measProcIndex,
+    int isCheckedMask,
+    Connection connection,
+  ) async {
+    await _writeHoldingRegisters(
+      connection: connection,
+      registers: [
+        result.date.year - 2000,
+        result.date.month,
+        result.date.day,
+        0,
+        ..._floatToRegisters(result.weak),
+        ..._floatToRegisters(result.physValue),
+      ],
+      startAddr: 200 + measProcIndex * _measProcRegisterCnt + _singleMeasOffset + measIndex * _singleMeasRegCnt,
+    );
+    await _writeHoldingRegisters(
+      connection: connection,
+      registers: [isCheckedMask],
+      startAddr: 200 + measProcIndex * _measProcRegisterCnt + _isCheckedOffset,
     );
   }
 

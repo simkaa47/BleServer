@@ -7,6 +7,7 @@ import 'package:idensity_ble_client/models/settings/device_settings.dart';
 import 'package:idensity_ble_client/models/settings/fast_change.dart';
 import 'package:idensity_ble_client/models/settings/get_temperature.dart';
 import 'package:idensity_ble_client/models/settings/serial_settings.dart';
+import 'package:idensity_ble_client/models/settings/single_meas_result.dart';
 import 'package:idensity_ble_client/models/settings/stand_settings.dart';
 import 'package:idensity_ble_client/models/settings/tcp_settings.dart';
 
@@ -33,7 +34,9 @@ abstract interface class ModbusService {
   Future<void> writeMeasProcStandartization(StandSettings stand, int standIndex, int measProcIndex, Connection connection);
   Future<void> writeMeasProcCalibrCurve(CalibrCurve calibrCurve,  int measProcIndex, Connection connection);
   Future<void> makeStandartization(StandSettings stand, int standIndex, int measProcIndex, Connection connection);
-   Future<void> writeMeasProcSingleMeasDuration(int duration, int measProcIndex, Connection connection);
+  Future<void> makeSingleMeasurement(int measIndex, int measProcIndex, Connection connection);
+  Future<void> writeMeasProcSingleMeasDuration(int duration, int measProcIndex, Connection connection);
+  Future<void> writeSingleMeasResult(SingleMeasResult result, int measIndex, int measProcIndex, int isCheckedMask, Connection connection);
 
   // Communication settings
   Future<void> writeModbusId(int value, Connection connection);

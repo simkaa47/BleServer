@@ -1,5 +1,6 @@
 import 'package:idensity_ble_client/models/device.dart';
 import 'package:idensity_ble_client/models/settings/calibr_curve.dart';
+import 'package:idensity_ble_client/models/settings/counter_settings.dart';
 import 'package:idensity_ble_client/models/settings/fast_change.dart';
 import 'package:idensity_ble_client/models/settings/single_meas_result.dart';
 import 'package:idensity_ble_client/models/settings/stand_settings.dart';
@@ -27,6 +28,8 @@ abstract interface class DeviceService {
   Future<void> writeMeasProcSingleMeasDuration(int duration, int measProcIndex, Device device);
   Future<void> writeSingleMeasResult(SingleMeasResult result, int measIndex, int measProcIndex, Device device);
 
+
+  Future<void> writeCounterSettings(CounterSettings settings, int counterIndex, Device device);
 
   Future<void> switchMeasState(bool value, Device device);
 

@@ -115,7 +115,7 @@ class MeasProcessParametersWidget extends ConsumerWidget {
                     FastChangesCard(fastChange: measProc.fastChange),
                     StandSettingsCard(standSettings: measProc.standSettings),
                     CalibrCurveCard(curve: measProc.calibrCurve),
-                    const CalibrationCard()
+                    const CalibrationCard(),                    
                   ],
                 );
               }

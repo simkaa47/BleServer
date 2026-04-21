@@ -27,10 +27,11 @@ class DeviceSettingsNavigationWidget extends StatelessWidget {
             },
           ),
         ),
-        const Card(
+        Card(
           child: ListTile(
-            title: Text("Счетчики"),
-            leading: Icon(Icons.monitor_heart),
+            title: const Text("Счетчики"),
+            leading: const Icon(Icons.monitor_heart),
+            onTap: () => context.push(Routes.counters),
           ),
         ),
       ],

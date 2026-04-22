@@ -393,6 +393,15 @@ class ModbusServiceImpl implements ModbusService {
   // ---------------------------------------------------------------------------
 
   @override
+  Future<void> writeAnalogInputActivity(bool active, int inputIndex, Connection connection) async {
+    await _writeHoldingRegisters(
+      connection: connection,
+      registers: [active ? 1 : 0],
+      startAddr: 70 + inputIndex,
+    );
+  }
+
+  @override
   Future<void> writeAnalogOutputSettings(
     AnalogOutputSettings settings,
     int outputIndex,

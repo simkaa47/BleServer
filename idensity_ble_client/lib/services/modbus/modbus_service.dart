@@ -46,6 +46,9 @@ abstract interface class ModbusService {
   // Counter settings
   Future<void> writeCounterSettings(CounterSettings settings, int counterIndex, Connection connection);
 
+  // Analog input settings
+  Future<void> writeAnalogInputActivity(bool active, int inputIndex, Connection connection);
+
   // Analog output settings
   Future<void> writeAnalogOutputSettings(AnalogOutputSettings settings, int outputIndex, Connection connection);
 

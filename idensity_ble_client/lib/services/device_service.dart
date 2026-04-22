@@ -34,6 +34,7 @@ abstract interface class DeviceService {
   Future<void> writeCounterSettings(CounterSettings settings, int counterIndex, Device device);
   Future<void> writeTcpSettings(TcpSettings settings, Device device);
   Future<void> writeSerialSettings(SerialSettings settings, Device device);
+  Future<void> writeAnalogInputActivity(bool active, int inputIndex, Device device);
 
   Future<void> switchMeasState(bool value, Device device);
 

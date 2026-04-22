@@ -440,6 +440,15 @@ class DeviceServiceImpl implements DeviceService {
   }
 
   @override
+  Future<void> writeAnalogInputActivity(bool active, int inputIndex, Device device) async {
+    _enqueue(device, () async {
+      await _connection(device)?.let(
+        (c) => modbusService.writeAnalogInputActivity(active, inputIndex, c),
+      );
+    });
+  }
+
+  @override
   Future<void> writeTcpSettings(TcpSettings settings, Device device) async {
     _enqueue(device, () async {
       await _connection(device)?.let(

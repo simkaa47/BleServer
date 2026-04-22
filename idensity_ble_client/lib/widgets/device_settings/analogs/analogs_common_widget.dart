@@ -4,6 +4,7 @@ import 'package:idensity_ble_client/models/device.dart';
 import 'package:idensity_ble_client/models/providers/services_registration.dart';
 import 'package:idensity_ble_client/services/device_service.dart';
 import 'package:idensity_ble_client/widgets/async_state_handlers/universal_async_handler.dart';
+import 'package:idensity_ble_client/widgets/device_settings/analogs/analog_input_widget.dart';
 
 class AnalogsCommonWidget extends ConsumerWidget {
   const AnalogsCommonWidget({super.key});
@@ -31,7 +32,14 @@ class AnalogsCommonWidget extends ConsumerWidget {
                   snapshot.data != null) {
             final settings = snapshot.data!;
             return ListView(
-              children: [ ],
+              children: [
+                for (var i = 0; i < settings.analogInputActivities.length; i++)
+                  AnalogInputWidget(
+                    device: device!,
+                    deviceService: service,
+                    inputIndex: i,
+                  ),
+              ],
             );
           }
           return const Center(child: Text("Нет устройства"));

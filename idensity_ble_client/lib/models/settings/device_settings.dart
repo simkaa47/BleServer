@@ -13,7 +13,7 @@ import 'package:idensity_ble_client/models/settings/tcp_settings.dart';
 class DeviceSettings {
   DeviceMode deviceMode = DeviceMode.density;
   int modbusId = 1;
-  String deviceName = '';
+  String serialNumber = '';
   double levelLength = 0;
   final List<MeasProcess> measProcesses = List.generate(min(2, Device.measProcCnt), (i) => MeasProcess());
   final List<CounterSettings> counterSettings = List.generate(3, (_) => CounterSettings());

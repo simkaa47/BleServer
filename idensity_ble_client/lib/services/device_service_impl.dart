@@ -274,6 +274,15 @@ class DeviceServiceImpl implements DeviceService {
   }
 
   @override
+  Future<void> writeRtc(DateTime dt, Device device) async {
+    _enqueue(device, () async {
+      await _connection(device)?.let(
+        (c) => modbusService.writeRtc(dt, c),
+      );
+    });
+  }
+
+  @override
   Future<void> writeLevelLength(double value, Device device) async {
     _enqueue(device, () async {
       await _connection(device)?.let(
@@ -346,6 +355,15 @@ class DeviceServiceImpl implements DeviceService {
       device.connectionSettings.ethernetSettings,
     ),
   };
+
+  @override
+  Future<void> writeMeasDiameter(double value, int measProcIndex, Device device) async {
+    _enqueue(device, () async {
+      await _connection(device)?.let(
+        (c) => modbusService.writeMeasDiameter(value, measProcIndex, c),
+      );
+    });
+  }
 
   @override
   Future<void> writeDensityLiquid(double value, int measProcIndex, Device device) async {
@@ -490,6 +508,15 @@ class DeviceServiceImpl implements DeviceService {
     _enqueue(device, () async {
       await _connection(device)?.let(
         (c) => modbusService.writeAnalogInputActivity(active, inputIndex, c),
+      );
+    });
+  }
+
+  @override
+  Future<void> writeModbusId(int value, Device device) async {
+    _enqueue(device, () async {
+      await _connection(device)?.let(
+        (c) => modbusService.writeModbusId(value, c),
       );
     });
   }

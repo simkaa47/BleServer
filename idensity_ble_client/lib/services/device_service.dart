@@ -19,10 +19,12 @@ abstract interface class DeviceService {
 
   Future<void> writeDeviceType(int type, Device device);
   Future<void> writeLevelLength(double value, Device device);
+  Future<void> writeRtc(DateTime dt, Device device);
   Future<void> writeMeasDuration(double value, int measProcIndex, Device device);
   Future<void> writeAveragePoints(int value, int measProcIndex, Device device);
   Future<void> writeCalcType(int value, int measProcIndex, Device device);
   Future<void> writeMeasType(int value, int measProcIndex, Device device);
+  Future<void> writeMeasDiameter(double value, int measProcIndex, Device device);
   Future<void> writeDensityLiquid(double value, int measProcIndex, Device device);
   Future<void> writeDensitySolid(double value, int measProcIndex, Device device);
   Future<void> writeFastChanges(FastChange fastChange, int measProcIndex, Device device);
@@ -36,6 +38,7 @@ abstract interface class DeviceService {
 
 
   Future<void> writeCounterSettings(CounterSettings settings, int counterIndex, Device device);
+  Future<void> writeModbusId(int value, Device device);
   Future<void> writeTcpSettings(TcpSettings settings, Device device);
   Future<void> writeSerialSettings(SerialSettings settings, Device device);
   Future<void> writeAnalogInputActivity(bool active, int inputIndex, Device device);

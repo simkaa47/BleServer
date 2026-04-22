@@ -456,6 +456,22 @@ class ModbusServiceImpl implements ModbusService {
   }
 
   @override
+  Future<void> writeRtc(DateTime dt, Connection connection) async {
+    await _writeHoldingRegisters(
+      connection: connection,
+      registers: [
+        dt.year - 2000,
+        dt.month,
+        dt.day,
+        dt.hour,
+        dt.minute,
+        dt.second,
+      ],
+      startAddr: 116,
+    );
+  }
+
+  @override
   Future<void> writeLevelLength(double value, Connection connection) async {
     await _writeHoldingRegisters(
       connection: connection,

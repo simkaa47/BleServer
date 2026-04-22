@@ -9,6 +9,7 @@ import 'package:idensity_ble_client/services/device_service.dart';
 import 'package:idensity_ble_client/widgets/async_state_handlers/universal_async_handler.dart';
 import 'package:idensity_ble_client/widgets/parameters/combobox_parameter_widget.dart';
 import 'package:idensity_ble_client/widgets/parameters/ip_parameter_widget.dart';
+import 'package:idensity_ble_client/widgets/parameters/text_parameter_widget.dart';
 
 const _knownBaudrates = [2400, 4800, 9600, 19200, 38400, 57600, 115200];
 
@@ -38,7 +39,7 @@ class CommunicationSettingsWidget extends ConsumerWidget {
                 snapshot.data != null) {
           final settings = snapshot.data;
           if (settings != null) {
-            return _buildContent(settings.ethernetSettings, settings.serialSettings, deviceService, device);
+            return _buildContent(settings.modbusId, settings.ethernetSettings, settings.serialSettings, deviceService, device);
           }
         }
         return const Scaffold(body: Center(child: CircularProgressIndicator()));
@@ -56,11 +57,18 @@ class CommunicationSettingsWidget extends ConsumerWidget {
     ..baudrate = s.baudrate
     ..mode = s.mode;
 
-  Widget _buildContent(TcpSettings tcp, SerialSettings serial, DeviceService deviceService, Device device) {
+  Widget _buildContent(int modbusId, TcpSettings tcp, SerialSettings serial, DeviceService deviceService, Device device) {
     return Scaffold(
       appBar: AppBar(title: const Text("Настройки связи")),
       body: ListView(
         children: [
+          TextParameterWidget(
+            name: 'Modbus ID',
+            value: modbusId,
+            minValue: 1,
+            maxValue: 247,
+            onConfirm: (value) async => deviceService.writeModbusId(value.toInt(), device),
+          ),
           _SectionHeader("Ethernet"),
           IpParameterWidget(
             name: "IP адрес",

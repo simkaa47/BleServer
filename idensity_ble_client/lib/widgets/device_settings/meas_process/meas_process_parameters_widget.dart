@@ -112,6 +112,18 @@ class MeasProcessParametersWidget extends ConsumerWidget {
                       },
                       options: calcTypes,
                     ),
+                    TextParameterWidget(
+                      minValue: 0,
+                      name: "Диаметр трубы, мм",
+                      value: measProc.diameterPipe,
+                      onConfirm: (value) async {
+                        await deviceService.writeMeasDiameter(
+                          value.toDouble(),
+                          measProcIndex,
+                          device,
+                        );
+                      },
+                    ),
                     FastChangesCard(fastChange: measProc.fastChange),
                     StandSettingsCard(standSettings: measProc.standSettings),
                     CalibrCurveCard(curve: measProc.calibrCurve),

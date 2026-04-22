@@ -80,14 +80,14 @@ extension DeviceSettingsExtensions on DeviceSettings {
     // LevelLength (reg 112..113, float)
     levelLength = registers.getFloat(112);
 
-    // DeviceName (reg 124..128, 5 registers = 10 ASCII bytes)
-    final nameBytes = <int>[];
+    // SerialNumber (reg 124..128, 5 registers = 10 ASCII bytes)
+    final serialBytes = <int>[];
     for (var i = 124; i < 129; i++) {
       final reg = registers[i];
-      nameBytes.add(reg & 0xFF);
-      nameBytes.add((reg >> 8) & 0xFF);
+      serialBytes.add(reg & 0xFF);
+      serialBytes.add((reg >> 8) & 0xFF);
     }
-    deviceName = String.fromCharCodes(nameBytes.where((b) => b != 0));
+    serialNumber = String.fromCharCodes(serialBytes.where((b) => b != 0));
 
     // MeasProcesses (reg 200+, step 180)
     const mpOffset = 200;

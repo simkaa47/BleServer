@@ -5,6 +5,7 @@ import 'package:idensity_ble_client/models/providers/services_registration.dart'
 import 'package:idensity_ble_client/services/device_service.dart';
 import 'package:idensity_ble_client/widgets/async_state_handlers/universal_async_handler.dart';
 import 'package:idensity_ble_client/widgets/device_settings/analogs/analog_input_widget.dart';
+import 'package:idensity_ble_client/widgets/device_settings/analogs/analog_output_widget.dart';
 
 class AnalogsCommonWidget extends ConsumerWidget {
   const AnalogsCommonWidget({super.key});
@@ -38,6 +39,12 @@ class AnalogsCommonWidget extends ConsumerWidget {
                     device: device!,
                     deviceService: service,
                     inputIndex: i,
+                  ),
+                for (var i = 0; i < settings.analogOutputSettings.length; i++)
+                  AnalogOutputWidget(
+                    device: device!,
+                    deviceService: service,
+                    outputIndex: i,
                   ),
               ],
             );

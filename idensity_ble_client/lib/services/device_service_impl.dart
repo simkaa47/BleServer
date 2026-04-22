@@ -10,6 +10,7 @@ import 'package:idensity_ble_client/models/connection.dart';
 import 'package:idensity_ble_client/models/connection_type.dart';
 import 'package:idensity_ble_client/models/device.dart';
 import 'package:idensity_ble_client/models/settings/calibr_curve.dart';
+import 'package:idensity_ble_client/models/settings/analog_output_settings.dart';
 import 'package:idensity_ble_client/models/settings/counter_settings.dart';
 import 'package:idensity_ble_client/models/settings/fast_change.dart';
 import 'package:idensity_ble_client/models/settings/serial_settings.dart';
@@ -435,6 +436,24 @@ class DeviceServiceImpl implements DeviceService {
     _enqueue(device, () async {
       await _connection(device)?.let(
         (c) => modbusService.writeCounterSettings(settings, counterIndex, c),
+      );
+    });
+  }
+
+  @override
+  Future<void> writeAnalogOutputSettings(AnalogOutputSettings settings, int outputIndex, Device device) async {
+    _enqueue(device, () async {
+      await _connection(device)?.let(
+        (c) => modbusService.writeAnalogOutputSettings(settings, outputIndex, c),
+      );
+    });
+  }
+
+  @override
+  Future<void> sendAnalogTestValue(int outputIndex, Device device) async {
+    _enqueue(device, () async {
+      await _connection(device)?.let(
+        (c) => modbusService.sendAnalogTestValue(outputIndex, c),
       );
     });
   }

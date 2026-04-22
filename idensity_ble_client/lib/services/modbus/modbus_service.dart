@@ -51,6 +51,7 @@ abstract interface class ModbusService {
 
   // Analog output settings
   Future<void> writeAnalogOutputSettings(AnalogOutputSettings settings, int outputIndex, Connection connection);
+  Future<void> sendAnalogTestValue(int outputIndex, Connection connection);
 
   // Temperature compensation
   Future<void> writeTemperatureCompensation(GetTemperature settings, Connection connection);

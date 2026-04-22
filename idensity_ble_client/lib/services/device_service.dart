@@ -1,5 +1,6 @@
 import 'package:idensity_ble_client/models/device.dart';
 import 'package:idensity_ble_client/models/settings/calibr_curve.dart';
+import 'package:idensity_ble_client/models/settings/analog_output_settings.dart';
 import 'package:idensity_ble_client/models/settings/counter_settings.dart';
 import 'package:idensity_ble_client/models/settings/fast_change.dart';
 import 'package:idensity_ble_client/models/settings/serial_settings.dart';
@@ -35,6 +36,8 @@ abstract interface class DeviceService {
   Future<void> writeTcpSettings(TcpSettings settings, Device device);
   Future<void> writeSerialSettings(SerialSettings settings, Device device);
   Future<void> writeAnalogInputActivity(bool active, int inputIndex, Device device);
+  Future<void> writeAnalogOutputSettings(AnalogOutputSettings settings, int outputIndex, Device device);
+  Future<void> sendAnalogTestValue(int outputIndex, Device device);
 
   Future<void> switchMeasState(bool value, Device device);
 

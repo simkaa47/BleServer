@@ -424,6 +424,15 @@ class ModbusServiceImpl implements ModbusService {
     );
   }
 
+  @override
+  Future<void> sendAnalogTestValue(int outputIndex, Connection connection) async {
+    await _writeHoldingRegisters(
+      connection: connection,
+      registers: [1],
+      startAddr: 74 + outputIndex * 14 + 13,
+    );
+  }
+
   // ---------------------------------------------------------------------------
   // Write operations — temperature compensation
   // ---------------------------------------------------------------------------

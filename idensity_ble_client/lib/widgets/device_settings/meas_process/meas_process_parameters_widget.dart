@@ -50,7 +50,7 @@ class MeasProcessParametersWidget extends ConsumerWidget {
                     ComboboxParameterWidget(
                       name: "Активность изм. процесса",
                       value: measProc.isActive ? 1 : 0,
-                      onConfirm: (value) async {                        
+                      onConfirm: (value) async {
                         await deviceService.writeMeasProcActivity(
                           value != 0,
                           measProcIndex,
@@ -115,7 +115,39 @@ class MeasProcessParametersWidget extends ConsumerWidget {
                     FastChangesCard(fastChange: measProc.fastChange),
                     StandSettingsCard(standSettings: measProc.standSettings),
                     CalibrCurveCard(curve: measProc.calibrCurve),
-                    const CalibrationCard(),                    
+                    const CalibrationCard(),
+                    if (device.deviceSettings!.deviceMode ==
+                            DeviceMode.density &&
+                        measProc.measType > 0)
+                      TextParameterWidget(
+                        minValue: 0,
+                        name: "Плотность твердого",
+                        fractionDigits: 5,
+                        value: measProc.densitySolid,
+                        onConfirm: (value) async {
+                          await deviceService.writeDensitySolid(
+                            value.toDouble(),
+                            measProcIndex,
+                            device,
+                          );
+                        },
+                      ),
+                    if (device.deviceSettings!.deviceMode ==
+                            DeviceMode.density &&
+                        measProc.measType > 0)
+                      TextParameterWidget(
+                        minValue: 0,
+                        name: "Плотность жидкого",
+                        fractionDigits: 5,
+                        value: measProc.densityLiquid,
+                        onConfirm: (value) async {
+                          await deviceService.writeDensityLiquid(
+                            value.toDouble(),
+                            measProcIndex,
+                            device,
+                          );
+                        },
+                      ),
                   ],
                 );
               }

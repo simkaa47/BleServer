@@ -339,6 +339,24 @@ class DeviceServiceImpl implements DeviceService {
   };
 
   @override
+  Future<void> writeDensityLiquid(double value, int measProcIndex, Device device) async {
+    _enqueue(device, () async {
+      await _connection(device)?.let(
+        (c) => modbusService.writeDensityLiquid(value, measProcIndex, c),
+      );
+    });
+  }
+
+  @override
+  Future<void> writeDensitySolid(double value, int measProcIndex, Device device) async {
+    _enqueue(device, () async {
+      await _connection(device)?.let(
+        (c) => modbusService.writeDensitySolid(value, measProcIndex, c),
+      );
+    });
+  }
+
+  @override
   Future<void> writeFastChanges(
     FastChange fastChange,
     int measProcIndex,

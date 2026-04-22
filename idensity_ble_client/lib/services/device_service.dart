@@ -22,6 +22,8 @@ abstract interface class DeviceService {
   Future<void> writeAveragePoints(int value, int measProcIndex, Device device);
   Future<void> writeCalcType(int value, int measProcIndex, Device device);
   Future<void> writeMeasType(int value, int measProcIndex, Device device);
+  Future<void> writeDensityLiquid(double value, int measProcIndex, Device device);
+  Future<void> writeDensitySolid(double value, int measProcIndex, Device device);
   Future<void> writeFastChanges(FastChange fastChange, int measProcIndex, Device device);
   Future<void> writeMeasProcActivity(bool activity, int measProcIndex, Device device);
   Future<void> writeMeasProcStandartization(StandSettings stand, int standIndex, int measProcIndex, Device device);

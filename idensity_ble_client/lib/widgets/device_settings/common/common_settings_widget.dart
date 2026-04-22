@@ -38,7 +38,7 @@ class CommonSettingsWidget extends ConsumerWidget {
               children: [
                 ComboboxParameterWidget(
                   name: 'Тип устройства',
-                  value: settings.deviceMode.index ?? 0,
+                  value: settings.deviceMode.index,
                   options: devicesTypes,
                   onConfirm: (value) async {
                     if (DeviceMode.values.length > value) {

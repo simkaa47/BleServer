@@ -41,6 +41,13 @@ class DeviceSettingsNavigationWidget extends StatelessWidget {
             onTap: () => context.push(Routes.deviceCommunicationSettings),
           ),
         ),
+       Card(
+          child: ListTile(
+            title: const Text("Аналоги"),
+            leading: const Icon(Icons.input),
+            onTap: () => context.push(Routes.analogs),
+          ),
+        ),
       ],
     );
   }

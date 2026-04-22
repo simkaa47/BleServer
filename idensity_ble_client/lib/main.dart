@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:idensity_ble_client/app_scroll_behavior.dart';
 import 'package:idensity_ble_client/widgets/app_shell.dart';
 import 'package:idensity_ble_client/widgets/communication/communication_tab.dart';
+import 'package:idensity_ble_client/widgets/device_settings/analogs/analogs_common_widget.dart';
 import 'package:idensity_ble_client/widgets/device_settings/common/common_settings_widget.dart';
 import 'package:idensity_ble_client/widgets/device_settings/device_settings_main_widget.dart';
 import 'package:idensity_ble_client/widgets/device_settings/device_settings_navigation_widget.dart';
@@ -92,9 +93,14 @@ final _router = GoRouter(
                       path: "counters",
                       builder: (context, state) => const CounterSettingsWidget(),
                     ),
+                    
                     GoRoute(
                       path: "communication",
                       builder: (context, state) => const CommunicationSettingsWidget(),
+                    ),
+                    GoRoute(
+                      path: "analogs",
+                      builder: (context, state) => const AnalogsCommonWidget(),
                     ),
                     ShellRoute(
                       builder:

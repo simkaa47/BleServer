@@ -10,6 +10,7 @@ class Routes {
   static const String measProcCalibrCurve = '/home/deviceSettings/measProcs/calibrCurve';
   static const String measProcCalibration = '/home/deviceSettings/measProcs/calibration';
   static const String counters = '/home/deviceSettings/counters';
+  static const String analogs = '/home/deviceSettings/analogs';
   static const String deviceCommunicationSettings = '/home/deviceSettings/communication';
   static const String communication = '/home/communication';
 }

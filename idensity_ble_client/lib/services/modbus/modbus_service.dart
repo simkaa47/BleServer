@@ -55,4 +55,5 @@ abstract interface class ModbusService {
 
   // Temperature compensation
   Future<void> writeTemperatureCompensation(GetTemperature settings, Connection connection);
+  Future<void> writeLevelLength(double value, Connection connection);
 }

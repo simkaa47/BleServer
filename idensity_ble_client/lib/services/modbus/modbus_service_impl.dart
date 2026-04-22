@@ -456,6 +456,15 @@ class ModbusServiceImpl implements ModbusService {
   }
 
   @override
+  Future<void> writeLevelLength(double value, Connection connection) async {
+    await _writeHoldingRegisters(
+      connection: connection,
+      registers: _floatToRegisters(value),
+      startAddr: 112,
+    );
+  }
+
+  @override
   Future<void> switchMeasState(bool value, Connection connection) async {
     await _writeHoldingRegisters(
       connection: connection,

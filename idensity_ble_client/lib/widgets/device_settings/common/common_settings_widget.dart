@@ -7,6 +7,7 @@ import 'package:idensity_ble_client/resources/enums.dart';
 import 'package:idensity_ble_client/services/device_service.dart';
 import 'package:idensity_ble_client/widgets/async_state_handlers/universal_async_handler.dart';
 import 'package:idensity_ble_client/widgets/parameters/combobox_parameter_widget.dart';
+import 'package:idensity_ble_client/widgets/parameters/text_parameter_widget.dart';
 
 class CommonSettingsWidget extends ConsumerWidget {
   const CommonSettingsWidget({super.key});
@@ -48,6 +49,15 @@ class CommonSettingsWidget extends ConsumerWidget {
                     await service.writeDeviceType(value, device!);
                   },
                 ),
+                if (settings.deviceMode == DeviceMode.level)
+                  TextParameterWidget(
+                    name: 'Длина уровнемера, мм',
+                    minValue: 0,
+                    value: settings.levelLength,
+                    onConfirm:
+                        (value) async =>
+                            service.writeLevelLength(value.toDouble(), device!),
+                  ),
               ],
             );
           }

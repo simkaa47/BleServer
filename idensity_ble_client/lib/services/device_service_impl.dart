@@ -274,6 +274,15 @@ class DeviceServiceImpl implements DeviceService {
   }
 
   @override
+  Future<void> writeLevelLength(double value, Device device) async {
+    _enqueue(device, () async {
+      await _connection(device)?.let(
+        (c) => modbusService.writeLevelLength(value, c),
+      );
+    });
+  }
+
+  @override
   Future<void> writeMeasDuration(
     double value,
     int measProcIndex,

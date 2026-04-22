@@ -18,6 +18,7 @@ abstract interface class DeviceService {
   Future<void> removeDevice(Device device);
 
   Future<void> writeDeviceType(int type, Device device);
+  Future<void> writeLevelLength(double value, Device device);
   Future<void> writeMeasDuration(double value, int measProcIndex, Device device);
   Future<void> writeAveragePoints(int value, int measProcIndex, Device device);
   Future<void> writeCalcType(int value, int measProcIndex, Device device);

@@ -16,6 +16,7 @@ import 'package:idensity_ble_client/widgets/device_settings/meas_process/meas_pr
 import 'package:idensity_ble_client/widgets/device_settings/meas_process/standarization/stand_settings_widget.dart';
 import 'package:idensity_ble_client/widgets/device_settings/communication/communication_settings_widget.dart';
 import 'package:idensity_ble_client/widgets/device_settings/counters/counter_settings_widget.dart';
+import 'package:idensity_ble_client/widgets/device_settings/spectrum/spectrum_main_widget.dart';
 import 'package:idensity_ble_client/widgets/main_page/main_page_widget.dart';
 import 'package:idensity_ble_client/widgets/meas_units/meas_units_widget.dart';
 import 'package:idensity_ble_client/widgets/routes.dart';
@@ -97,6 +98,10 @@ final _router = GoRouter(
                     GoRoute(
                       path: "communication",
                       builder: (context, state) => const CommunicationSettingsWidget(),
+                    ),
+                     GoRoute(
+                      path: "spectrum",
+                      builder: (context, state) => const SpectrumMainWidget(),
                     ),
                     GoRoute(
                       path: "analogs",

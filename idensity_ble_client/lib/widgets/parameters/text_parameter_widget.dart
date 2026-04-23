@@ -12,31 +12,45 @@ class TextParameterWidget extends StatelessWidget {
     required this.value,
     required this.onConfirm,
     this.fractionDigits,
+    this.actualValue,
     this.showCard = true,
   });
 
   final num? minValue;
   final num? maxValue;
+  final num? actualValue;
   final String name;
   final num value;
   final Future<void> Function(num value) onConfirm;
   final int? fractionDigits;
   final bool showCard;
 
+  _getSubtitle(num number) {
+    return Text(
+      fractionDigits != null
+          ? number.toStringAsFixed(fractionDigits!)
+          : number.toString(),
+      style: TextStyle(
+        color:
+            (number > (maxValue ?? double.infinity) ||
+                    number < (minValue ?? double.negativeInfinity))
+                ? Colors.red
+                : Colors.black,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final tile = ListTile(
       title: Text(name),
-      subtitle: Text(
-        fractionDigits != null
-            ? value.toStringAsFixed(fractionDigits!)
-            : value.toString(),
-        style: TextStyle(
-          color: (value > (maxValue ?? double.infinity) || value < (minValue ?? double.negativeInfinity))
-              ? Colors.red
-              : Colors.black,
-        ),
-      ),
+      subtitle: Row(children: [
+        if(actualValue != null)
+         _getSubtitle(actualValue!),
+        if(actualValue != null)
+        const Text("/"),
+        _getSubtitle(value)
+        ]),
       onTap: () => _openInput(context),
     );
     return showCard ? Card(child: tile) : tile;
@@ -58,14 +72,15 @@ class TextParameterWidget extends StatelessWidget {
       if (!context.mounted) return;
       showModalBottomSheet(
         context: context,
-        builder: (ctx) => NumericParameterFloatingWidget(
-          maxValue: maxValue,
-          minValue: minValue,
-          name: name,
-          onConfirm: onConfirm,
-          value: value,
-          fractionDigits: fractionDigits,
-        ),
+        builder:
+            (ctx) => NumericParameterFloatingWidget(
+              maxValue: maxValue,
+              minValue: minValue,
+              name: name,
+              onConfirm: onConfirm,
+              value: value,
+              fractionDigits: fractionDigits,
+            ),
       );
     }
   }

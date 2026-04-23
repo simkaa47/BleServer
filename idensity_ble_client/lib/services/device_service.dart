@@ -1,4 +1,5 @@
 import 'package:idensity_ble_client/models/device.dart';
+import 'package:idensity_ble_client/models/settings/adc_board_settings.dart';
 import 'package:idensity_ble_client/models/settings/calibr_curve.dart';
 import 'package:idensity_ble_client/models/settings/analog_output_settings.dart';
 import 'package:idensity_ble_client/models/settings/counter_settings.dart';
@@ -20,6 +21,7 @@ abstract interface class DeviceService {
   Future<void> writeDeviceType(int type, Device device);
   Future<void> writeLevelLength(double value, Device device);
   Future<void> writeRtc(DateTime dt, Device device);
+  Future<void> writeAdcBoardSettings(AdcBoardSettings settings, Device device);
   Future<void> writeMeasDuration(double value, int measProcIndex, Device device);
   Future<void> writeAveragePoints(int value, int measProcIndex, Device device);
   Future<void> writeCalcType(int value, int measProcIndex, Device device);

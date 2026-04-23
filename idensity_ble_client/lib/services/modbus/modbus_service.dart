@@ -1,5 +1,6 @@
 import 'package:idensity_ble_client/models/connection.dart';
 import 'package:idensity_ble_client/models/indication/indication.dart';
+import 'package:idensity_ble_client/models/settings/adc_board_settings.dart';
 import 'package:idensity_ble_client/models/settings/analog_output_settings.dart';
 import 'package:idensity_ble_client/models/settings/calibr_curve.dart';
 import 'package:idensity_ble_client/models/settings/counter_settings.dart';
@@ -57,4 +58,5 @@ abstract interface class ModbusService {
   Future<void> writeTemperatureCompensation(GetTemperature settings, Connection connection);
   Future<void> writeLevelLength(double value, Connection connection);
   Future<void> writeRtc(DateTime dt, Connection connection);
+  Future<void> writeAdcBoardSettings(AdcBoardSettings settings, Connection connection);
 }

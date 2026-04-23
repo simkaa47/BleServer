@@ -48,6 +48,13 @@ class DeviceSettingsNavigationWidget extends StatelessWidget {
             onTap: () => context.push(Routes.analogs),
           ),
         ),
+        Card(
+          child: ListTile(
+            title: const Text("Спектр"),
+            leading: const Icon(Icons.graphic_eq),
+            onTap: () => context.push(Routes.spectrum),
+          ),
+        ),
       ],
     );
   }

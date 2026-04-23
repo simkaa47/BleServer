@@ -9,6 +9,7 @@ import 'package:idensity_ble_client/models/charts/chart_type.dart';
 import 'package:idensity_ble_client/models/connection.dart';
 import 'package:idensity_ble_client/models/connection_type.dart';
 import 'package:idensity_ble_client/models/device.dart';
+import 'package:idensity_ble_client/models/settings/adc_board_settings.dart';
 import 'package:idensity_ble_client/models/settings/calibr_curve.dart';
 import 'package:idensity_ble_client/models/settings/analog_output_settings.dart';
 import 'package:idensity_ble_client/models/settings/counter_settings.dart';
@@ -270,6 +271,15 @@ class DeviceServiceImpl implements DeviceService {
       await _connection(
         device,
       )?.let((c) => modbusService.writeDeviceType(type, c));
+    });
+  }
+
+  @override
+  Future<void> writeAdcBoardSettings(AdcBoardSettings settings, Device device) async {
+    _enqueue(device, () async {
+      await _connection(device)?.let(
+        (c) => modbusService.writeAdcBoardSettings(settings, c),
+      );
     });
   }
 

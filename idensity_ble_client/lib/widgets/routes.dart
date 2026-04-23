@@ -13,4 +13,5 @@ class Routes {
   static const String analogs = '/home/deviceSettings/analogs';
   static const String deviceCommunicationSettings = '/home/deviceSettings/communication';
   static const String communication = '/home/communication';
+  static const String spectrum = '/home/deviceSettings/spectrum';
 }

@@ -5,6 +5,7 @@ import 'package:idensity_ble_client/models/connection.dart';
 import 'package:idensity_ble_client/models/connection_type.dart';
 import 'package:idensity_ble_client/models/indication/indication.dart';
 import 'package:idensity_ble_client/models/modbus/modbus_commands.dart';
+import 'package:idensity_ble_client/models/settings/adc_board_settings.dart';
 import 'package:idensity_ble_client/models/settings/analog_output_settings.dart';
 import 'package:idensity_ble_client/models/settings/calibr_curve.dart';
 import 'package:idensity_ble_client/models/settings/counter_settings.dart';
@@ -452,6 +453,29 @@ class ModbusServiceImpl implements ModbusService {
         ..._floatToRegisters(settings.coeffs[1].b),
       ],
       startAddr: 103,
+    );
+  }
+
+  @override
+  Future<void> writeAdcBoardSettings(AdcBoardSettings settings, Connection connection) async {
+    await _writeHoldingRegisters(
+      connection: connection,
+      registers: [
+        settings.mode.index,
+        settings.syncLevel,
+        settings.timerSendData,
+        settings.gain,
+        ...settings.updAddress,
+        settings.udpPort,
+        settings.hvSv * 20,
+        settings.peakSpectrumSv,
+      ],
+      startAddr: 3,
+    );
+    await _writeHoldingRegisters(
+      connection: connection,
+      registers: [settings.adcDataSendEnabled ? 1 : 0],
+      startAddr: 20,
     );
   }
 

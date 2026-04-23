@@ -69,7 +69,7 @@ class CommunicationSettingsWidget extends ConsumerWidget {
             maxValue: 247,
             onConfirm: (value) async => deviceService.writeModbusId(value.toInt(), device),
           ),
-          _SectionHeader("Ethernet"),
+          const _SectionHeader("Ethernet"),
           IpParameterWidget(
             name: "IP адрес",
             octets: tcp.address,
@@ -85,7 +85,7 @@ class CommunicationSettingsWidget extends ConsumerWidget {
             octets: tcp.gateway,
             onConfirm: (o) => deviceService.writeTcpSettings(_tcpCopy(tcp)..gateway = o, device),
           ),
-          _SectionHeader("Последовательный порт"),
+          const _SectionHeader("Последовательный порт"),
           ComboboxParameterWidget(
             name: "Скорость, бод",
             value: _knownBaudrates.indexOf(serial.baudrate).clamp(0, _knownBaudrates.length - 1),

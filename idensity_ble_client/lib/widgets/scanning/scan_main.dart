@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:idensity_ble_client/models/connection_type.dart';
 import 'package:idensity_ble_client/models/providers/services_registration.dart';
 import 'package:idensity_ble_client/models/scan_result.dart';
+import 'package:idensity_ble_client/services/scan_service.dart';
+import 'package:idensity_ble_client/widgets/async_state_handlers/universal_async_handler.dart';
 import 'package:idensity_ble_client/widgets/routes.dart';
 import 'package:idensity_ble_client/widgets/scanning/scan_buttons_widget.dart';
 import 'package:idensity_ble_client/widgets/scanning/scan_list.dart';
@@ -24,8 +26,28 @@ class _ScanMainState extends ConsumerState<ScanMainWidget> {
   Widget build(BuildContext context) {
     final currentScanType = ref.watch(connectionTypeProvider);
     final scanTypeController = ref.watch(connectionTypeProvider.notifier);
-    final scanService = ref.watch(scanServiceProvider(currentScanType));
+    final scanServiceAsyncState = ref.watch(
+      scanServiceProvider(currentScanType),
+    );
+    final serviceName = "Сервис сканирования";
 
+    return scanServiceAsyncState.when(
+      data:
+          (service) => _onScanServiceHasData(
+            service,
+            currentScanType,
+            scanTypeController,
+          ),
+      error: (e, s) => UniversalAsyncHandler.onError(serviceName, e, s),
+      loading: () => UniversalAsyncHandler.onLoading(serviceName),
+    );
+  }
+
+  Widget _onScanServiceHasData(
+    ScanService scanService,
+    ConnectionType currentScanType,
+    StateController<ConnectionType> scanTypeController,
+  ) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Сканирование новых устройств"),
@@ -80,19 +102,21 @@ class _ScanMainState extends ConsumerState<ScanMainWidget> {
             opacity: _selectedResultsIsNotEmpty ? 1 : 0.4,
             child: FloatingActionButton(
               heroTag: 'save device',
-              onPressed:
-                  _selectedResultsIsNotEmpty
-                      ? () {
-                        scanService.saveDevices(selectedResults);
-                      }
-                      : null,
+              onPressed: _selectedResultsIsNotEmpty
+                  ? () async {
+                      await scanService.stopScan();
+                      await scanService.saveDevices(selectedResults);
+                      if (!mounted) return;
+                      context.go(Routes.home);
+                    }
+                  : null,
               child: const Icon(Icons.add),
             ),
           ),
           const SizedBox(width: 16),
           FloatingActionButton(
             heroTag: 'next',
-            onPressed: () async{
+            onPressed: () async {
               await scanService.stopScan();
               if (!context.mounted) return;
               context.go(Routes.home);

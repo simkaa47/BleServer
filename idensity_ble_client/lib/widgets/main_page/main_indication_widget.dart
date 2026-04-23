@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:idensity_ble_client/models/device.dart';
 import 'package:idensity_ble_client/models/indication/indication.dart';
 import 'package:idensity_ble_client/models/providers/services_registration.dart';
+import 'package:idensity_ble_client/services/device_service.dart';
+import 'package:idensity_ble_client/widgets/async_state_handlers/universal_async_handler.dart';
 import 'package:idensity_ble_client/widgets/main_page/indication_item_widget.dart';
 import 'package:idensity_ble_client/widgets/main_page/meas_result_widget.dart';
 import 'package:idensity_ble_client/widgets/routes.dart';
@@ -13,8 +15,17 @@ class MainIndicationWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final deviceService = ref.read(deviceServiceProvider);
-    
+    final deviceServiceAsyncState = ref.watch(deviceServiceProvider);
+    final serviceName = "Сервис устройств";
+
+    return deviceServiceAsyncState.when(
+      data: (service) => _onHasDeviceService(service),
+      error: (e, s) => UniversalAsyncHandler.onError(serviceName, e, s),
+      loading: () => UniversalAsyncHandler.onLoading(serviceName),
+    );
+  }
+
+  Widget _onHasDeviceService(DeviceService deviceService) {
     return StreamBuilder<List<Device>>(
       stream: deviceService.devicesStream,
       builder: (context, snapshot) {
@@ -106,10 +117,20 @@ class MainIndicationWidget extends ConsumerWidget {
                             flex: 2,
                             child: Row(
                               children: [
-                                Expanded(child: MeasResultWidget(data.measResults[0], device)),
-                                Expanded(child: MeasResultWidget(data.measResults[1], device)),
+                                Expanded(
+                                  child: MeasResultWidget(
+                                    data.measResults[0],
+                                    device,
+                                  ),
+                                ),
+                                Expanded(
+                                  child: MeasResultWidget(
+                                    data.measResults[1],
+                                    device,
+                                  ),
+                                ),
                               ],
-                            )
+                            ),
                           ),
                         ],
                       );

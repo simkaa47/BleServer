@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:idensity_ble_client/models/device.dart';
 import 'package:idensity_ble_client/models/providers/services_registration.dart';
 import 'package:idensity_ble_client/models/settings/device_mode.dart';
 import 'package:idensity_ble_client/resources/enums.dart';
+import 'package:idensity_ble_client/services/device_service.dart';
+import 'package:idensity_ble_client/widgets/async_state_handlers/universal_async_handler.dart';
+import 'package:idensity_ble_client/widgets/device_settings/meas_process/calibr_curve/calibr_curve_card.dart';
+import 'package:idensity_ble_client/widgets/device_settings/meas_process/calibration/calibration_card.dart';
+import 'package:idensity_ble_client/widgets/device_settings/meas_process/fast_changes/fast_changes_card.dart';
+import 'package:idensity_ble_client/widgets/device_settings/meas_process/standarization/stand_settings_card.dart';
 import 'package:idensity_ble_client/widgets/parameters/combobox_parameter_widget.dart';
 import 'package:idensity_ble_client/widgets/parameters/text_parameter_widget.dart';
 
@@ -11,10 +18,24 @@ class MeasProcessParametersWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final deviceService = ref.read(deviceServiceProvider);
+    final deviceServiceAsyncState = ref.watch(deviceServiceProvider);
     final measProcIndex = ref.watch(selectedMeasProcIndexProvider);
     final device = ref.watch(selectedDeviceProvider);
 
+    final serviceName = "Сервис устройств";
+
+    return deviceServiceAsyncState.when(
+      data: (service) => _onDeviceServiceData(device, measProcIndex, service),
+      error: (e, s) => UniversalAsyncHandler.onError(serviceName, e, s),
+      loading: () => UniversalAsyncHandler.onLoading(serviceName),
+    );
+  }
+
+  Widget _onDeviceServiceData(
+    Device? device,
+    int measProcIndex,
+    DeviceService deviceService,
+  ) {
     return device != null
         ? StreamBuilder(
           stream: device.settingsStream,
@@ -26,6 +47,18 @@ class MeasProcessParametersWidget extends ConsumerWidget {
               if (measProc != null) {
                 return ListView(
                   children: [
+                    ComboboxParameterWidget(
+                      name: "Активность изм. процесса",
+                      value: measProc.isActive ? 1 : 0,
+                      onConfirm: (value) async {
+                        await deviceService.writeMeasProcActivity(
+                          value != 0,
+                          measProcIndex,
+                          device,
+                        );
+                      },
+                      options: const ['Неактивен', "Активен"],
+                    ),
                     TextParameterWidget(
                       minValue: 0.1,
                       maxValue: 1000,
@@ -79,6 +112,54 @@ class MeasProcessParametersWidget extends ConsumerWidget {
                       },
                       options: calcTypes,
                     ),
+                    TextParameterWidget(
+                      minValue: 0,
+                      name: "Диаметр трубы, мм",
+                      value: measProc.diameterPipe,
+                      onConfirm: (value) async {
+                        await deviceService.writeMeasDiameter(
+                          value.toDouble(),
+                          measProcIndex,
+                          device,
+                        );
+                      },
+                    ),
+                    FastChangesCard(fastChange: measProc.fastChange),
+                    StandSettingsCard(standSettings: measProc.standSettings),
+                    CalibrCurveCard(curve: measProc.calibrCurve),
+                    const CalibrationCard(),
+                    if (device.deviceSettings!.deviceMode ==
+                            DeviceMode.density &&
+                        measProc.measType > 0)
+                      TextParameterWidget(
+                        minValue: 0,
+                        name: "Плотность твердого",
+                        fractionDigits: 5,
+                        value: measProc.densitySolid,
+                        onConfirm: (value) async {
+                          await deviceService.writeDensitySolid(
+                            value.toDouble(),
+                            measProcIndex,
+                            device,
+                          );
+                        },
+                      ),
+                    if (device.deviceSettings!.deviceMode ==
+                            DeviceMode.density &&
+                        measProc.measType > 0)
+                      TextParameterWidget(
+                        minValue: 0,
+                        name: "Плотность жидкого",
+                        fractionDigits: 5,
+                        value: measProc.densityLiquid,
+                        onConfirm: (value) async {
+                          await deviceService.writeDensityLiquid(
+                            value.toDouble(),
+                            measProcIndex,
+                            device,
+                          );
+                        },
+                      ),
                   ],
                 );
               }

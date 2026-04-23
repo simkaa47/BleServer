@@ -1,0 +1,1 @@
+enum AdcBoardMode { oscilloscope, spectrum }

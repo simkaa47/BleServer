@@ -63,6 +63,12 @@ class _MainChartState extends ConsumerState<ConsumerStatefulWidget> {
   @override
   Widget build(BuildContext context) {
     final chartAsync = ref.watch(chartInitProvider);
+    final appSettingsAsyncState = ref.read(appSettingsProvider);
+
+    if(appSettingsAsyncState.hasValue){
+      _settings = appSettingsAsyncState.value;
+    }
+
 
     return chartAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -224,6 +230,7 @@ class _MainChartState extends ConsumerState<ConsumerStatefulWidget> {
     final state = ref.read(chartInitProvider).value;
     if (state == null) return;
     final cutoff = DateTime.now().subtract(_settings!.chartWindow);
+    
     for (final line in state.values) {
       if (line.deviceName != device.name) continue;
 
@@ -249,6 +256,7 @@ class _MainChartState extends ConsumerState<ConsumerStatefulWidget> {
     while (line.points.isNotEmpty && line.points.first.x.isBefore(cutoff)) {
       line.points.removeAt(0);
       removed++;
+      break;
     }
 
     return removed;

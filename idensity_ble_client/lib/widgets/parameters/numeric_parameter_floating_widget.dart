@@ -4,18 +4,20 @@ import 'package:flutter/services.dart';
 class NumericParameterFloatingWidget extends StatefulWidget {
   const NumericParameterFloatingWidget({
     super.key,
-    required this.minValue,
-    required this.maxValue,
+    this.minValue,
+    this.maxValue,
     required this.name,
     required this.value,
     required this.onConfirm,
+    this.fractionDigits,
   });
 
-  final num minValue;
-  final num maxValue;
+  final num? minValue;
+  final num? maxValue;
   final String name;
   final num value;
   final Future<void> Function(num value) onConfirm;
+  final int? fractionDigits;
 
   @override
   State<NumericParameterFloatingWidget> createState() {
@@ -31,7 +33,9 @@ class _NumericParameterFloatingWidgetState
   @override
   void initState() {
     super.initState();
-    _controller.text = widget.value.toString();
+    _controller.text = widget.fractionDigits != null
+        ? widget.value.toStringAsFixed(widget.fractionDigits!)
+        : widget.value.toString();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _formKey.currentState?.validate();
     });
@@ -58,10 +62,10 @@ class _NumericParameterFloatingWidgetState
                 }
                 final num? number = num.tryParse(value);
 
-                if (number == null ||
-                    number < widget.minValue ||
-                    number > widget.maxValue) {
-                  return 'Число должно быть в диапазоне от ${widget.minValue} до ${widget.maxValue}';
+                final min = widget.minValue ?? double.negativeInfinity;
+                final max = widget.maxValue ?? double.infinity;
+                if (number == null || number < min || number > max) {
+                  return 'Число должно быть в диапазоне от $min до $max';
                 }
 
                 return null;

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idensity_ble_client/models/providers/services_registration.dart';
+import 'package:idensity_ble_client/services/device_service.dart';
+import 'package:idensity_ble_client/widgets/async_state_handlers/universal_async_handler.dart';
 
 class DeviceSettingsMainWidget extends ConsumerWidget {
   const DeviceSettingsMainWidget(this.child, {super.key});
@@ -9,8 +11,17 @@ class DeviceSettingsMainWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final deviceService = ref.watch(deviceServiceProvider);
+    final deviceServiceAsyncState = ref.watch(deviceServiceProvider);
+    final serviceName = "Сервис устройств";
 
+    return deviceServiceAsyncState.when(
+      data: (service) => _onDeviceServiceHasData(service, ref),
+      error: (e, s) => UniversalAsyncHandler.onError(serviceName, e, s),
+      loading: () => UniversalAsyncHandler.onLoading(serviceName),
+    );
+  }
+
+  Widget _onDeviceServiceHasData(DeviceService deviceService, WidgetRef ref) {
     return SafeArea(
       child: StreamBuilder(
         stream: deviceService.devicesStream,
@@ -28,16 +39,17 @@ class DeviceSettingsMainWidget extends ConsumerWidget {
                       child: PageView.builder(
                         scrollDirection: Axis.horizontal,
                         onPageChanged: (value) {
-                          if(value < data.length){
+                          if (value < data.length) {
                             final newDevice = data[value];
-                            ref.read(selectedDeviceIdProvider.notifier).state = newDevice.name;
+                            ref.read(selectedDeviceIdProvider.notifier).state =
+                                newDevice.name;
                           }
                         },
                         itemCount: deviceService.devices.length,
                         itemBuilder: (context, index) {
                           final device = deviceService.devices[index];
-                    
-                          return Card(child: Center(child: Text(device.name)), );
+
+                          return Card(child: Center(child: Text(device.name)));
                         },
                       ),
                     ),

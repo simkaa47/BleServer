@@ -815,6 +815,363 @@ class MeasUnitRowsCompanion extends UpdateCompanion<MeasUnitRow> {
   }
 }
 
+class $DeviceRowsTable extends DeviceRows
+    with TableInfo<$DeviceRowsTable, DeviceRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DeviceRowsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _connectionTypeMeta = const VerificationMeta(
+    'connectionType',
+  );
+  @override
+  late final GeneratedColumn<int> connectionType = GeneratedColumn<int>(
+    'connection_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _macAddressMeta = const VerificationMeta(
+    'macAddress',
+  );
+  @override
+  late final GeneratedColumn<String> macAddress = GeneratedColumn<String>(
+    'mac_address',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _ipMeta = const VerificationMeta('ip');
+  @override
+  late final GeneratedColumn<String> ip = GeneratedColumn<String>(
+    'ip',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    connectionType,
+    macAddress,
+    ip,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'device_rows';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<DeviceRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('connection_type')) {
+      context.handle(
+        _connectionTypeMeta,
+        connectionType.isAcceptableOrUnknown(
+          data['connection_type']!,
+          _connectionTypeMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_connectionTypeMeta);
+    }
+    if (data.containsKey('mac_address')) {
+      context.handle(
+        _macAddressMeta,
+        macAddress.isAcceptableOrUnknown(data['mac_address']!, _macAddressMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_macAddressMeta);
+    }
+    if (data.containsKey('ip')) {
+      context.handle(_ipMeta, ip.isAcceptableOrUnknown(data['ip']!, _ipMeta));
+    } else if (isInserting) {
+      context.missing(_ipMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  DeviceRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DeviceRow(
+      id:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}id'],
+          )!,
+      name:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}name'],
+          )!,
+      connectionType:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}connection_type'],
+          )!,
+      macAddress:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}mac_address'],
+          )!,
+      ip:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}ip'],
+          )!,
+    );
+  }
+
+  @override
+  $DeviceRowsTable createAlias(String alias) {
+    return $DeviceRowsTable(attachedDatabase, alias);
+  }
+}
+
+class DeviceRow extends DataClass implements Insertable<DeviceRow> {
+  final int id;
+  final String name;
+  final int connectionType;
+  final String macAddress;
+  final String ip;
+  const DeviceRow({
+    required this.id,
+    required this.name,
+    required this.connectionType,
+    required this.macAddress,
+    required this.ip,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['name'] = Variable<String>(name);
+    map['connection_type'] = Variable<int>(connectionType);
+    map['mac_address'] = Variable<String>(macAddress);
+    map['ip'] = Variable<String>(ip);
+    return map;
+  }
+
+  DeviceRowsCompanion toCompanion(bool nullToAbsent) {
+    return DeviceRowsCompanion(
+      id: Value(id),
+      name: Value(name),
+      connectionType: Value(connectionType),
+      macAddress: Value(macAddress),
+      ip: Value(ip),
+    );
+  }
+
+  factory DeviceRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DeviceRow(
+      id: serializer.fromJson<int>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      connectionType: serializer.fromJson<int>(json['connectionType']),
+      macAddress: serializer.fromJson<String>(json['macAddress']),
+      ip: serializer.fromJson<String>(json['ip']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'name': serializer.toJson<String>(name),
+      'connectionType': serializer.toJson<int>(connectionType),
+      'macAddress': serializer.toJson<String>(macAddress),
+      'ip': serializer.toJson<String>(ip),
+    };
+  }
+
+  DeviceRow copyWith({
+    int? id,
+    String? name,
+    int? connectionType,
+    String? macAddress,
+    String? ip,
+  }) => DeviceRow(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    connectionType: connectionType ?? this.connectionType,
+    macAddress: macAddress ?? this.macAddress,
+    ip: ip ?? this.ip,
+  );
+  DeviceRow copyWithCompanion(DeviceRowsCompanion data) {
+    return DeviceRow(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      connectionType:
+          data.connectionType.present
+              ? data.connectionType.value
+              : this.connectionType,
+      macAddress:
+          data.macAddress.present ? data.macAddress.value : this.macAddress,
+      ip: data.ip.present ? data.ip.value : this.ip,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DeviceRow(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('connectionType: $connectionType, ')
+          ..write('macAddress: $macAddress, ')
+          ..write('ip: $ip')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, name, connectionType, macAddress, ip);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DeviceRow &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.connectionType == this.connectionType &&
+          other.macAddress == this.macAddress &&
+          other.ip == this.ip);
+}
+
+class DeviceRowsCompanion extends UpdateCompanion<DeviceRow> {
+  final Value<int> id;
+  final Value<String> name;
+  final Value<int> connectionType;
+  final Value<String> macAddress;
+  final Value<String> ip;
+  const DeviceRowsCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.connectionType = const Value.absent(),
+    this.macAddress = const Value.absent(),
+    this.ip = const Value.absent(),
+  });
+  DeviceRowsCompanion.insert({
+    this.id = const Value.absent(),
+    required String name,
+    required int connectionType,
+    required String macAddress,
+    required String ip,
+  }) : name = Value(name),
+       connectionType = Value(connectionType),
+       macAddress = Value(macAddress),
+       ip = Value(ip);
+  static Insertable<DeviceRow> custom({
+    Expression<int>? id,
+    Expression<String>? name,
+    Expression<int>? connectionType,
+    Expression<String>? macAddress,
+    Expression<String>? ip,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (connectionType != null) 'connection_type': connectionType,
+      if (macAddress != null) 'mac_address': macAddress,
+      if (ip != null) 'ip': ip,
+    });
+  }
+
+  DeviceRowsCompanion copyWith({
+    Value<int>? id,
+    Value<String>? name,
+    Value<int>? connectionType,
+    Value<String>? macAddress,
+    Value<String>? ip,
+  }) {
+    return DeviceRowsCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      connectionType: connectionType ?? this.connectionType,
+      macAddress: macAddress ?? this.macAddress,
+      ip: ip ?? this.ip,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (connectionType.present) {
+      map['connection_type'] = Variable<int>(connectionType.value);
+    }
+    if (macAddress.present) {
+      map['mac_address'] = Variable<String>(macAddress.value);
+    }
+    if (ip.present) {
+      map['ip'] = Variable<String>(ip.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DeviceRowsCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('connectionType: $connectionType, ')
+          ..write('macAddress: $macAddress, ')
+          ..write('ip: $ip')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $CommonSettingsTable extends CommonSettings
     with TableInfo<$CommonSettingsTable, CommonSetting> {
   @override
@@ -1439,6 +1796,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $DataLogCellsTable dataLogCells = $DataLogCellsTable(this);
   late final $MeasUnitRowsTable measUnitRows = $MeasUnitRowsTable(this);
+  late final $DeviceRowsTable deviceRows = $DeviceRowsTable(this);
   late final $CommonSettingsTable commonSettings = $CommonSettingsTable(this);
   late final $ChartSettingTableRowsTable chartSettingTableRows =
       $ChartSettingTableRowsTable(this);
@@ -1453,6 +1811,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   List<DatabaseSchemaEntity> get allSchemaEntities => [
     dataLogCells,
     measUnitRows,
+    deviceRows,
     commonSettings,
     chartSettingTableRows,
     idxDeviceTypeDt,
@@ -1907,6 +2266,208 @@ typedef $$MeasUnitRowsTableProcessedTableManager =
       MeasUnitRow,
       PrefetchHooks Function()
     >;
+typedef $$DeviceRowsTableCreateCompanionBuilder =
+    DeviceRowsCompanion Function({
+      Value<int> id,
+      required String name,
+      required int connectionType,
+      required String macAddress,
+      required String ip,
+    });
+typedef $$DeviceRowsTableUpdateCompanionBuilder =
+    DeviceRowsCompanion Function({
+      Value<int> id,
+      Value<String> name,
+      Value<int> connectionType,
+      Value<String> macAddress,
+      Value<String> ip,
+    });
+
+class $$DeviceRowsTableFilterComposer
+    extends Composer<_$AppDatabase, $DeviceRowsTable> {
+  $$DeviceRowsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get connectionType => $composableBuilder(
+    column: $table.connectionType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get macAddress => $composableBuilder(
+    column: $table.macAddress,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get ip => $composableBuilder(
+    column: $table.ip,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$DeviceRowsTableOrderingComposer
+    extends Composer<_$AppDatabase, $DeviceRowsTable> {
+  $$DeviceRowsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get connectionType => $composableBuilder(
+    column: $table.connectionType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get macAddress => $composableBuilder(
+    column: $table.macAddress,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get ip => $composableBuilder(
+    column: $table.ip,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$DeviceRowsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $DeviceRowsTable> {
+  $$DeviceRowsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<int> get connectionType => $composableBuilder(
+    column: $table.connectionType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get macAddress => $composableBuilder(
+    column: $table.macAddress,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get ip =>
+      $composableBuilder(column: $table.ip, builder: (column) => column);
+}
+
+class $$DeviceRowsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $DeviceRowsTable,
+          DeviceRow,
+          $$DeviceRowsTableFilterComposer,
+          $$DeviceRowsTableOrderingComposer,
+          $$DeviceRowsTableAnnotationComposer,
+          $$DeviceRowsTableCreateCompanionBuilder,
+          $$DeviceRowsTableUpdateCompanionBuilder,
+          (
+            DeviceRow,
+            BaseReferences<_$AppDatabase, $DeviceRowsTable, DeviceRow>,
+          ),
+          DeviceRow,
+          PrefetchHooks Function()
+        > {
+  $$DeviceRowsTableTableManager(_$AppDatabase db, $DeviceRowsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer:
+              () => $$DeviceRowsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer:
+              () => $$DeviceRowsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer:
+              () => $$DeviceRowsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<int> connectionType = const Value.absent(),
+                Value<String> macAddress = const Value.absent(),
+                Value<String> ip = const Value.absent(),
+              }) => DeviceRowsCompanion(
+                id: id,
+                name: name,
+                connectionType: connectionType,
+                macAddress: macAddress,
+                ip: ip,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String name,
+                required int connectionType,
+                required String macAddress,
+                required String ip,
+              }) => DeviceRowsCompanion.insert(
+                id: id,
+                name: name,
+                connectionType: connectionType,
+                macAddress: macAddress,
+                ip: ip,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable(table),
+                          BaseReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$DeviceRowsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $DeviceRowsTable,
+      DeviceRow,
+      $$DeviceRowsTableFilterComposer,
+      $$DeviceRowsTableOrderingComposer,
+      $$DeviceRowsTableAnnotationComposer,
+      $$DeviceRowsTableCreateCompanionBuilder,
+      $$DeviceRowsTableUpdateCompanionBuilder,
+      (DeviceRow, BaseReferences<_$AppDatabase, $DeviceRowsTable, DeviceRow>),
+      DeviceRow,
+      PrefetchHooks Function()
+    >;
 typedef $$CommonSettingsTableCreateCompanionBuilder =
     CommonSettingsCompanion Function({
       Value<int> id,
@@ -2308,6 +2869,8 @@ class $AppDatabaseManager {
       $$DataLogCellsTableTableManager(_db, _db.dataLogCells);
   $$MeasUnitRowsTableTableManager get measUnitRows =>
       $$MeasUnitRowsTableTableManager(_db, _db.measUnitRows);
+  $$DeviceRowsTableTableManager get deviceRows =>
+      $$DeviceRowsTableTableManager(_db, _db.deviceRows);
   $$CommonSettingsTableTableManager get commonSettings =>
       $$CommonSettingsTableTableManager(_db, _db.commonSettings);
   $$ChartSettingTableRowsTableTableManager get chartSettingTableRows =>

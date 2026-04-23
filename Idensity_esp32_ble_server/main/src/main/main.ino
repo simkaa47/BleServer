@@ -10,6 +10,10 @@
 #define CHARACTERISTIC_1_UUID "d973f2e2-b19e-11e2-9e96-0800200c9a66"
 #define CHARACTERISTIC_2_UUID "d973f2e1-b19e-11e2-9e96-0800200c9a66"
 
+#define CHUNK_SIZE 512
+
+
+
 extern uint8_t modbus_response_buffer[250];
 extern TMeas_Proc_Data_Struct meas_proc_data_ready_strct[2];
 extern THV_Module_Telemetry_Struct hv_module_telemetry_strct;
@@ -30,6 +34,28 @@ class MyServerCallbacks : public BLEServerCallbacks {
 };
 
 class MyCharacteristicsCallbacksRw : public BLECharacteristicCallbacks {
+private:
+  BLECharacteristic *pReadCharacteristic;
+
+public:
+  MyCharacteristicsCallbacksRw(BLECharacteristic *pReadChar) {
+    pReadCharacteristic = pReadChar;
+  }
+
+  void sendChunked(BLECharacteristic *ch, uint8_t *data, int totalLen) {
+    int offset = 0;
+
+    while (offset < totalLen) {
+      int len = min(CHUNK_SIZE, totalLen - offset);
+
+      ch->setValue(data + offset, len);
+      ch->notify();
+
+      offset += len;
+    }
+  }
+
+
   void onWrite(BLECharacteristic *pCharacteristic) {
     // Получаем длину этих данных
     size_t receivedLength = pCharacteristic->getLength();
@@ -51,15 +77,9 @@ class MyCharacteristicsCallbacksRw : public BLECharacteristicCallbacks {
         Serial.print("Modbus result: ");
         Serial.print(result);
         Serial.println(" bytes");
-        pCharacteristic->setValue(modbus_response_buffer, result);
+        sendChunked(pReadCharacteristic, modbus_response_buffer, result);
       }
-
-
-      // Устанавливаем полученные данные в качестве ответа
-
-
-      // Отправляем уведомление
-      pCharacteristic->notify();
+      
     } else {
       Serial.println("Received empty data.");
     }
@@ -83,6 +103,7 @@ void setup() {
 
   //initialize device
   BLEDevice::init(DEVICE_NAME);
+  //BLEDevice::setMTU(23);
 
 
   // Create server
@@ -106,7 +127,7 @@ void setup() {
 
   //pCharacteristic = pCharacteristicRead;
 
-  pCharacteristicRead->setCallbacks(new MyCharacteristicsCallbacksRw());
+  pCharacteristicWrite->setCallbacks(new MyCharacteristicsCallbacksRw(pCharacteristicRead));
 
   // // Descriptors
   // BLE2902 *descriptor_2901 = new BLE2902();
@@ -131,9 +152,9 @@ void loop() {
   temp_module_telemetry_strct.t_int = 31.4 + float(currentMilis1 % 13) / 10;
   meas_proc_data_ready_strct[0].phys_vals[0] = 1.23 + (float(currentMilis1 % 3) / 10);
   meas_proc_data_ready_strct[0].phys_val_complete_aver = 1.23 + (float(currentMilis1 % 3) / 40);
-  meas_proc_data_ready_strct[0].meas_in_progress = 1;
+  meas_proc_data_ready_strct[0].meas_in_progress = 0;
   meas_proc_data_ready_strct[1].phys_vals[0] = 1.46 + (float(currentMilis1 % 5) / 10);
   meas_proc_data_ready_strct[1].phys_val_complete_aver = 1.46 + (float(currentMilis1 % 5) / 50);
-  meas_proc_data_ready_strct[1].meas_in_progress = 1;
+  meas_proc_data_ready_strct[1].meas_in_progress = 0;
   meas_proc_data_ready_strct[1].meas_ndx = 1;
 }

@@ -1,0 +1,1 @@
+enum AnalogOutputMode { testValue, measuredValue }

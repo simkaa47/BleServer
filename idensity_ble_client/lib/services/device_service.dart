@@ -1,288 +1,53 @@
-import 'dart:async';
-import 'dart:collection';
-import 'dart:core';
-import 'dart:developer';
-import 'package:flutter/material.dart';
-import 'package:idensity_ble_client/data_access/data_log_cells/data_log_cell_repository.dart';
-import 'package:idensity_ble_client/data_access/app_database.dart';
-import 'package:idensity_ble_client/models/charts/chart_type.dart';
-import 'package:idensity_ble_client/models/connection.dart';
-import 'package:idensity_ble_client/models/connection_type.dart';
 import 'package:idensity_ble_client/models/device.dart';
-import 'package:idensity_ble_client/models/indication/indication.dart';
-import 'package:idensity_ble_client/models/settings/device_settings.dart';
-import 'package:idensity_ble_client/services/modbus/modbus_service.dart';
-import 'package:rxdart/subjects.dart';
+import 'package:idensity_ble_client/models/settings/adc_board_settings.dart';
+import 'package:idensity_ble_client/models/settings/calibr_curve.dart';
+import 'package:idensity_ble_client/models/settings/analog_output_settings.dart';
+import 'package:idensity_ble_client/models/settings/counter_settings.dart';
+import 'package:idensity_ble_client/models/settings/fast_change.dart';
+import 'package:idensity_ble_client/models/settings/serial_settings.dart';
+import 'package:idensity_ble_client/models/settings/single_meas_result.dart';
+import 'package:idensity_ble_client/models/settings/stand_settings.dart';
+import 'package:idensity_ble_client/models/settings/tcp_settings.dart';
 
-class DeviceService {
-  DeviceService({required this.logCellRepository});
+abstract interface class DeviceService {
+  Stream<Device> get updateStream;
+  Stream<List<Device>> get devicesStream;
+  List<Device> get devices;
 
-  final DataLogCellRepository logCellRepository;
-  final Queue<Function> _commandQueue = Queue<Function>();
+  Future<void> init();
+  Future<void> addDevices(List<Device> newDevices);
+  Future<void> removeDevice(Device device);
 
-  final List<DataLogCellsCompanion> _logCells = [];
+  Future<void> writeDeviceType(int type, Device device);
+  Future<void> writeLevelLength(double value, Device device);
+  Future<void> writeRtc(DateTime dt, Device device);
+  Future<void> writeAdcBoardSettings(AdcBoardSettings settings, Device device);
+  Future<void> writeMeasDuration(double value, int measProcIndex, Device device);
+  Future<void> writeAveragePoints(int value, int measProcIndex, Device device);
+  Future<void> writeCalcType(int value, int measProcIndex, Device device);
+  Future<void> writeMeasType(int value, int measProcIndex, Device device);
+  Future<void> writeMeasDiameter(double value, int measProcIndex, Device device);
+  Future<void> writeDensityLiquid(double value, int measProcIndex, Device device);
+  Future<void> writeDensitySolid(double value, int measProcIndex, Device device);
+  Future<void> writeFastChanges(FastChange fastChange, int measProcIndex, Device device);
+  Future<void> writeMeasProcActivity(bool activity, int measProcIndex, Device device);
+  Future<void> writeMeasProcStandartization(StandSettings stand, int standIndex, int measProcIndex, Device device);
+  Future<void> writeMeasProcCalibrCurve(CalibrCurve calibrCurve,  int measProcIndex, Device device);
+  Future<void> makeStandartization(StandSettings stand, int standIndex, int measProcIndex, Device device);
+  Future<void> makeSingleMeasurement(int measIndex, int measProcIndex, Device device); 
+  Future<void> writeMeasProcSingleMeasDuration(int duration, int measProcIndex, Device device);
+  Future<void> writeSingleMeasResult(SingleMeasResult result, int measIndex, int measProcIndex, Device device);
 
-  final modbusService = ModbusService();
 
-  final List<Connection> _connections = [];
+  Future<void> writeCounterSettings(CounterSettings settings, int counterIndex, Device device);
+  Future<void> writeModbusId(int value, Device device);
+  Future<void> writeTcpSettings(TcpSettings settings, Device device);
+  Future<void> writeSerialSettings(SerialSettings settings, Device device);
+  Future<void> writeAnalogInputActivity(bool active, int inputIndex, Device device);
+  Future<void> writeAnalogOutputSettings(AnalogOutputSettings settings, int outputIndex, Device device);
+  Future<void> sendAnalogTestValue(int outputIndex, Device device);
 
-  final _updateController = StreamController<Device>.broadcast();
-  Stream<Device> get updateStream => _updateController.stream;
+  Future<void> switchMeasState(bool value, Device device);
 
-  final BehaviorSubject<List<Device>> _devicesController =
-      BehaviorSubject<List<Device>>();
-
-  Stream<List<Device>> get devicesStream => _devicesController.stream;
-  final List<Device> _currentDevices = [];
-  List<Device> get devices => List.unmodifiable(_currentDevices);
-
-  Future<void> addDevices(List<Device> newDevices) async {
-    for (var newDevice in newDevices) {
-      if (!_currentDevices.any((d) => isEqual(d, newDevice))) {
-        _currentDevices.add(newDevice);
-        if (_currentDevices.length == 1) {
-          askDevices();
-        }
-        _devicesController.add(List.from(_currentDevices));
-        _connections.add(
-          Connection(newDevice.connectionSettings, name: newDevice.name),
-        );
-        debugPrint(
-          'Устройство добавлено: ${newDevice.name}. Текущих устройств: ${_currentDevices.length}',
-        );
-      }
-    }
-  }
-
-  Future<void> removeDevice(Device device) async {
-    await device.dispose();
-    var connection =
-        _connections.where((c) => c.name == device.name).firstOrNull;
-    if (connection != null) {
-      _connections.remove(connection);
-      await connection.dispose();
-    }
-    _currentDevices.remove(device);
-    _devicesController.add(
-      List.from(_currentDevices),
-    ); // Отправляем копию списка в поток
-    debugPrint(
-      'Устройство удалено: ${device.name}. Текущих устройств: ${_currentDevices.length}',
-    );
-  }
-
-  Future<void> askDevices() async {
-    debugPrint('Начало опроса устройств...');
-    while (_currentDevices.isNotEmpty) {
-      try {
-        final List<Device> devicesToUpdate = List.from(_currentDevices);
-        for (var i = 0; i < devicesToUpdate.length; i++) {
-          final device = devicesToUpdate[i];
-          var connection =
-              _connections.where((c) => c.name == device.name).firstOrNull;
-          if (connection != null) {
-            // Получаем новые данные для устройства
-            final newIndicationData = await _getIndicationData(connection);
-            final newSettings = await _getDeviceSettings(connection);
-            if (_commandQueue.isEmpty) {
-              device.updateIndicationData(newIndicationData);
-              device.updateDeviceSettings(newSettings);
-            }
-            await _log(device);
-            _updateController.add(device);
-            debugPrint('Обновлены данные для ${device.name}');
-          }
-        }
-        if (devicesToUpdate.isEmpty) {
-          await Future.delayed(const Duration(seconds: 1));
-        } else {
-          await Future.delayed(const Duration(milliseconds: 50));
-        }
-        if (_commandQueue.isNotEmpty) {
-          final command = _commandQueue.removeFirst();
-          try {
-            await command();
-          } catch (e) {
-            debugPrint('Ошибка при выполнении команды: $e');
-          }
-        }
-      } catch (e) {
-        debugPrint('Ошибка при получении данных устройства: $e');
-      }
-    }
-  }
-
-  Future<IndicationData> _getIndicationData(Connection connection) async {
-    return await modbusService.getIndicationData(connection);
-  }
-
-  Future<DeviceSettings> _getDeviceSettings(Connection connection) async {
-    return await modbusService.getDeviceSettings(connection);
-  }
-
-  Future<void> _log(Device device) async {
-    final dt = DateTime.now();
-    _logCells.add(DataLogCellsCompanion.insert(
-      deviceName: device.name,
-      chartType: ChartType.counter.index,
-      dt: dt,
-      value: device.indicationData?.counters ?? 0,
-    ));
-    _logCells.add(DataLogCellsCompanion.insert(
-      deviceName: device.name,
-      chartType: ChartType.currentValue0.index,
-      dt: dt,
-      value: device.indicationData?.measResults[0].currentValue ?? 0,
-    ));
-    _logCells.add(DataLogCellsCompanion.insert(
-      deviceName: device.name,
-      chartType: ChartType.averageValue0.index,
-      dt: dt,
-      value: device.indicationData?.measResults[0].averageValue ?? 0,
-    ));
-    _logCells.add(DataLogCellsCompanion.insert(
-      deviceName: device.name,
-      chartType: ChartType.currentValue1.index,
-      dt: dt,
-      value: device.indicationData?.measResults[1].currentValue ?? 0,
-    ));
-    _logCells.add(DataLogCellsCompanion.insert(
-      deviceName: device.name,
-      chartType: ChartType.averageValue1.index,
-      dt: dt,
-      value: device.indicationData?.measResults[1].averageValue ?? 0,
-    ));
-     _logCells.add(DataLogCellsCompanion.insert(
-      deviceName: device.name,
-      chartType: ChartType.aiCurrent0.index,
-      dt: dt,
-      value: device.indicationData?.analogInputIndications[0].current ?? 0,
-    ));
-    _logCells.add(DataLogCellsCompanion.insert(
-      deviceName: device.name,
-      chartType: ChartType.aoCurrent0.index,
-      dt: dt,
-      value: device.indicationData?.analogOutputIndications[0].current ?? 0,
-    ));
-    _logCells.add(DataLogCellsCompanion.insert(
-      deviceName: device.name,
-      chartType: ChartType.aiCurrent1.index,
-      dt: dt,
-      value: device.indicationData?.analogInputIndications[1].current ?? 0,
-    ));
-    _logCells.add(DataLogCellsCompanion.insert(
-      deviceName: device.name,
-      chartType: ChartType.aoCurrent1.index,
-      dt: dt,
-      value: device.indicationData?.analogOutputIndications[1].current ?? 0,
-    ));
-    _logCells.add(DataLogCellsCompanion.insert(
-      deviceName: device.name,
-      chartType: ChartType.hv.index,
-      dt: dt,
-      value: device.indicationData?.hv ?? 0,
-    ));
-    _logCells.add(DataLogCellsCompanion.insert(
-      deviceName: device.name,
-      chartType: ChartType.temp.index,
-      dt: dt,
-      value: device.indicationData?.temperature ?? 0,
-    ));
-    if(_logCells.length>100){
-      try {
-        logCellRepository.insertBatch(_logCells);
-        _logCells.clear();
-      } catch (e) {
-        debugPrint("Проблема с записью в БД логов измерения");
-      }
-    }
-  }
-
-  void dispose() {
-    _updateController.close();
-    _devicesController.close();
-    for (var device in devices) {
-      device.dispose();
-    }
-    for (var connection in _connections) {
-      connection.dispose();
-    }
-  }
-
-  bool isEqual(Device first, Device second) {
-    return first.connectionSettings.connectionType ==
-                second.connectionSettings.connectionType &&
-            (first.connectionSettings.connectionType ==
-                    ConnectionType.bluetooth &&
-                first.connectionSettings.bluetoothSettings.macAddress ==
-                    second.connectionSettings.bluetoothSettings.macAddress) ||
-        (first.connectionSettings.connectionType == ConnectionType.ethernet &&
-            first.connectionSettings.ethernetSettings.ip ==
-                second.connectionSettings.ethernetSettings.ip);
-  }
-
-  Future<void> writeDeviceType(int type, Device device) async {
-    _commandQueue.add(() async {
-      var connection = _connections.where((c) => c.name == c.name).firstOrNull;
-      if (connection != null) {
-        await modbusService.writeDeviceType(type, connection);
-      }
-    });
-  }
-
-  Future<void> writeMeasDuration(
-    double value,
-    int measProcIndex,
-    Device device,
-  ) async {
-    _commandQueue.add(() async {
-      var connection = _connections.where((c) => c.name == c.name).firstOrNull;
-      if (connection != null) {
-        await modbusService.writeMeasDuration(value, measProcIndex, connection);
-      }
-    });
-  }
-
-  Future<void> writeAveragePoints(
-    int value,
-    int measProcIndex,
-    Device device,
-  ) async {
-    _commandQueue.add(() async {
-      var connection = _connections.where((c) => c.name == c.name).firstOrNull;
-      if (connection != null) {
-        await modbusService.writeAveragePoints(
-          value,
-          measProcIndex,
-          connection,
-        );
-      }
-    });
-  }
-
-  Future<void> writeCalcType(
-    int value,
-    int measProcIndex,
-    Device device,
-  ) async {
-    _commandQueue.add(() async {
-      var connection = _connections.where((c) => c.name == c.name).firstOrNull;
-      if (connection != null) {
-        await modbusService.writeCalcType(value, measProcIndex, connection);
-      }
-    });
-  }
-
-  Future<void> writeMeasType(
-    int value,
-    int measProcIndex,
-    Device device,
-  ) async {
-    _commandQueue.add(() async {
-      var connection = _connections.where((c) => c.name == c.name).firstOrNull;
-      if (connection != null) {
-        await modbusService.writeMeasType(value, measProcIndex, connection);
-      }
-    });
-  }
+  void dispose();
 }

@@ -94,9 +94,9 @@ class BleConnection implements Connection {
 
     await _readSub?.cancel();
 
-    _charWrite = await _bleDevice.getCharacteristic(_writeCharUuid, service: _serviceUuid);
-    _charRead = await _bleDevice.getCharacteristic(_readCharUuid, service: _serviceUuid);
-    _charSpectrum = await _bleDevice.getCharacteristic(_spectrumCharUuid, service: _serviceUuid);
+    _charWrite = await _bleDevice.getCharacteristic(_writeCharUuid, service: _serviceUuid, preferCached: false);
+    _charRead = await _bleDevice.getCharacteristic(_readCharUuid, service: _serviceUuid, preferCached: false);
+    _charSpectrum = await _bleDevice.getCharacteristic(_spectrumCharUuid, service: _serviceUuid, preferCached: false);
 
     if (_charRead!.notifications.isSupported) {
       await _charRead!.notifications.subscribe();

@@ -78,18 +78,22 @@ class BleConnection implements Connection {
   }
 
   Future<void> _connectAndSubscribe() async {
-    // If characteristics are missing but device thinks it's connected — reconnect clean
-    if (_charRead == null || _charWrite == null) {
-      if (await _bleDevice.connectionState == BleConnectionState.connected) {
-        await _bleDevice.disconnect();
-      }
+    await _charRead?.unsubscribe();
+    await _charSpectrum?.unsubscribe();
+    await _readSub?.cancel();
+    await _spectrumSub?.cancel();
+    _charWrite = null;
+    _charRead = null;
+    _charSpectrum = null;
+
+    if (await _bleDevice.connectionState == BleConnectionState.connected) {
+      await _bleDevice.disconnect();
     }
-    if (await _bleDevice.connectionState == BleConnectionState.disconnected) {
-      await _bleDevice.connect();
-      if (!Platform.isLinux) {
-        final mtu = await _bleDevice.requestMtu(256);
-        debugPrint('MTU = $mtu bytes');
-      }
+
+    await UniversalBle.connect(_bleDevice.deviceId, timeout: const Duration(seconds: 10));
+    if (!Platform.isLinux) {
+      final mtu = await _bleDevice.requestMtu(256);
+      debugPrint('MTU = $mtu bytes');
     }
 
     await _readSub?.cancel();
@@ -127,6 +131,7 @@ class BleConnection implements Connection {
 
   // Level 1: accumulate MTU chunks until terminator '#' (0x23 = 35)
   void _onSpectrumChunk(List<int> chunk) {
+    debugPrint('Нотификация от х-ки спектра - @chunk');
     _bleBuffer.addAll(chunk);
     if (_bleBuffer.last != 35) return;
     _parsePacket(List.unmodifiable(_bleBuffer));

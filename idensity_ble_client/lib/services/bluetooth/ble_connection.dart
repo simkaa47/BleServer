@@ -94,7 +94,7 @@ class BleConnection implements Connection {
       }
     } catch (_) {}
 
-    await UniversalBle.connect(_bleDevice.deviceId, timeout: const Duration(seconds: 10));
+    await UniversalBle.connect(_bleDevice.deviceId, timeout: const Duration(seconds: 90));
     if (!Platform.isLinux) {
       final mtu = await _bleDevice.requestMtu(256);
       debugPrint('MTU = $mtu bytes');
@@ -135,7 +135,7 @@ class BleConnection implements Connection {
 
   // Level 1: accumulate MTU chunks until terminator '#' (0x23 = 35)
   void _onSpectrumChunk(List<int> chunk) {
-    debugPrint('Нотификация от х-ки спектра - @chunk');
+    debugPrint('Нотификация от х-ки спектра - $chunk');
     _bleBuffer.addAll(chunk);
     if (_bleBuffer.last != 35) return;
     _parsePacket(List.unmodifiable(_bleBuffer));

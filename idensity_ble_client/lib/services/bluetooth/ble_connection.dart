@@ -78,17 +78,21 @@ class BleConnection implements Connection {
   }
 
   Future<void> _connectAndSubscribe() async {
-    await _charRead?.unsubscribe();
-    await _charSpectrum?.unsubscribe();
-    await _readSub?.cancel();
-    await _spectrumSub?.cancel();
+    await Future.wait([
+      _charRead?.unsubscribe().catchError((_) {}) ?? Future.value(),
+      _charSpectrum?.unsubscribe().catchError((_) {}) ?? Future.value(),
+      _readSub?.cancel() ?? Future.value(),
+      _spectrumSub?.cancel() ?? Future.value(),
+    ]);
     _charWrite = null;
     _charRead = null;
     _charSpectrum = null;
 
-    if (await _bleDevice.connectionState == BleConnectionState.connected) {
-      await _bleDevice.disconnect();
-    }
+    try {
+      if (await _bleDevice.connectionState == BleConnectionState.connected) {
+        await _bleDevice.disconnect();
+      }
+    } catch (_) {}
 
     await UniversalBle.connect(_bleDevice.deviceId, timeout: const Duration(seconds: 10));
     if (!Platform.isLinux) {

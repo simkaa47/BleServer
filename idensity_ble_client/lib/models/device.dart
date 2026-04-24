@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:idensity_ble_client/models/adc/adc_frame.dart';
 import 'package:idensity_ble_client/models/connection_settings.dart';
 import 'package:idensity_ble_client/models/indication/indication.dart';
 import 'package:idensity_ble_client/models/settings/device_settings.dart';
@@ -18,6 +19,8 @@ class Device {
   IndicationData? get indicationData => _indicationData;
   DeviceSettings? get deviceSettings => _deviceSettings;
   String name = "";
+  List<int>? spectrum;
+  List<int>? oscillogramma;
 
   DateTime _lastSettingsReadTime = DateTime.fromMillisecondsSinceEpoch(0);
   DateTime _lastIndicationReadTime = DateTime.fromMillisecondsSinceEpoch(0);
@@ -45,9 +48,22 @@ class Device {
   final _deviceSettingsController = BehaviorSubject<DeviceSettings>();
   Stream<DeviceSettings> get settingsStream => _deviceSettingsController.stream;
 
+  final _adcFrameController = BehaviorSubject<AdcFrame>();
+  Stream<AdcFrame> get adcFrameStream => _adcFrameController.stream;
+
   dispose() {
     _indicationDataController.close();
     _deviceSettingsController.close();
+    _adcFrameController.close();
+  }
+
+  void updateAdcFrame(AdcFrame frame) {
+    if (frame.type == AdcFrameType.oscilloscope) {
+      oscillogramma = frame.samples;
+    } else {
+      spectrum = frame.samples;
+    }
+    _adcFrameController.add(frame);
   }
 
   void updateIndicationData(IndicationData data) {

@@ -38,6 +38,7 @@ class DeviceServiceImpl implements DeviceService {
   final Queue<(Device, Future<void> Function())> _commandQueue = Queue();
   final List<DataLogCellsCompanion> _logCells = [];
   final Map<Device, Connection> _connections = {};
+  final Map<Device, StreamSubscription<dynamic>> _spectrumSubscriptions = {};
 
   final _updateController = StreamController<Device>.broadcast();
   @override
@@ -64,7 +65,10 @@ class DeviceServiceImpl implements DeviceService {
       if (!_currentDevices.any((d) => isEqual(d, newDevice))) {
         newDevice.id = await deviceRepository.add(newDevice);
         _currentDevices.add(newDevice);
-        _connections[newDevice] = _createConnection(newDevice);
+        final connection = _createConnection(newDevice);
+        _connections[newDevice] = connection;
+        _spectrumSubscriptions[newDevice] = connection.spectrumStream
+            .listen((frame) => newDevice.updateAdcFrame(frame));
         if (_currentDevices.length == 1) {
           askDevices();
         }
@@ -80,6 +84,7 @@ class DeviceServiceImpl implements DeviceService {
   Future<void> removeDevice(Device device) async {
     await deviceRepository.delete(device);
     _currentDevices.remove(device);
+    await _spectrumSubscriptions.remove(device)?.cancel();
     await _connections.remove(device)?.dispose();
     await device.dispose();
     _devicesController.add(List.from(_currentDevices));

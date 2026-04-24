@@ -11,6 +11,8 @@ class BluetoothConnection {
       "d973f2e2-b19e-11e2-9e96-0800200c9a66";
   static const String characteristicReadUuid =
       "d973f2e1-b19e-11e2-9e96-0800200c9a66";
+  static const String characteristicSpectrumUuid =
+      "d973f2e3-b19e-11e2-9e96-0800200c9a66";
   BleCharacteristic? _characteristicRead;
   BleCharacteristic? _characteristicWrite;
   final BleDevice bleDevice;
@@ -76,7 +78,7 @@ class BluetoothConnection {
     if (connectionState == BleConnectionState.disconnected) {
       try {
         await bleDevice.connect();
-        if(!Platform.isLinux) {
+        if (!Platform.isLinux) {
           var result = await bleDevice.requestMtu(256);
           debugPrint("MTU = $result bytes");
         }

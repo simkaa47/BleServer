@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:idensity_ble_client/models/adc/adc_frame.dart';
 import 'package:idensity_ble_client/models/device.dart';
 import 'package:idensity_ble_client/models/providers/services_registration.dart';
 import 'package:idensity_ble_client/models/settings/adc_board_mode.dart';
 import 'package:idensity_ble_client/models/settings/adc_board_settings.dart';
 import 'package:idensity_ble_client/services/device_service.dart';
 import 'package:idensity_ble_client/widgets/async_state_handlers/universal_async_handler.dart';
+import 'package:idensity_ble_client/widgets/device_settings/spectrum/oscilloscope_chart_widget.dart';
+import 'package:idensity_ble_client/widgets/device_settings/spectrum/spectrum_chart_widget.dart';
 import 'package:idensity_ble_client/widgets/parameters/combobox_parameter_widget.dart';
-import 'package:rxdart/rxdart.dart';
 import 'package:idensity_ble_client/widgets/parameters/ip_parameter_widget.dart';
 import 'package:idensity_ble_client/widgets/parameters/text_parameter_widget.dart';
+import 'package:rxdart/rxdart.dart';
 
 class SpectrumMainWidget extends ConsumerWidget {
   const SpectrumMainWidget({super.key});
@@ -38,10 +41,45 @@ class SpectrumMainWidget extends ConsumerWidget {
     ..peakSpectrumSv = s.peakSpectrumSv
     ..adcDataSendEnabled = s.adcDataSendEnabled;
 
+  Widget _chartPanel(Device? device) {
+    return StreamBuilder(
+      stream: device?.adcFrameStream,
+      builder: (context, snapshot) {
+        final frame = snapshot.data;
+        if (frame == null) {
+          return const Center(child: Text('Ожидание данных...'));
+        }
+        return switch (frame.type) {
+          AdcFrameType.oscilloscope => OscilloscopeChartWidget(frame: frame),
+          _ => SpectrumChartWidget(frame: frame),
+        };
+      },
+    );
+  }
+
   Widget _onData(Device? device, DeviceService service) {
     return Scaffold(
       appBar: AppBar(title: const Text("Спектр")),
-      body: StreamBuilder(
+      body: OrientationBuilder(
+        builder: (context, orientation) {
+          final chart = _chartPanel(device);
+          final settings = _settingsPanel(device, service);
+          return orientation == Orientation.portrait
+              ? Column(children: [
+                  Expanded(child: chart),
+                  Expanded(child: settings),
+                ])
+              : Row(children: [
+                  Expanded(child: chart),
+                  Expanded(child: settings),
+                ]);
+        },
+      ),
+    );
+  }
+
+  Widget _settingsPanel(Device? device, DeviceService service) {
+    return StreamBuilder(
         stream: device == null
             ? null
             : Rx.combineLatest2(
@@ -150,7 +188,7 @@ class SpectrumMainWidget extends ConsumerWidget {
           }
           return const Center(child: Text("Нет устройства"));
         },
-      ),
-    );
+      );
+    
   }
 }

@@ -9,6 +9,7 @@
 #define SERVICE_1_UUID "d973f2e0-b19e-11e2-9e96-0800200c9a66"
 #define CHARACTERISTIC_1_UUID "d973f2e2-b19e-11e2-9e96-0800200c9a66"
 #define CHARACTERISTIC_2_UUID "d973f2e1-b19e-11e2-9e96-0800200c9a66"
+#define CHARACTERISTIC_3_UUID "d973f2e3-b19e-11e2-9e96-0800200c9a66"
 
 #define CHUNK_SIZE 512
 
@@ -79,7 +80,7 @@ public:
         Serial.println(" bytes");
         sendChunked(pReadCharacteristic, modbus_response_buffer, result);
       }
-      
+
     } else {
       Serial.println("Received empty data.");
     }
@@ -120,6 +121,9 @@ void setup() {
   BLECharacteristic *pCharacteristicRead = pService->createCharacteristic(
     CHARACTERISTIC_2_UUID,
     BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE | BLECharacteristic::PROPERTY_NOTIFY);
+
+  BLECharacteristic *pCharacteristicSpectrum = pService->createCharacteristic(
+    CHARACTERISTIC_3_UUID, BLECharacteristic::PROPERTY_NOTIFY);
 
   BLECharacteristic *pCharacteristicWrite = pService->createCharacteristic(
     CHARACTERISTIC_1_UUID,

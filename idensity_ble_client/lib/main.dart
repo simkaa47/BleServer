@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:idensity_ble_client/app_scroll_behavior.dart';
 import 'package:idensity_ble_client/widgets/app_shell.dart';
+import 'package:idensity_ble_client/widgets/archive/archive_main_widget.dart';
 import 'package:idensity_ble_client/widgets/communication/communication_tab.dart';
 import 'package:idensity_ble_client/widgets/device_settings/analogs/analogs_common_widget.dart';
 import 'package:idensity_ble_client/widgets/device_settings/common/common_settings_widget.dart';
@@ -73,7 +74,13 @@ final _router = GoRouter(
             ),
             GoRoute(
               path: "measUnits",
-              builder: (context, state) => const MeasUnitsWidget(),
+              builder: (context, state) => const MeasUnitsWidget(),              
+              
+            ),
+            GoRoute(
+              path: "archive",
+              builder: (context, state) => const ArchiveMainWidget(),              
+              
             ),
 
             ShellRoute(
@@ -162,12 +169,13 @@ final Map<String, Map<String, String>> _localizedTitles = {
     Routes.measUnits: 'Единицы измерения',
     Routes.deviceSettings: 'Настройки прибора',
     Routes.communication: "Устройства",
+    Routes.archive: "История измерений",
   },
   'ru': {
     Routes.home: 'Home',
     Routes.measUnits: 'Meas Units',
     Routes.deviceSettings: 'Device Settings',
-    Routes.communication: "Devices",
+    Routes.communication: "Archive",
   },
 };
 

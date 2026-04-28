@@ -21,33 +21,37 @@ class IndicationItemWidget extends StatelessWidget {
         color: const Color.fromARGB(255, 216, 214, 210),
         borderRadius: BorderRadius.circular(4),
       ),
-
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           if (icon != null) Icon(icon),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  AutoSizeText(
-                    paramName,
-                    style: const TextStyle(fontSize: 18),
-                    maxLines: 2,
-                    maxFontSize: 18,
-                  ),
-                  AutoSizeText(
-                    value,
-                    style: const TextStyle(
-                      color: Color.fromARGB(255, 1, 63, 50),
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                  Flexible(
+                    child: AutoSizeText(
+                      paramName,
+                      style: const TextStyle(fontSize: 18),
+                      maxLines: 2,
+                      maxFontSize: 18,
+                      textAlign: TextAlign.center,
                     ),
-                    maxLines: 1,
-                    maxFontSize: 20,
+                  ),
+                  Flexible(
+                    child: AutoSizeText(
+                      value,
+                      style: const TextStyle(
+                        color: Color.fromARGB(255, 1, 63, 50),
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 1,
+                      maxFontSize: 20,
+                    ),
                   ),
                 ],
               ),

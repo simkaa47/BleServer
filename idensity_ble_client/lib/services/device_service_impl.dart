@@ -96,49 +96,49 @@ class DeviceServiceImpl implements DeviceService {
   Future<void> askDevices() async {
     debugPrint('Начало опроса устройств...');
     while (_currentDevices.isNotEmpty) {
-      try {
-        final devicesToUpdate = List<Device>.from(_currentDevices);
-        for (final device in devicesToUpdate) {
-          final connection = _connections[device];
-          if (connection != null) {
-            if (device.shouldReadIndication) {
-              final newIndicationData = await modbusService.getIndicationData(
-                connection,
-              );
-              device.markIndicationRead();
-              if (_commandQueue.isEmpty) {
-                device.updateIndicationData(newIndicationData);
-              }
-              await _log(device);
-              _updateController.add(device);
-              debugPrint('Обновлены данные для ${device.name}');
+      final devicesToUpdate = List<Device>.from(_currentDevices);
+      for (final device in devicesToUpdate) {
+        final connection = _connections[device];
+        if (connection == null) continue;
+        try {
+          if (device.shouldReadIndication) {
+            final newIndicationData = await modbusService.getIndicationData(
+              connection,
+            );
+            device.markIndicationRead();
+            if (_commandQueue.isEmpty) {
+              device.updateIndicationData(newIndicationData);
             }
-            if (device.shouldReadSettings) {
-              final newSettings = await modbusService.getDeviceSettings(
-                connection,
-              );
-              device.updateDeviceSettings(newSettings);
-              device.markSettingsRead();
-            }
+            await _log(device);
+            _updateController.add(device);
+            debugPrint('Обновлены данные для ${device.name}');
           }
-        }
-        if (devicesToUpdate.isEmpty) {
-          await Future.delayed(const Duration(seconds: 1));
-        } else {
-          await Future.delayed(const Duration(milliseconds: 50));
-        }
-        if (_commandQueue.isNotEmpty) {
-          final (device, command) = _commandQueue.removeFirst();
-          try {
-            await command();
-            device.invalidateSettings();
-          } catch (e) {
-            debugPrint('Ошибка при выполнении команды: $e');
+          if (device.shouldReadSettings) {
+            final newSettings = await modbusService.getDeviceSettings(
+              connection,
+            );
+            device.updateDeviceSettings(newSettings);
+            device.markSettingsRead();
           }
+        } catch (e) {
+          debugPrint('Ошибка при получении данных устройства ${device.name}: $e');
         }
-      } catch (e) {
-        debugPrint('Ошибка при получении данных устройства: $e');
-        await Future.delayed(const Duration(milliseconds: 500));
+      }
+
+      if (devicesToUpdate.isEmpty) {
+        await Future.delayed(const Duration(seconds: 1));
+      } else {
+        await Future.delayed(const Duration(milliseconds: 50));
+      }
+
+      if (_commandQueue.isNotEmpty) {
+        final (device, command) = _commandQueue.removeFirst();
+        try {
+          await command();
+          device.invalidateSettings();
+        } catch (e) {
+          debugPrint('Ошибка при выполнении команды: $e');
+        }
       }
     }
   }

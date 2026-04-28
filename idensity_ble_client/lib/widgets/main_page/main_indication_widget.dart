@@ -64,17 +64,54 @@ class MainIndicationWidget extends ConsumerWidget {
                       return Column(
                         children: [
                           Expanded(
-                            flex: 3,
+                            flex: 2,
                             child: Column(
                               children: [
-                                Expanded(
+                                
+                                Expanded(                                  
                                   child: Row(
                                     children: [
                                       Expanded(
-                                        child: IndicationItemWidget(
-                                          paramName: "ID",
-                                          value: device.name,
-                                          icon: Icons.perm_identity,
+                                        child: GestureDetector(
+                                          onTap:
+                                              () =>
+                                                  deviceService.switchMeasState(
+                                                    !data.isMeasuringState,
+                                                    device,
+                                                  ),
+                                          child: Container(
+                                            margin: const EdgeInsets.all(2),
+                                            decoration: BoxDecoration(
+                                              color:
+                                                  data.isMeasuringState
+                                                      ? Colors.green.shade300
+                                                      : const Color.fromARGB(
+                                                        255,
+                                                        216,
+                                                        214,
+                                                        210,
+                                                      ),
+                                              borderRadius:
+                                                  BorderRadius.circular(4),
+                                            ),
+                                            child: Center(
+                                              child: Padding(
+                                                padding: const EdgeInsets.all(
+                                                  8.0,
+                                                ),
+                                                child: Text(
+                                                  data.isMeasuringState
+                                                      ? 'ВЫКЛЮЧИТЬ\nИЗМЕРЕНИЯ'
+                                                      : 'ВКЛЮЧИТЬ\nИЗМЕРЕНИЯ',
+                                                  textAlign: TextAlign.center,
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 14,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
                                         ),
                                       ),
                                       Expanded(
@@ -88,7 +125,7 @@ class MainIndicationWidget extends ConsumerWidget {
                                     ],
                                   ),
                                 ),
-                                Expanded(
+                                Expanded(                                  
                                   child: Row(
                                     children: [
                                       Expanded(
@@ -113,23 +150,51 @@ class MainIndicationWidget extends ConsumerWidget {
                               ],
                             ),
                           ),
-                          Expanded(
-                            flex: 2,
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: MeasResultWidget(
-                                    data.measResults[0],
-                                    device,
-                                  ),
+                          Builder(
+                            builder: (context) {
+                              final activeResults =
+                                  data.measResults
+                                      .where((r) => r.isActive)
+                                      .toList();
+                              if (activeResults.isEmpty)
+                                return const SizedBox.shrink();
+                              return Expanded(
+                                flex: 2,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      child: Row(
+                                        children:
+                                            activeResults
+                                                .map(
+                                                  (r) => Expanded(
+                                                    child: MeasResultWidget(
+                                                      r,
+                                                      device,
+                                                    ),
+                                                  ),
+                                                )
+                                                .toList(),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                Expanded(
-                                  child: MeasResultWidget(
-                                    data.measResults[1],
-                                    device,
-                                  ),
+                              );
+                            },
+                          ),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 8, top: 2),
+                              child: Text(
+                                device.name,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
                                 ),
-                              ],
+                              ),
                             ),
                           ),
                         ],

@@ -9,7 +9,9 @@ class DriftDeviceRepository implements DeviceRepository {
   DriftDeviceRepository({required this.db});
   @override
   Future<int> add(Device device) async {
-    return await db.into(db.deviceRows).insertOnConflictUpdate(device.toCompanion());
+    final rowId = await db.into(db.deviceRows).insertOnConflictUpdate(device.toCompanion());
+    // insertOnConflictUpdate returns 0 on UPDATE (conflict) — preserve existing id
+    return rowId != 0 ? rowId : device.id!;
   }
 
   @override

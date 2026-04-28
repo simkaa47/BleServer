@@ -120,7 +120,9 @@ class DeviceServiceImpl implements DeviceService {
             device.updateDeviceSettings(newSettings);
             device.markSettingsRead();
           }
+          device.updateConnectionState(true);
         } catch (e) {
+          device.updateConnectionState(false);
           debugPrint('Ошибка при получении данных устройства ${device.name}: $e');
         }
       }

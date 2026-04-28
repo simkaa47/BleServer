@@ -12,7 +12,6 @@ class Device {
   static const measProcCnt = 2;
 
   int? id;
-  bool connected = false;
   ConnectionSettings connectionSettings = ConnectionSettings();
   IndicationData? _indicationData;
   DeviceSettings? _deviceSettings;
@@ -51,10 +50,21 @@ class Device {
   final _adcFrameController = BehaviorSubject<AdcFrame>();
   Stream<AdcFrame> get adcFrameStream => _adcFrameController.stream;
 
+  final _connectedController = BehaviorSubject<bool>.seeded(false);
+  Stream<bool> get connectionStream => _connectedController.stream;
+  bool get isConnected => _connectedController.value;
+
+  void updateConnectionState(bool connected) {
+    if (_connectedController.value != connected) {
+      _connectedController.add(connected);
+    }
+  }
+
   dispose() {
     _indicationDataController.close();
     _deviceSettingsController.close();
     _adcFrameController.close();
+    _connectedController.close();
   }
 
   void updateAdcFrame(AdcFrame frame) {

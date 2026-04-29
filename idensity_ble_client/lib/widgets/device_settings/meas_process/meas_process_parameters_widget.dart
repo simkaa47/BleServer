@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idensity_ble_client/models/device.dart';
+import 'package:idensity_ble_client/models/meas_units/meas_unit.dart';
 import 'package:idensity_ble_client/models/providers/services_registration.dart';
 import 'package:idensity_ble_client/models/settings/device_mode.dart';
 import 'package:idensity_ble_client/resources/enums.dart';
 import 'package:idensity_ble_client/services/device_service.dart';
+import 'package:idensity_ble_client/services/meas_units/meas_unit_service.dart';
 import 'package:idensity_ble_client/widgets/async_state_handlers/universal_async_handler.dart';
 import 'package:idensity_ble_client/widgets/device_settings/meas_process/calibr_curve/calibr_curve_card.dart';
 import 'package:idensity_ble_client/widgets/device_settings/meas_process/calibration/calibration_card.dart';
@@ -21,11 +23,19 @@ class MeasProcessParametersWidget extends ConsumerWidget {
     final deviceServiceAsyncState = ref.watch(deviceServiceProvider);
     final measProcIndex = ref.watch(selectedMeasProcIndexProvider);
     final device = ref.watch(selectedDeviceProvider);
+    final measUnitServiceValue = ref.read(measUnitServiceProvider);
+    final selectMeasUnitsAsyncValue = ref.watch(changeMeasUnitSelectingProvider);
 
     final serviceName = "Сервис устройств";
 
     return deviceServiceAsyncState.when(
-      data: (service) => _onDeviceServiceData(device, measProcIndex, service),
+      data: (service) => _onDeviceServiceData(
+        device,
+        measProcIndex,
+        service,
+        measUnitServiceValue.valueOrNull,
+        selectMeasUnitsAsyncValue.hasValue,
+      ),
       error: (e, s) => UniversalAsyncHandler.onError(serviceName, e, s),
       loading: () => UniversalAsyncHandler.onLoading(serviceName),
     );
@@ -35,6 +45,8 @@ class MeasProcessParametersWidget extends ConsumerWidget {
     Device? device,
     int measProcIndex,
     DeviceService deviceService,
+    MeasUnitService? measUnitService,
+    bool measUnitsReady,
   ) {
     return device != null
         ? StreamBuilder(
@@ -45,6 +57,26 @@ class MeasProcessParametersWidget extends ConsumerWidget {
                     snapshot.data != null) {
               final measProc = snapshot.data?.measProcesses[measProcIndex];
               if (measProc != null) {
+                final devMode = snapshot.data?.deviceMode.index ?? 0;
+
+                List<MeasUnit>? measUnits;
+                MeasUnit? measUnit;
+                double koeff = 1;
+                double offset = 0;
+
+                if (measUnitsReady && measUnitService != null) {
+                  measUnits = measUnitService.getMeasUnitsForMeasProc(
+                    measProc.measType,
+                    devMode,
+                  );
+                  measUnit = measUnitService.getMeasUnitForMeasProc(
+                    measProc.measType,
+                    devMode,
+                  );
+                  koeff = measUnit?.coeff ?? 1;
+                  offset = measUnit?.offset ?? 0;
+                }
+
                 return ListView(
                   children: [
                     ComboboxParameterWidget(
@@ -135,10 +167,16 @@ class MeasProcessParametersWidget extends ConsumerWidget {
                         minValue: 0,
                         name: "Плотность твердого",
                         fractionDigits: 5,
-                        value: measProc.densitySolid,
-                        onConfirm: (value) async {
+                        value: measProc.densitySolid * koeff + offset,
+                        measUnits: measUnits,
+                        selectedMeasNum: measUnit,
+                        onChangeMeasUnit: measUnitService != null
+                            ? (mu) => measUnitService.changeMeasUnit(mu)
+                            : null,
+                        onConfirm: (displayValue) async {
+                          final raw = (displayValue.toDouble() - offset) / koeff;
                           await deviceService.writeDensitySolid(
-                            value.toDouble(),
+                            raw,
                             measProcIndex,
                             device,
                           );
@@ -151,10 +189,16 @@ class MeasProcessParametersWidget extends ConsumerWidget {
                         minValue: 0,
                         name: "Плотность жидкого",
                         fractionDigits: 5,
-                        value: measProc.densityLiquid,
-                        onConfirm: (value) async {
+                        value: measProc.densityLiquid * koeff + offset,
+                        measUnits: measUnits,
+                        selectedMeasNum: measUnit,
+                        onChangeMeasUnit: measUnitService != null
+                            ? (mu) => measUnitService.changeMeasUnit(mu)
+                            : null,
+                        onConfirm: (displayValue) async {
+                          final raw = (displayValue.toDouble() - offset) / koeff;
                           await deviceService.writeDensityLiquid(
-                            value.toDouble(),
+                            raw,
                             measProcIndex,
                             device,
                           );

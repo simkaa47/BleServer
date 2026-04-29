@@ -49,7 +49,32 @@ class DeviceSettingsMainWidget extends ConsumerWidget {
                         itemBuilder: (context, index) {
                           final device = deviceService.devices[index];
 
-                          return Card(child: Center(child: Text(device.name)));
+                          return Card(
+                            child: Center(
+                              child: StreamBuilder<bool>(
+                                stream: device.connectionStream,
+                                initialData: device.isConnected,
+                                builder: (context, snapshot) {
+                                  final connected = snapshot.data ?? false;
+                                  return Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        width: 10,
+                                        height: 10,
+                                        decoration: BoxDecoration(
+                                          color: connected ? Colors.green : Colors.red,
+                                          shape: BoxShape.circle,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Text(device.name),
+                                    ],
+                                  );
+                                },
+                              ),
+                            ),
+                          );
                         },
                       ),
                     ),

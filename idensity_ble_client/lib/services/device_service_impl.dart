@@ -38,6 +38,7 @@ class DeviceServiceImpl implements DeviceService {
   final Queue<(Device, Future<void> Function())> _commandQueue = Queue();
   final List<DataLogCellsCompanion> _logCells = [];
   final Map<Device, Connection> _connections = {};
+  final Map<Device, StreamSubscription<dynamic>> _spectrumSubscriptions = {};
 
   final _updateController = StreamController<Device>.broadcast();
   @override
@@ -64,7 +65,10 @@ class DeviceServiceImpl implements DeviceService {
       if (!_currentDevices.any((d) => isEqual(d, newDevice))) {
         newDevice.id = await deviceRepository.add(newDevice);
         _currentDevices.add(newDevice);
-        _connections[newDevice] = _createConnection(newDevice);
+        final connection = _createConnection(newDevice);
+        _connections[newDevice] = connection;
+        _spectrumSubscriptions[newDevice] = connection.spectrumStream
+            .listen((frame) => newDevice.updateAdcFrame(frame));
         if (_currentDevices.length == 1) {
           askDevices();
         }
@@ -80,6 +84,7 @@ class DeviceServiceImpl implements DeviceService {
   Future<void> removeDevice(Device device) async {
     await deviceRepository.delete(device);
     _currentDevices.remove(device);
+    await _spectrumSubscriptions.remove(device)?.cancel();
     await _connections.remove(device)?.dispose();
     await device.dispose();
     _devicesController.add(List.from(_currentDevices));
@@ -91,49 +96,51 @@ class DeviceServiceImpl implements DeviceService {
   Future<void> askDevices() async {
     debugPrint('Начало опроса устройств...');
     while (_currentDevices.isNotEmpty) {
-      try {
-        final devicesToUpdate = List<Device>.from(_currentDevices);
-        for (final device in devicesToUpdate) {
-          final connection = _connections[device];
-          if (connection != null) {
-            if (device.shouldReadIndication) {
-              final newIndicationData = await modbusService.getIndicationData(
-                connection,
-              );
-              device.markIndicationRead();
-              if (_commandQueue.isEmpty) {
-                device.updateIndicationData(newIndicationData);
-              }
-              await _log(device);
-              _updateController.add(device);
-              debugPrint('Обновлены данные для ${device.name}');
+      final devicesToUpdate = List<Device>.from(_currentDevices);
+      for (final device in devicesToUpdate) {
+        final connection = _connections[device];
+        if (connection == null) continue;
+        try {
+          if (device.shouldReadIndication) {
+            final newIndicationData = await modbusService.getIndicationData(
+              connection,
+            );
+            device.markIndicationRead();
+            if (_commandQueue.isEmpty) {
+              device.updateIndicationData(newIndicationData);
             }
-            if (device.shouldReadSettings) {
-              final newSettings = await modbusService.getDeviceSettings(
-                connection,
-              );
-              device.updateDeviceSettings(newSettings);
-              device.markSettingsRead();
-            }
+            await _log(device);
+            _updateController.add(device);
+            debugPrint('Обновлены данные для ${device.name}');
           }
-        }
-        if (devicesToUpdate.isEmpty) {
-          await Future.delayed(const Duration(seconds: 1));
-        } else {
-          await Future.delayed(const Duration(milliseconds: 50));
-        }
-        if (_commandQueue.isNotEmpty) {
-          final (device, command) = _commandQueue.removeFirst();
-          try {
-            await command();
-            device.invalidateSettings();
-          } catch (e) {
-            debugPrint('Ошибка при выполнении команды: $e');
+          if (device.shouldReadSettings) {
+            final newSettings = await modbusService.getDeviceSettings(
+              connection,
+            );
+            device.updateDeviceSettings(newSettings);
+            device.markSettingsRead();
           }
+          device.updateConnectionState(true);
+        } catch (e) {
+          device.updateConnectionState(false);
+          debugPrint('Ошибка при получении данных устройства ${device.name}: $e');
         }
-      } catch (e) {
-        debugPrint('Ошибка при получении данных устройства: $e');
-        await Future.delayed(const Duration(milliseconds: 500));
+      }
+
+      if (devicesToUpdate.isEmpty) {
+        await Future.delayed(const Duration(seconds: 1));
+      } else {
+        await Future.delayed(const Duration(milliseconds: 50));
+      }
+
+      if (_commandQueue.isNotEmpty) {
+        final (device, command) = _commandQueue.removeFirst();
+        try {
+          await command();
+          device.invalidateSettings();
+        } catch (e) {
+          debugPrint('Ошибка при выполнении команды: $e');
+        }
       }
     }
   }

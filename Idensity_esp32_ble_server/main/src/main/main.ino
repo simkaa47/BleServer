@@ -5,10 +5,11 @@
 #include "adc_module.h"
 
 /**Defines*/
-#define DEVICE_NAME "Idensity_BLE2"
+#define DEVICE_NAME "Idensity_BLE"
 #define SERVICE_1_UUID "d973f2e0-b19e-11e2-9e96-0800200c9a66"
 #define CHARACTERISTIC_1_UUID "d973f2e2-b19e-11e2-9e96-0800200c9a66"
 #define CHARACTERISTIC_2_UUID "d973f2e1-b19e-11e2-9e96-0800200c9a66"
+#define CHARACTERISTIC_3_UUID "d973f2e3-b19e-11e2-9e96-0800200c9a66"
 
 #define CHUNK_SIZE 512
 
@@ -79,7 +80,7 @@ public:
         Serial.println(" bytes");
         sendChunked(pReadCharacteristic, modbus_response_buffer, result);
       }
-      
+
     } else {
       Serial.println("Received empty data.");
     }
@@ -121,6 +122,9 @@ void setup() {
     CHARACTERISTIC_2_UUID,
     BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE | BLECharacteristic::PROPERTY_NOTIFY);
 
+  BLECharacteristic *pCharacteristicSpectrum = pService->createCharacteristic(
+    CHARACTERISTIC_3_UUID, BLECharacteristic::PROPERTY_NOTIFY);
+
   BLECharacteristic *pCharacteristicWrite = pService->createCharacteristic(
     CHARACTERISTIC_1_UUID,
     BLECharacteristic::PROPERTY_WRITE);
@@ -152,7 +156,7 @@ void loop() {
   temp_module_telemetry_strct.t_int = 31.4 + float(currentMilis1 % 13) / 10;
   meas_proc_data_ready_strct[0].phys_vals[0] = 1.23 + (float(currentMilis1 % 3) / 10);
   meas_proc_data_ready_strct[0].phys_val_complete_aver = 1.23 + (float(currentMilis1 % 3) / 40);
-  meas_proc_data_ready_strct[0].meas_in_progress = 0;
+  meas_proc_data_ready_strct[0].meas_in_progress = 1;
   meas_proc_data_ready_strct[1].phys_vals[0] = 1.46 + (float(currentMilis1 % 5) / 10);
   meas_proc_data_ready_strct[1].phys_val_complete_aver = 1.46 + (float(currentMilis1 % 5) / 50);
   meas_proc_data_ready_strct[1].meas_in_progress = 0;

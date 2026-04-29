@@ -88,7 +88,6 @@ class _MainChartState extends ConsumerState<ConsumerStatefulWidget> {
           padding: const EdgeInsets.all(16.0),
           child: SfCartesianChart(
             key: ValueKey('${left.isNotEmpty}-${right.isNotEmpty}'),
-            // Включаем сглаживание для отрисовки
             enableSideBySideSeriesPlacement: false,
             zoomPanBehavior: _zoomPanBehavior,
             primaryXAxis: DateTimeAxis(

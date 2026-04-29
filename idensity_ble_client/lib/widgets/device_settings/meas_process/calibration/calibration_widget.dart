@@ -68,6 +68,8 @@ class CalibrationWidget extends ConsumerWidget {
                       name: 'Ед. измерение $i',
                       result: r,
                       indication: measProcIndication.singleMeasureIndications[i],
+                      device: device,
+                      measProcIndex: measProcIndex,
                       onWrite: (updated) => deviceService.writeSingleMeasResult(
                         updated,
                         i,

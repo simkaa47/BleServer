@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:idensity_ble_client/app_scroll_behavior.dart';
@@ -23,9 +24,13 @@ import 'package:idensity_ble_client/widgets/main_page/main_page_widget.dart';
 import 'package:idensity_ble_client/widgets/meas_units/meas_units_widget.dart';
 import 'package:idensity_ble_client/widgets/routes.dart';
 import 'package:idensity_ble_client/widgets/scanning/scan_main.dart';
+import 'package:idensity_ble_client/widgets/splash/splash_screen.dart';
 
 void main() {
+  final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   runApp(const ProviderScope(child: MyApp()));
+  FlutterNativeSplash.remove();
 }
 
 class MyApp extends StatelessWidget {
@@ -46,8 +51,12 @@ class MyApp extends StatelessWidget {
 }
 
 final _router = GoRouter(
-  initialLocation: Routes.home,
+  initialLocation: Routes.splash,
   routes: [
+    GoRoute(
+      path: Routes.splash,
+      builder: (context, state) => const SplashScreen(),
+    ),
     GoRoute(
       path: Routes.scanning,
       builder: (context, state) => const ScanMainWidget(),
@@ -63,7 +72,6 @@ final _router = GoRouter(
         return AppShell(title: currentTitle, child: child);
       },
       routes: [
-        GoRoute(path: '/', redirect: (context, state) => Routes.home),
         GoRoute(
           path: Routes.home,
           name: "home",

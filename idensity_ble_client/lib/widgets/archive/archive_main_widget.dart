@@ -16,8 +16,6 @@ class ArchiveMainWidget extends ConsumerStatefulWidget {
 }
 
 class _ArchiveMainWidgetState extends ConsumerState<ArchiveMainWidget> {
-  late final StateController<List<Widget>> _appBarNotifier;
-
   final _zoomPanBehavior = ZoomPanBehavior(
     enablePanning: true,
     enableDirectionalZooming: true,
@@ -30,16 +28,7 @@ class _ArchiveMainWidgetState extends ConsumerState<ArchiveMainWidget> {
   @override
   void initState() {
     super.initState();
-    _appBarNotifier = ref.read(appBarActionsProvider.notifier);
     _updateAppBar(hasData: false);
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) => _appBarNotifier.state = [],
-    );
-    super.dispose();
   }
 
   void _updateAppBar({required bool hasData}) {

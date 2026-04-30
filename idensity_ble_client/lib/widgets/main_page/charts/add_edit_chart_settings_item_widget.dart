@@ -98,6 +98,7 @@ class _AddEditChartSettingsItemWidgetState
             children: [
               const SizedBox(height: 20),
               DropdownButtonFormField(
+                isExpanded: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Пожалуйста, введите ID прибора';
@@ -122,6 +123,7 @@ class _AddEditChartSettingsItemWidgetState
               ),
               const SizedBox(height: 20),
               DropdownButtonFormField(
+                isExpanded: true,
                 initialValue: getByIndexFromList(_chartType.index, chartNames),
                 items:
                     chartNames
@@ -149,6 +151,7 @@ class _AddEditChartSettingsItemWidgetState
               ),
               const SizedBox(height: 20),
               DropdownButtonFormField(
+                isExpanded: true,
                 initialValue: getByIndexFromList(_isRightAxis ? 1 : 0, _axis),
                 items:
                     _axis

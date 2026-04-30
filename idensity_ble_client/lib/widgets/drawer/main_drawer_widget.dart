@@ -36,6 +36,7 @@ class MainDrawerWidget extends StatelessWidget {
           const DrawerItem(title: 'Единицы измерения', routeName: Routes.measUnits),
           const DrawerItem(title: 'Устройства', routeName: Routes.communication),
           const DrawerItem(title: 'История измерений', routeName: Routes.archive),
+          const DrawerItem(title: 'Диагностика', routeName: Routes.diagnostic),
         ],
       ),
     );

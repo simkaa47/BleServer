@@ -15,4 +15,5 @@ class Routes {
   static const String communication = '/home/communication';
   static const String spectrum = '/home/deviceSettings/spectrum';
   static const String archive = '/home/archive';
+  static const String diagnostic = '/home/diagnostic';
 }

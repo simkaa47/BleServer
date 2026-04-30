@@ -20,6 +20,7 @@ import 'package:idensity_ble_client/models/settings/stand_settings.dart';
 import 'package:idensity_ble_client/models/settings/tcp_settings.dart';
 import 'package:idensity_ble_client/services/bluetooth/ble_connection.dart';
 import 'package:idensity_ble_client/services/device_service.dart';
+import 'package:idensity_ble_client/services/diagnostic/diagnostic_service.dart';
 import 'package:idensity_ble_client/services/ethernet/ethernet_connection.dart';
 import 'package:idensity_ble_client/services/modbus/modbus_service.dart';
 import 'package:rxdart/subjects.dart';
@@ -29,11 +30,13 @@ class DeviceServiceImpl implements DeviceService {
     required this.logCellRepository,
     required this.deviceRepository,
     required this.modbusService,
+    required this.diagnosticService,
   });
 
   final DataLogCellRepository logCellRepository;
   final DeviceRepository deviceRepository;
   final ModbusService modbusService;
+  final DiagnosticService diagnosticService;
 
   final Queue<(Device, Future<void> Function())> _commandQueue = Queue();
   final List<DataLogCellsCompanion> _logCells = [];
@@ -65,6 +68,7 @@ class DeviceServiceImpl implements DeviceService {
       if (!_currentDevices.any((d) => isEqual(d, newDevice))) {
         newDevice.id = await deviceRepository.add(newDevice);
         _currentDevices.add(newDevice);
+        diagnosticService.registerDevice(newDevice);
         final connection = _createConnection(newDevice);
         _connections[newDevice] = connection;
         _spectrumSubscriptions[newDevice] = connection.spectrumStream
@@ -84,6 +88,7 @@ class DeviceServiceImpl implements DeviceService {
   Future<void> removeDevice(Device device) async {
     await deviceRepository.delete(device);
     _currentDevices.remove(device);
+    diagnosticService.unregisterDevice(device);
     await _spectrumSubscriptions.remove(device)?.cancel();
     await _connections.remove(device)?.dispose();
     await device.dispose();
@@ -109,6 +114,7 @@ class DeviceServiceImpl implements DeviceService {
             if (_commandQueue.isEmpty) {
               device.updateIndicationData(newIndicationData);
             }
+            diagnosticService.check(device, newIndicationData);
             await _log(device);
             _updateController.add(device);
             debugPrint('Обновлены данные для ${device.name}');
@@ -121,8 +127,10 @@ class DeviceServiceImpl implements DeviceService {
             device.markSettingsRead();
           }
           device.updateConnectionState(true);
+          diagnosticService.updateConnectionEvent(device, true);
         } catch (e) {
           device.updateConnectionState(false);
+          diagnosticService.updateConnectionEvent(device, false);
           debugPrint('Ошибка при получении данных устройства ${device.name}: $e');
         }
       }

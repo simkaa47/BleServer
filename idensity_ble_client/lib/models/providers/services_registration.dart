@@ -12,8 +12,11 @@ import 'package:idensity_ble_client/models/settings/meas_process.dart';
 import 'package:idensity_ble_client/services/bluetooth/ble_scan_service.dart';
 import 'package:idensity_ble_client/services/charts/charts_settings_service.dart';
 import 'package:idensity_ble_client/services/charts/charts_settings_service_impl.dart';
+import 'package:idensity_ble_client/models/diagnostic/device_event.dart';
 import 'package:idensity_ble_client/services/device_service.dart';
 import 'package:idensity_ble_client/services/device_service_impl.dart';
+import 'package:idensity_ble_client/services/diagnostic/diagnostic_service.dart' show ActiveEvent, DiagnosticService;
+import 'package:idensity_ble_client/services/diagnostic/diagnostic_service_impl.dart';
 import 'package:idensity_ble_client/services/ethernet/ethernet_scan_service.dart';
 import 'package:idensity_ble_client/services/meas_units/meas_unit_service.dart';
 import 'package:idensity_ble_client/services/meas_units/meas_unit_service_impl.dart';
@@ -29,18 +32,35 @@ final modbusServiceProvider = Provider<ModbusService>((ref) {
   return ModbusServiceImpl();
 });
 
+final diagnosticServiceProvider = Provider<DiagnosticService>((ref) {
+  return DiagnosticServiceImpl();
+});
+
 final deviceServiceProvider = FutureProvider<DeviceService>((ref) async {
   final logsRepo = ref.read(dataLogCellsRepositoryProvider);
   final deviceRepo = ref.read(deviceRepositoryProvider);
   final modbusService = ref.read(modbusServiceProvider);
+  final diagnosticService = ref.read(diagnosticServiceProvider);
   final service = DeviceServiceImpl(
     logCellRepository: logsRepo,
     deviceRepository: deviceRepo,
     modbusService: modbusService,
+    diagnosticService: diagnosticService,
   );
   ref.onDispose(() => service.dispose());
   await service.init();
   return service;
+});
+
+final diagnosticEventsProvider = StreamProvider<List<DeviceEvent>>((ref) {
+  final device = ref.watch(selectedDeviceProvider);
+  final diagnosticService = ref.watch(diagnosticServiceProvider);
+  if (device == null) return const Stream.empty();
+  return diagnosticService.eventsStreamFor(device);
+});
+
+final diagnosticAllActiveEventsProvider = StreamProvider<List<ActiveEvent>>((ref) {
+  return ref.watch(diagnosticServiceProvider).allActiveEventsStream;
 });
 
 final scanServiceProvider = FutureProvider.family

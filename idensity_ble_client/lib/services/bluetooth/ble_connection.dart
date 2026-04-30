@@ -94,7 +94,7 @@ class BleConnection implements Connection {
       }
     } catch (_) {}
 
-    await UniversalBle.connect(_bleDevice.deviceId, timeout: const Duration(seconds: 10));
+    await UniversalBle.connect(_bleDevice.deviceId, timeout: const Duration(seconds: 5));
     if (!Platform.isLinux) {
       final mtu = await _bleDevice.requestMtu(256);
       debugPrint('MTU = $mtu bytes');

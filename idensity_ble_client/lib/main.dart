@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:idensity_ble_client/app_scroll_behavior.dart';
 import 'package:idensity_ble_client/widgets/app_shell.dart';
 import 'package:idensity_ble_client/widgets/archive/archive_main_widget.dart';
+import 'package:idensity_ble_client/widgets/diagnostic/diagnostic_widget.dart';
 import 'package:idensity_ble_client/widgets/communication/communication_tab.dart';
 import 'package:idensity_ble_client/widgets/device_settings/analogs/analogs_common_widget.dart';
 import 'package:idensity_ble_client/widgets/device_settings/common/common_settings_widget.dart';
@@ -22,9 +24,13 @@ import 'package:idensity_ble_client/widgets/main_page/main_page_widget.dart';
 import 'package:idensity_ble_client/widgets/meas_units/meas_units_widget.dart';
 import 'package:idensity_ble_client/widgets/routes.dart';
 import 'package:idensity_ble_client/widgets/scanning/scan_main.dart';
+import 'package:idensity_ble_client/widgets/splash/splash_screen.dart';
 
 void main() {
+  final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   runApp(const ProviderScope(child: MyApp()));
+  FlutterNativeSplash.remove();
 }
 
 class MyApp extends StatelessWidget {
@@ -45,8 +51,12 @@ class MyApp extends StatelessWidget {
 }
 
 final _router = GoRouter(
-  initialLocation: Routes.home,
+  initialLocation: Routes.splash,
   routes: [
+    GoRoute(
+      path: Routes.splash,
+      builder: (context, state) => const SplashScreen(),
+    ),
     GoRoute(
       path: Routes.scanning,
       builder: (context, state) => const ScanMainWidget(),
@@ -62,7 +72,6 @@ final _router = GoRouter(
         return AppShell(title: currentTitle, child: child);
       },
       routes: [
-        GoRoute(path: '/', redirect: (context, state) => Routes.home),
         GoRoute(
           path: Routes.home,
           name: "home",
@@ -79,8 +88,11 @@ final _router = GoRouter(
             ),
             GoRoute(
               path: "archive",
-              builder: (context, state) => const ArchiveMainWidget(),              
-              
+              builder: (context, state) => const ArchiveMainWidget(),
+            ),
+            GoRoute(
+              path: "diagnostic",
+              builder: (context, state) => const DiagnosticWidget(),
             ),
 
             ShellRoute(
@@ -170,12 +182,13 @@ final Map<String, Map<String, String>> _localizedTitles = {
     Routes.deviceSettings: 'Настройки прибора',
     Routes.communication: "Устройства",
     Routes.archive: "История измерений",
+    Routes.diagnostic: "Диагностика",
   },
   'ru': {
     Routes.home: 'Home',
     Routes.measUnits: 'Meas Units',
     Routes.deviceSettings: 'Device Settings',
-    Routes.communication: "Archive",
+    Routes.communication: "Diagnostics",
   },
 };
 

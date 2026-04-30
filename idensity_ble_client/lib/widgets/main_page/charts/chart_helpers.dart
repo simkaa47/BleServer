@@ -19,14 +19,18 @@ class ChartHelpers {
     switch (chartType) {
       case ChartType.currentValue0:
       case ChartType.averageValue0:
+        final measProcIndex = device.indicationData?.measResults[0].measProcIndex ?? 0;
+        final measMode = measProcIndex <= Device.measProcCnt ? (device.deviceSettings?.measProcesses[measProcIndex].measType ?? 0) : 0;
         return muService.getMeasUnitForMeasProc(
-          device.indicationData?.measResults[0].measProcIndex ?? 0,
+          measMode,
           device.deviceSettings?.deviceMode.index ?? 0,
         );
       case ChartType.currentValue1:
       case ChartType.averageValue1:
+        final measProcIndex = device.indicationData?.measResults[1].measProcIndex ?? 0;
+        final measMode = measProcIndex <= Device.measProcCnt ? (device.deviceSettings?.measProcesses[measProcIndex].measType ?? 0) : 0;
         return muService.getMeasUnitForMeasProc(
-          device.indicationData?.measResults[1].measProcIndex ?? 0,
+          measMode,
           device.deviceSettings?.deviceMode.index ?? 0,
         );
       default:

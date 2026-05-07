@@ -103,7 +103,7 @@ void setup() {
   Serial.print("ESP32 BLE Server beginning...");
 
   //initialize device
-  BLEDevice::init(DEVICE_NAME);
+  BLEDevice::init((String(DEVICE_NAME) + "BDP060301").c_str());
   //BLEDevice::setMTU(23);
 
 

@@ -24,9 +24,9 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
-   @override
+  @override
   MigrationStrategy get migration => MigrationStrategy(
         onCreate: (Migrator m) async {
           await m.createAll();
@@ -35,16 +35,23 @@ class AppDatabase extends _$AppDatabase {
           if (from < 2) {
             await m.createTable(commonSettings);
           }
-          if(from < 3){
+          if (from < 3) {
             await m.createTable(measUnitRows);
           }
-          if(from < 4){
-           await m.createTable(chartSettingTableRows);
+          if (from < 4) {
+            await m.createTable(chartSettingTableRows);
           }
-          if(from < 5){
-           await m.createTable(deviceRows);
+          if (from < 5) {
+            await m.createTable(deviceRows);
           }
-          
+          if (from < 6) {
+            await customStatement(
+              "UPDATE data_log_cells SET device_name = REPLACE(device_name, 'BDP060301', '') WHERE device_name LIKE '%BDP060301%'",
+            );
+            await customStatement(
+              "UPDATE device_rows SET name = REPLACE(name, 'BDP060301', '') WHERE name LIKE '%BDP060301%'",
+            );
+          }
         },
       );
 }

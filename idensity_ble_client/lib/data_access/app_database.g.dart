@@ -32,7 +32,7 @@ class $DataLogCellsTable extends DataLogCells
     false,
     additionalChecks: GeneratedColumn.checkTextLength(
       minTextLength: 1,
-      maxTextLength: 20,
+      maxTextLength: 50,
     ),
     type: DriftSqlType.string,
     requiredDuringInsert: true,

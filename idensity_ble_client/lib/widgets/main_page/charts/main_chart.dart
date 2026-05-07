@@ -8,7 +8,7 @@ import 'package:idensity_ble_client/models/providers/services_registration.dart'
 import 'package:idensity_ble_client/models/settings/app_settings.dart';
 import 'package:idensity_ble_client/widgets/main_page/charts/chart_helpers.dart';
 import 'package:idensity_ble_client/widgets/main_page/charts/chart_init_provider.dart';
-import 'package:idensity_ble_client/widgets/main_page/charts/charts_overlay_legend.dart';
+import 'package:idensity_ble_client/widgets/charts/chart_legend_widget.dart';
 import 'package:idensity_ble_client/widgets/main_page/charts/edit_charts_settings_widget.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -82,90 +82,83 @@ class _MainChartState extends ConsumerState<ConsumerStatefulWidget> {
     final left = lines.values.where((l) => !l.isRight).toList();
     final right = lines.values.where((l) => l.isRight).toList();
 
-    return Stack(
+    return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: SfCartesianChart(
-            key: ValueKey('${left.isNotEmpty}-${right.isNotEmpty}'),
-            enableSideBySideSeriesPlacement: false,
-            zoomPanBehavior: _zoomPanBehavior,
-            primaryXAxis: DateTimeAxis(
-              dateFormat: DateFormat('HH:mm:ss'),
-              desiredIntervals: 5,
-              intervalType: DateTimeIntervalType.seconds,
-              rangePadding: ChartRangePadding.none,
-              enableAutoIntervalOnZooming: true,
-            ),
-
-            primaryYAxis: const NumericAxis(isVisible: false),
-            axes: _buildAxes(left.isNotEmpty, right.isNotEmpty),
-
-            series:
-                _chartLines.entries.map((entry) {
-                  return LineSeries<LinePoint, DateTime>(
-                    name: entry.value.id,
-                    onRendererCreated:
-                        (controller) => {
+        Expanded(
+          child: Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: SfCartesianChart(
+                  key: ValueKey('${left.isNotEmpty}-${right.isNotEmpty}'),
+                  enableSideBySideSeriesPlacement: false,
+                  zoomPanBehavior: _zoomPanBehavior,
+                  primaryXAxis: DateTimeAxis(
+                    dateFormat: DateFormat('HH:mm:ss'),
+                    desiredIntervals: 5,
+                    intervalType: DateTimeIntervalType.seconds,
+                    rangePadding: ChartRangePadding.none,
+                    enableAutoIntervalOnZooming: true,
+                  ),
+                  primaryYAxis: const NumericAxis(isVisible: false),
+                  axes: _buildAxes(left.isNotEmpty, right.isNotEmpty),
+                  series: _chartLines.entries.map((entry) {
+                    return LineSeries<LinePoint, DateTime>(
+                      name: entry.value.id,
+                      onRendererCreated: (controller) =>
                           _controllers[entry.value.id] = controller,
-                        },
-                    key: ValueKey(
-                      "${entry.value.id}_${entry.value.isRight ? 'right' : 'left'}",
-                    ),
-                    yAxisName: entry.value.isRight ? 'right' : 'left',
-                    dataSource: entry.value.points,
-                    xValueMapper: (data, _) => data.x,
-                    yValueMapper:
-                        (data, _) =>
-                            data.y * (entry.value.measUnit?.coeff ?? 1) +
-                            (entry.value.measUnit?.offset ?? 0),
-                    color: entry.value.color,
-                    animationDuration: 0,
-                  );
-                }).toList(),
-          ),
-        ),
-        Positioned(
-          bottom: 0,
-          right: 0,
-          child: IconButton(
-            iconSize: 40,
-            tooltip: 'Настройки',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (ctx) => const EditChartsSettingsWidget(),
+                      key: ValueKey(
+                        "${entry.value.id}_${entry.value.isRight ? 'right' : 'left'}",
+                      ),
+                      yAxisName: entry.value.isRight ? 'right' : 'left',
+                      dataSource: entry.value.points,
+                      xValueMapper: (data, _) => data.x,
+                      yValueMapper: (data, _) =>
+                          data.y * (entry.value.measUnit?.coeff ?? 1) +
+                          (entry.value.measUnit?.offset ?? 0),
+                      color: entry.value.color,
+                      animationDuration: 0,
+                    );
+                  }).toList(),
                 ),
-              );
-            },
-            icon: const Icon(Icons.settings),
+              ),
+              Positioned(
+                bottom: 0,
+                right: 0,
+                child: IconButton(
+                  iconSize: 40,
+                  tooltip: 'Настройки',
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (ctx) => const EditChartsSettingsWidget(),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.settings),
+                ),
+              ),
+              Positioned(
+                bottom: 0,
+                left: 0,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.7),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: IconButton(
+                    iconSize: 40,
+                    icon: const Icon(Icons.zoom_out_map),
+                    onPressed: () => _zoomPanBehavior.reset(),
+                    tooltip: 'Сбросить зум',
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
-        Positioned(
-          bottom: 0,
-          left: 0,
-          child: Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface.withOpacity(0.7),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: IconButton(
-              iconSize: 40,
-              icon: const Icon(Icons.zoom_out_map),
-              onPressed: () => _zoomPanBehavior.reset(),
-              tooltip: 'Сбросить зум',
-            ),
-          ),
-        ),
-        if(left.isNotEmpty)
-        Positioned(top: 12, left: 12, child: ChartsOverlayLegend(lines: left)),
-        if(right.isNotEmpty)
-        Positioned(
-          top: 12,
-          right: 12,
-          child: ChartsOverlayLegend(lines: right),
-        ),
+        ChartLegendWidget(lines: lines.values.toList()),
       ],
     );
   }

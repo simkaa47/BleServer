@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:idensity_ble_client/models/charts/chart_line.dart';
+import 'package:idensity_ble_client/widgets/charts/chart_legend_widget.dart';
 import 'package:idensity_ble_client/models/charts/line_point.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -52,37 +53,8 @@ class ArchiveTrendChart extends StatelessWidget {
             ],
           ),
         ),
-        _buildLegend(left, right),
+        ChartLegendWidget(lines: lines),
       ],
-    );
-  }
-
-  Widget _buildLegend(List<ChartLine> left, List<ChartLine> right) {
-    final all = [...left, ...right];
-    if (all.isEmpty) return const SizedBox();
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: Wrap(
-        spacing: 16,
-        runSpacing: 4,
-        children: all.map((line) {
-          return Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 10,
-                height: 10,
-                decoration: BoxDecoration(
-                  color: line.color,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              const SizedBox(width: 6),
-              Text(line.id, style: const TextStyle(fontSize: 11)),
-            ],
-          );
-        }).toList(),
-      ),
     );
   }
 

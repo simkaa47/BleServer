@@ -38,17 +38,17 @@ class BleScanService implements ScanService {
     debugPrint('Scanning for devices...');
     UniversalBle.timeout = const Duration(seconds: 15);
     subscription = UniversalBle.scanStream.listen((BleDevice bleDevice) {
-      if (bleDevice.name != null && bleDevice.name!.isNotEmpty) {
-        if (!results.any((result) {
-          return result.advName == bleDevice.name;
-        })) {
+      final name = bleDevice.name;
+      if (name != null && name.contains(kDeviceIdentifier)) {
+        final displayName = name.replaceAll(kDeviceIdentifier, '');
+        if (!results.any((result) => result.advName == displayName)) {
           final BlueScanResult result = BlueScanResult();
-          result.advName = bleDevice.name!;
+          result.advName = displayName;
           result.macAddress = bleDevice.deviceId;
           results.add(result);
 
           _stateController.add(ScanState.scanning);
-          log('${bleDevice.deviceId}: "${bleDevice.name}" found!');
+          log('${bleDevice.deviceId}: "$displayName" found!');
         }
       }
     });

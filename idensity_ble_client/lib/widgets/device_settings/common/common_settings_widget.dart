@@ -44,6 +44,12 @@ class CommonSettingsWidget extends ConsumerWidget {
                     subtitle: Text(settings.serialNumber.isEmpty ? '—' : settings.serialNumber),
                   ),
                 ),
+                Card(
+                  child: ListTile(
+                    title: const Text('Версия прошивки'),
+                    subtitle: Text(settings.fwVersion.isEmpty ? '—' : settings.fwVersion),
+                  ),
+                ),
                 ComboboxParameterWidget(
                   name: 'Тип устройства',
                   value: settings.deviceMode.index,
@@ -67,6 +73,16 @@ class CommonSettingsWidget extends ConsumerWidget {
                   ),
                 if (device != null)
                   RtcWidget(device: device, deviceService: service),
+                if (device != null)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: OutlinedButton.icon(
+                      icon: const Icon(Icons.restart_alt, color: Colors.red),
+                      label: const Text('Перезагрузить прибор', style: TextStyle(color: Colors.red)),
+                      style: OutlinedButton.styleFrom(side: const BorderSide(color: Colors.red)),
+                      onPressed: () => _confirmReboot(context, device, service),
+                    ),
+                  ),
               ],
             );
           }
@@ -74,5 +90,25 @@ class CommonSettingsWidget extends ConsumerWidget {
         },
       ),
     );
+  }
+
+  Future<void> _confirmReboot(BuildContext context, Device device, DeviceService service) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Перезагрузка прибора'),
+        content: const Text('Прибор будет перезагружен. Продолжить?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Отмена')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Перезагрузить', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) {
+      await service.rebootDevice(device);
+    }
   }
 }

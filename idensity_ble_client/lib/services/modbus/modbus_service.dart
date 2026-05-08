@@ -59,4 +59,5 @@ abstract interface class ModbusService {
   Future<void> writeLevelLength(double value, Connection connection);
   Future<void> writeRtc(DateTime dt, Connection connection);
   Future<void> writeAdcBoardSettings(AdcBoardSettings settings, Connection connection);
+  Future<void> rebootDevice(Connection connection);
 }

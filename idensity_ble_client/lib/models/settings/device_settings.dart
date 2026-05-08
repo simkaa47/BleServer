@@ -14,6 +14,7 @@ class DeviceSettings {
   DeviceMode deviceMode = DeviceMode.density;
   int modbusId = 1;
   String serialNumber = '';
+  String fwVersion = '';
   double levelLength = 0;
   final List<MeasProcess> measProcesses = List.generate(min(2, Device.measProcCnt), (i) => MeasProcess());
   final List<CounterSettings> counterSettings = List.generate(3, (_) => CounterSettings());

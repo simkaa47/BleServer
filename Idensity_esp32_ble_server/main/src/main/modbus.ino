@@ -422,6 +422,10 @@ int modBusRTUholdRegWrite(uint16_t address, uint16_t value) {
     case 114:
       SwitchCycleMeas(value);
       break;
+    // Перезагрузить прибор
+    case 129:
+      if (value == 1) ESP.restart();
+      break;
     default:
       // Если счетчики
       if (address >= counter_start_reg_num && address < (counter_start_reg_num + counter_diap_reg_cnt * 3)) {
@@ -857,6 +861,12 @@ uint16_t modBusRTUholdRegRead(uint16_t address) {
       else if (address >= meas_proc_start_reg_num && address < (meas_proc_start_reg_num + meas_proc_reg_cnt * meas_proc_cnt)) {
         result = GetMeasProcData(address);
       }
+      else if (address >= 124 && address <= 128) {
+        result = getSerialNum(address);
+      }
+      else if (address >= 130 && address <= 135) {
+        result = getFwVersionRegister(address);
+      }
       break;
   }
 
@@ -1225,6 +1235,19 @@ uint16_t getCalibrCurveData(uint8_t meas_proc_num, uint16_t offset)
 			}
 	}
 	return result;
+}
+
+uint16_t getSerialNum(uint16_t address) {
+  uint16_t result = 0;
+  memcpy(&result, (uint8_t *)&settings.device_SN + (address - 124) * 2, 2);
+  return result;
+}
+
+uint16_t getFwVersionRegister(uint16_t address) {
+  static const char ver[12] = DEVICE_FW_VERSION;
+  uint16_t result = 0;
+  memcpy(&result, ver + (address - 130) * 2, sizeof(result));
+  return result;
 }
 
 uint16_t getSingleMeasData(uint8_t meas_proc_num, uint16_t offset)

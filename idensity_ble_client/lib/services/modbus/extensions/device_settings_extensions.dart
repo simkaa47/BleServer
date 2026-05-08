@@ -89,6 +89,15 @@ extension DeviceSettingsExtensions on DeviceSettings {
     }
     serialNumber = String.fromCharCodes(serialBytes.where((b) => b != 0));
 
+    // FwVersion (reg 130..135, 6 registers = 12 ASCII bytes)
+    final fwBytes = <int>[];
+    for (var i = 130; i < 136; i++) {
+      final reg = registers[i];
+      fwBytes.add(reg & 0xFF);
+      fwBytes.add((reg >> 8) & 0xFF);
+    }
+    fwVersion = String.fromCharCodes(fwBytes.where((b) => b != 0));
+
     // MeasProcesses (reg 200+, step 180)
     const mpOffset = 200;
     const mpStep = 180;

@@ -48,6 +48,7 @@ abstract interface class DeviceService {
   Future<void> sendAnalogTestValue(int outputIndex, Device device);
 
   Future<void> switchMeasState(bool value, Device device);
+  Future<void> rebootDevice(Device device);
 
   void dispose();
 }

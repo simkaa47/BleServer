@@ -583,6 +583,15 @@ class DeviceServiceImpl implements DeviceService {
   }
 
   @override
+  Future<void> rebootDevice(Device device) async {
+    _enqueue(device, () async {
+      await _connection(device)?.let(
+        (c) => modbusService.rebootDevice(c),
+      );
+    });
+  }
+
+  @override
   Future<void> writeMeasProcCalibrCurve(CalibrCurve calibrCurve, int measProcIndex, Device device) async{
     _enqueue(device, () async {
       await _connection(device)?.let(

@@ -480,6 +480,15 @@ class ModbusServiceImpl implements ModbusService {
   }
 
   @override
+  Future<void> rebootDevice(Connection connection) async {
+    await _writeHoldingRegisters(
+      connection: connection,
+      registers: [1],
+      startAddr: 129,
+    );
+  }
+
+  @override
   Future<void> writeRtc(DateTime dt, Connection connection) async {
     await _writeHoldingRegisters(
       connection: connection,

@@ -42,6 +42,7 @@ class DeviceServiceImpl implements DeviceService {
   final List<DataLogCellsCompanion> _logCells = [];
   final Map<Device, Connection> _connections = {};
   final Map<Device, StreamSubscription<dynamic>> _spectrumSubscriptions = {};
+  Timer? _logCleanupTimer;
 
   final _updateController = StreamController<Device>.broadcast();
   @override
@@ -58,8 +59,15 @@ class DeviceServiceImpl implements DeviceService {
 
   @override
   Future<void> init() async {
+    await _deleteOldLogs();
+    _logCleanupTimer = Timer.periodic(const Duration(hours: 24), (_) => _deleteOldLogs());
     final devices = await deviceRepository.getDevicesList();
     await addDevices(devices);
+  }
+
+  Future<void> _deleteOldLogs() async {
+    final cutoff = DateTime.now().subtract(const Duration(days: 30));
+    await logCellRepository.deleteOlderThan(cutoff);
   }
 
   @override
@@ -255,6 +263,7 @@ class DeviceServiceImpl implements DeviceService {
 
   @override
   void dispose() {
+    _logCleanupTimer?.cancel();
     _updateController.close();
     _devicesController.close();
     for (final device in _currentDevices) {

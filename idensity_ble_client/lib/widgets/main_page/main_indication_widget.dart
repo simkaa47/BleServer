@@ -156,8 +156,9 @@ class MainIndicationWidget extends ConsumerWidget {
                                   data.measResults
                                       .where((r) => r.isActive)
                                       .toList();
-                              if (activeResults.isEmpty)
+                              if (activeResults.isEmpty) {
                                 return const SizedBox.shrink();
+                              }
                               return Expanded(
                                 flex: 2,
                                 child: Column(

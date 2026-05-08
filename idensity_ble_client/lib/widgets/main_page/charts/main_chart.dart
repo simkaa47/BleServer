@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idensity_ble_client/data_access/common_settings/app_settings_providers.dart';
@@ -27,6 +29,7 @@ class _MainChartState extends ConsumerState<ConsumerStatefulWidget> {
   Map<String, ChartLine> _chartLines = {};
   late final ZoomPanBehavior _zoomPanBehavior;
   AppSettings? _settings;
+  final List<StreamSubscription<dynamic>> _settingsSubscriptions = [];
 
   @override
   void initState() {
@@ -58,6 +61,33 @@ class _MainChartState extends ConsumerState<ConsumerStatefulWidget> {
       if (next == null) return;
       _settings = next;
     });
+
+    ref.listenManual<AsyncValue<List<Device>>>(devicesStreamProvider, (_, next) {
+      next.whenData(_subscribeToDeviceSettings);
+    });
+  }
+
+  void _subscribeToDeviceSettings(List<Device> devices) {
+    for (final sub in _settingsSubscriptions) {
+      sub.cancel();
+    }
+    _settingsSubscriptions.clear();
+
+    for (final device in devices) {
+      _settingsSubscriptions.add(
+        device.settingsStream.listen((_) {
+          if (mounted) _updateMeasUnits();
+        }),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    for (final sub in _settingsSubscriptions) {
+      sub.cancel();
+    }
+    super.dispose();
   }
 
   @override

@@ -5,6 +5,7 @@ import 'package:idensity_ble_client/models/device.dart';
 import 'package:idensity_ble_client/models/indication/indication.dart';
 import 'package:idensity_ble_client/models/providers/services_registration.dart';
 import 'package:idensity_ble_client/services/device_service.dart';
+import 'package:idensity_ble_client/theme/app_theme.dart';
 import 'package:idensity_ble_client/widgets/async_state_handlers/universal_async_handler.dart';
 import 'package:idensity_ble_client/widgets/main_page/indication_item_widget.dart';
 import 'package:idensity_ble_client/widgets/main_page/meas_result_widget.dart';
@@ -84,31 +85,38 @@ class MainIndicationWidget extends ConsumerWidget {
                                             decoration: BoxDecoration(
                                               color:
                                                   data.isMeasuringState
-                                                      ? Colors.green.shade300
-                                                      : const Color.fromARGB(
-                                                        255,
-                                                        216,
-                                                        214,
-                                                        210,
-                                                      ),
+                                                      ? Theme.of(context).colorScheme.error
+                                                      : Theme.of(context).colorScheme.primary,
                                               borderRadius:
                                                   BorderRadius.circular(4),
                                             ),
                                             child: Center(
-                                              child: Padding(
-                                                padding: const EdgeInsets.all(
-                                                  8.0,
-                                                ),
-                                                child: Text(
-                                                  data.isMeasuringState
-                                                      ? 'ВЫКЛЮЧИТЬ\nИЗМЕРЕНИЯ'
-                                                      : 'ВКЛЮЧИТЬ\nИЗМЕРЕНИЯ',
-                                                  textAlign: TextAlign.center,
-                                                  style: const TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 14,
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Icon(
+                                                    data.isMeasuringState
+                                                        ? Icons.stop_circle_outlined
+                                                        : Icons.play_circle_outlined,
+                                                    color: data.isMeasuringState
+                                                        ? Theme.of(context).colorScheme.onError
+                                                        : Theme.of(context).colorScheme.onPrimary,
                                                   ),
-                                                ),
+                                                  const SizedBox(height: 4),
+                                                  Text(
+                                                    data.isMeasuringState
+                                                        ? 'ВЫКЛЮЧИТЬ\nИЗМЕРЕНИЯ'
+                                                        : 'ВКЛЮЧИТЬ\nИЗМЕРЕНИЯ',
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 14,
+                                                      color: data.isMeasuringState
+                                                          ? Theme.of(context).colorScheme.onError
+                                                          : Theme.of(context).colorScheme.onPrimary,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                             ),
                                           ),
@@ -200,7 +208,7 @@ class MainIndicationWidget extends ConsumerWidget {
                                         width: 10,
                                         height: 10,
                                         decoration: BoxDecoration(
-                                          color: connected ? Colors.green : Colors.red,
+                                          color: connected ? AppColors.success : Theme.of(context).colorScheme.error,
                                           shape: BoxShape.circle,
                                         ),
                                       ),

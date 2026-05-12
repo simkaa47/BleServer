@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idensity_ble_client/models/providers/services_registration.dart';
 import 'package:idensity_ble_client/services/device_service.dart';
+import 'package:idensity_ble_client/theme/app_theme.dart';
 import 'package:idensity_ble_client/widgets/async_state_handlers/universal_async_handler.dart';
 
 class DeviceSettingsMainWidget extends ConsumerWidget {
@@ -63,7 +64,7 @@ class DeviceSettingsMainWidget extends ConsumerWidget {
                                         width: 10,
                                         height: 10,
                                         decoration: BoxDecoration(
-                                          color: connected ? Colors.green : Colors.red,
+                                          color: connected ? AppColors.success : Theme.of(context).colorScheme.error,
                                           shape: BoxShape.circle,
                                         ),
                                       ),

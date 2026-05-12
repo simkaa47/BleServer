@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:idensity_ble_client/models/indication/analog_indication.dart';
+import 'package:idensity_ble_client/theme/app_theme.dart';
 
 class AnalogIndicationWidget extends StatelessWidget {
   const AnalogIndicationWidget({
@@ -41,9 +42,9 @@ class _StatusRow extends StatelessWidget {
           Text(label, style: Theme.of(context).textTheme.bodyMedium),
           Row(
             children: [
-              Icon(ok ? Icons.check_circle : Icons.cancel, color: ok ? Colors.green : Colors.red, size: 18),
+              Icon(ok ? Icons.check_circle : Icons.cancel, color: ok ? AppColors.success : Theme.of(context).colorScheme.error, size: 18),
               const SizedBox(width: 4),
-              Text(ok ? okText : failText, style: TextStyle(color: ok ? Colors.green : Colors.red)),
+              Text(ok ? okText : failText, style: TextStyle(color: ok ? AppColors.success : Theme.of(context).colorScheme.error)),
             ],
           ),
         ],

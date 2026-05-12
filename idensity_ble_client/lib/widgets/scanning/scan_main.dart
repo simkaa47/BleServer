@@ -118,7 +118,7 @@ class _ScanMainState extends ConsumerState<ScanMainWidget> {
             heroTag: 'next',
             onPressed: () async {
               await scanService.stopScan();
-              if (!context.mounted) return;
+              if (!mounted) return;
               context.go(Routes.home);
             },
             child: const Icon(Icons.skip_next),

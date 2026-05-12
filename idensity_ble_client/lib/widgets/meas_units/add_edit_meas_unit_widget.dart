@@ -160,7 +160,7 @@ class _AddEditMeasUnitWidgetState extends State<AddEditMeasUnitWidget> {
               ),
               const SizedBox(height: 20),
               DropdownButtonFormField(
-                value: getByIndexFromList(_selectedDeviceTypeIndex, devicesTypes),
+                initialValue: getByIndexFromList(_selectedDeviceTypeIndex, devicesTypes),
                 items:
                     devicesTypes
                         .map(
@@ -186,7 +186,7 @@ class _AddEditMeasUnitWidgetState extends State<AddEditMeasUnitWidget> {
               ),
               const SizedBox(height: 20),
               DropdownButtonFormField(
-                value:
+                initialValue:
                     (_selectedDeviceTypeIndex == 0
                         ? densityMeasModes
                         : levelmeterMeasModes)[_selecteMeasModeIndex],

@@ -245,7 +245,6 @@ class MainIndicationWidget extends ConsumerWidget {
               ],
             ),
           );
-          ;
         }
       },
     );

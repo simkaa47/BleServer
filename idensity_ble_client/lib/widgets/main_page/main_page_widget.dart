@@ -19,7 +19,10 @@ class MainPageWidget extends StatelessWidget {
               Expanded(
                 flex: 1,
                 child: Container(
-                  color: Colors.yellow.withOpacity(0.2),
+                  // Нейтральная подложка для блока индикации.
+                  // Если хочется лёгкий тёплый акцент — используйте
+                  // colorScheme.tertiaryContainer (см. app_theme.dart).
+                  color: Theme.of(context).colorScheme.surface,
                   child: indication,
                 ),
               ),
@@ -33,7 +36,7 @@ class MainPageWidget extends StatelessWidget {
               Expanded(
                 flex: 1,
                 child: Container(
-                  color: Colors.yellow.withOpacity(0.2),
+                  color: Colors.yellow.withValues(alpha: 0.2),
                   child: indication,
                 ),
               ),

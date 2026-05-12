@@ -55,9 +55,10 @@ class _AppShellState extends ConsumerState<AppShell>
   @override
   Widget build(BuildContext context) {
     final actions = ref.watch(appBarActionsProvider);
-    final hasErrors = ref.watch(diagnosticAllActiveEventsProvider).whenOrNull(
-          data: (events) => events.isNotEmpty,
-        ) ??
+    final hasErrors =
+        ref
+            .watch(diagnosticAllActiveEventsProvider)
+            .whenOrNull(data: (events) => events.isNotEmpty) ??
         false;
 
     return Scaffold(
@@ -66,11 +67,7 @@ class _AppShellState extends ConsumerState<AppShell>
         actions: [
           if (hasErrors) _DiagnosticWarningButton(animation: _pulseAnimation),
           ...actions,
-        ],
-        iconTheme: const IconThemeData(size: 40),
-        toolbarHeight: 60,
-        surfaceTintColor: Colors.amber,
-        actionsIconTheme: const IconThemeData(size: 40),
+        ],        
         actionsPadding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
       ),
       drawer: const MainDrawerWidget(),

@@ -11,31 +11,41 @@ class MainDrawerWidget extends StatelessWidget {
       child: Column(
         children: [
           DrawerHeader(
-            padding: const EdgeInsets.all(20),            
+            padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  const Color(0xFF28BCBA),
-                  const Color(0xFF28BCBA).withOpacity(0.8),
+                  Theme.of(context).colorScheme.primary,
+                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
                 ],
                 begin: Alignment.topLeft,
-                end: Alignment.bottomRight
+                end: Alignment.bottomRight,
               ),
             ),
             child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [                
-                  Image.asset('assets/images/konvels_logo.png')
-                ],
+                children: [Image.asset('assets/images/konvels_logo.png')],
               ),
             ),
           ),
           const DrawerItem(title: 'Главная', routeName: Routes.home),
-          const DrawerItem(title: 'Настройки прибора', routeName: Routes.deviceSettings),
-          const DrawerItem(title: 'Единицы измерения', routeName: Routes.measUnits),
-          const DrawerItem(title: 'Устройства', routeName: Routes.communication),
-          const DrawerItem(title: 'История измерений', routeName: Routes.archive),
+          const DrawerItem(
+            title: 'Настройки прибора',
+            routeName: Routes.deviceSettings,
+          ),
+          const DrawerItem(
+            title: 'Единицы измерения',
+            routeName: Routes.measUnits,
+          ),
+          const DrawerItem(
+            title: 'Устройства',
+            routeName: Routes.communication,
+          ),
+          const DrawerItem(
+            title: 'История измерений',
+            routeName: Routes.archive,
+          ),
           const DrawerItem(title: 'Диагностика', routeName: Routes.diagnostic),
         ],
       ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:idensity_ble_client/theme/app_theme.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -43,9 +44,7 @@ class MyApp extends StatelessWidget {
       scrollBehavior: AppScrollBehavior(),
       routerConfig: _router,
       title: 'Idensity Bluetooth Client',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
+      theme: AppTheme.light,
     );
   }
 }

@@ -40,7 +40,7 @@ class _ComboboxFloatingWidgetState extends State<ComboboxFloatingWidget> {
         child: Column(
           children: [
             DropdownButtonFormField(
-              value:
+              initialValue:
                   widget.itemsSource.length > widget.value
                       ? widget.itemsSource[widget.value]
                       : null,

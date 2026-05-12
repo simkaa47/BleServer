@@ -12,7 +12,7 @@ class EthernetConnection implements Connection {
   ConnectionType get connectionType => ConnectionType.ethernet;
 
   @override
-  Stream<AdcFrame> get spectrumStream => Stream.empty(); // TODO: UDP server
+  Stream<AdcFrame> get spectrumStream => const Stream.empty(); // TODO: UDP server
 
   @override
   Future<List<int>> readBytes(List<int> request, {int? expectedRespLen}) {

@@ -1,3 +1,7 @@
+// lib/widgets/main_page/indication_item_widget.dart
+// Rewritten to match the mock: card with outline, accent icon,
+// secondary label, primary-coloured tabular value.
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 
@@ -15,49 +19,58 @@ class IndicationItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return Container(
-      margin: const EdgeInsets.all(2),
+      margin: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 216, 214, 210),
-        borderRadius: BorderRadius.circular(4),
+        color: cs.surface,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: cs.outline),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          if (icon != null) Icon(icon),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        child: Row(
+          children: [
+            if (icon != null) ...[
+              Icon(icon, color: cs.primary, size: 22),
+              const SizedBox(width: 10),
+            ],
+            Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Flexible(
                     child: AutoSizeText(
                       paramName,
-                      style: const TextStyle(fontSize: 18),
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 0.4,
+                        color: cs.onSurfaceVariant,
+                      ),
                       maxLines: 2,
-                      maxFontSize: 18,
-                      textAlign: TextAlign.center,
                     ),
                   ),
                   Flexible(
                     child: AutoSizeText(
                       value,
-                      style: const TextStyle(
-                        color: Color.fromARGB(255, 1, 63, 50),
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                      style: TextStyle(
+                        color: cs.primary,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                        fontFeatures: const [FontFeature.tabularFigures()],
+                        height: 1.1,
                       ),
                       maxLines: 1,
-                      maxFontSize: 20,
                     ),
                   ),
                 ],
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

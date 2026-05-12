@@ -36,7 +36,7 @@ class MainPageWidget extends StatelessWidget {
               Expanded(
                 flex: 1,
                 child: Container(
-                  color: Colors.yellow.withValues(alpha: 0.2),
+                  color: Theme.of(context).colorScheme.surface,
                   child: indication,
                 ),
               ),

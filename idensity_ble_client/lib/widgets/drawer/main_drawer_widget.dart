@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:idensity_ble_client/models/providers/theme_provider.dart';
 import 'package:idensity_ble_client/widgets/drawer/drawer_item_widget.dart';
 import 'package:idensity_ble_client/widgets/routes.dart';
 
-class MainDrawerWidget extends StatelessWidget {
+class MainDrawerWidget extends ConsumerWidget {
   const MainDrawerWidget({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeModeProvider);
+    final isDark = themeMode == ThemeMode.dark ||
+        (themeMode == ThemeMode.system &&
+            MediaQuery.platformBrightnessOf(context) == Brightness.dark);
+    final cs = Theme.of(context).colorScheme;
+
     return Drawer(
       child: Column(
         children: [
@@ -15,8 +23,8 @@ class MainDrawerWidget extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Theme.of(context).colorScheme.primary,
-                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
+                  cs.primary,
+                  cs.primary.withValues(alpha: 0.8),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -47,6 +55,30 @@ class MainDrawerWidget extends StatelessWidget {
             routeName: Routes.archive,
           ),
           const DrawerItem(title: 'Диагностика', routeName: Routes.diagnostic),
+          const Spacer(),
+          const Divider(height: 1),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.light_mode),
+                  color: !isDark ? cs.primary : cs.onSurfaceVariant,
+                  onPressed: () {
+                    ref.read(themeModeProvider.notifier).state = ThemeMode.light;
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.dark_mode),
+                  color: isDark ? cs.primary : cs.onSurfaceVariant,
+                  onPressed: () {
+                    ref.read(themeModeProvider.notifier).state = ThemeMode.dark;
+                  },
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );

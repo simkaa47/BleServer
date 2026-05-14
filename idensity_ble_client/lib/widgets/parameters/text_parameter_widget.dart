@@ -69,7 +69,7 @@ class TextParameterWidget extends StatelessWidget {
               items: measUnits!
                   .map((u) => DropdownMenuItem<MeasUnit>(
                         value: u,
-                        child: MeasUnitItemWidget.getFormula(u.name, fontSize: 16),
+                        child: MeasUnitItemWidget.getFormula(u.name, fontSize: 16, color: Theme.of(context).colorScheme.onSurface),
                       ))
                   .toList(),
               onChanged: (u) async {

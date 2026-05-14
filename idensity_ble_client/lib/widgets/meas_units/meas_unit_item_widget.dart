@@ -14,21 +14,20 @@ class MeasUnitItemWidget extends StatelessWidget {
   final MeasUnitService service;
   final MeasUnit measUnit;
 
-  static Widget getFormula(String text, {double fontSize=32}) {
+  static Widget getFormula(String text, {double fontSize = 32, Color color = Colors.black}) {
     final list = text.split('^').where((s) => s.isNotEmpty).toList();
     return RichText(
       text: TextSpan(
-        style:  TextStyle(fontSize: fontSize, color: Colors.black),
+        style: TextStyle(fontSize: fontSize, color: color),
         children: <InlineSpan>[
           for (int i = 1; i <= list.length; i++) ...[
-            // Добавляем проверку, чтобы не добавлять смещение для первого элемента
             if (i % 2 == 0)
               WidgetSpan(
                 child: Transform.translate(
-                  offset: const Offset(0.0, -10.0), // Смещаем вверх
+                  offset: const Offset(0.0, -10.0),
                   child: Text(
                     list[i - 1],
-                    style:  TextStyle(fontSize: fontSize/1.5, color: Colors.black),
+                    style: TextStyle(fontSize: fontSize / 1.5, color: color),
                   ),
                 ),
               ),
@@ -58,7 +57,7 @@ class MeasUnitItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: ListTile(
-        title: getFormula(measUnit.name),
+        title: getFormula(measUnit.name, color: Theme.of(context).colorScheme.onSurface),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

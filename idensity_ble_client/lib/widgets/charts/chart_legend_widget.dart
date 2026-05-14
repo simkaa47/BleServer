@@ -13,55 +13,108 @@ class ChartLegendWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final left = lines.where((l) => !l.isRight).toList();
     final right = lines.where((l) => l.isRight).toList();
-    if (left.isEmpty && right.isEmpty) return const SizedBox();
+    if (left.isEmpty && right.isEmpty) return const SizedBox.shrink();
+
+    final cs = Theme.of(context).colorScheme;
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Левая ось — выравнивание влево
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
-              children: left.map((l) => _item(l)).toList(),
+              children: left
+                  .map((l) => _LegendItem(
+                        line: l,
+                        textColor: cs.onSurfaceVariant,
+                        rightAlign: false,
+                      ))
+                  .toList(),
             ),
           ),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisSize: MainAxisSize.min,
-              children: right.map((l) => _item(l, rightAlign: true)).toList(),
+          // Правая ось — выравнивание вправо
+          if (right.isNotEmpty)
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisSize: MainAxisSize.min,
+                children: right
+                    .map((l) => _LegendItem(
+                          line: l,
+                          textColor: cs.onSurfaceVariant,
+                          rightAlign: true,
+                        ))
+                    .toList(),
+              ),
             ),
-          ),
         ],
       ),
     );
   }
+}
 
-  Widget _item(ChartLine line, {bool rightAlign = false}) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment:
-          rightAlign ? MainAxisAlignment.end : MainAxisAlignment.start,
-      children: [
-        Container(
-          width: 10,
-          height: 10,
-          decoration: BoxDecoration(color: line.color, shape: BoxShape.circle),
-        ),
-        const SizedBox(width: 6),
-        Flexible(
-          child: Text(
-            _getLineName(line),
-            style: const TextStyle(fontSize: 11),
-            textAlign: rightAlign ? TextAlign.right : TextAlign.left,
+class _LegendItem extends StatelessWidget {
+  const _LegendItem({
+    required this.line,
+    required this.textColor,
+    required this.rightAlign,
+  });
+
+  final ChartLine line;
+  final Color textColor;
+  final bool rightAlign;
+
+  @override
+  Widget build(BuildContext context) {
+    final marker = Container(
+      width: 12,
+      height: 4,
+      decoration: BoxDecoration(
+        color: line.color,
+        borderRadius: BorderRadius.circular(2),
+      ),
+    );
+    final unitWidget = line.measUnit != null
+        ? MeasUnitItemWidget.getFormula(line.measUnit!.name, fontSize: 11, color: textColor)
+        : null;
+
+    // Text.rich инлайнит маркер + название + единицу в один поток.
+    // Когда текст переносится — единица идёт сразу за последним словом,
+    // а не уезжает к правому краю.
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Text.rich(
+        TextSpan(
+          style: TextStyle(
+            fontSize: 11.5,
+            color: textColor,
+            height: 1.25,
+            fontWeight: FontWeight.w500,
           ),
+          children: [
+            WidgetSpan(
+              alignment: PlaceholderAlignment.middle,
+              child: Padding(
+                padding: const EdgeInsets.only(right: 6),
+                child: marker,
+              ),
+            ),
+            TextSpan(text: _getLineName(line)),
+            if (unitWidget != null) ...[              
+              const TextSpan(text: '\u00A0'),
+              WidgetSpan(
+                alignment: PlaceholderAlignment.middle,
+                child: unitWidget,
+              ),
+            ],
+          ],
         ),
-        if (line.measUnit != null) ...[
-          const SizedBox(width: 4),
-          MeasUnitItemWidget.getFormula(line.measUnit!.name, fontSize: 11),
-        ],
-      ],
+        textAlign: rightAlign ? TextAlign.right : TextAlign.left,
+      ),
     );
   }
 
@@ -86,3 +139,6 @@ class ChartLegendWidget extends StatelessWidget {
     return line.id;
   }
 }
+
+
+

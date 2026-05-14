@@ -87,6 +87,7 @@ class MeasResultWidget extends ConsumerWidget {
                                 child: MeasUnitItemWidget.getFormula(
                                   item.name,
                                   fontSize: 16,
+                                  color: cs.onSurface,
                                 ),
                               ),
                             )

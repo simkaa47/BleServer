@@ -33,22 +33,19 @@ class TextParameterWidget extends StatelessWidget {
   final int? fractionDigits;
   final bool showCard;
 
-  _getSubtitle(num number) {
+  Widget _getSubtitle(BuildContext context, num number) {
+    final cs = Theme.of(context).colorScheme;
     final koeff = selectedMeasNum?.coeff ?? 1;
     final offset = selectedMeasNum?.offset ?? 0;
     final displayMax = maxValue != null ? maxValue! * koeff + offset : null;
     final displayMin = minValue != null ? minValue! * koeff + offset : null;
+    final outOfRange = number > (displayMax ?? double.infinity) ||
+        number < (displayMin ?? double.negativeInfinity);
     return Text(
       fractionDigits != null
           ? number.toStringAsFixed(fractionDigits!)
           : number.toString(),
-      style: TextStyle(
-        color:
-            (number > (displayMax ?? double.infinity) ||
-                    number < (displayMin ?? double.negativeInfinity))
-                ? Colors.red
-                : Colors.black,
-      ),
+      style: TextStyle(color: outOfRange ? cs.error : cs.onSurface),
     );
   }
 
@@ -58,9 +55,9 @@ class TextParameterWidget extends StatelessWidget {
       title: Text(name),
       subtitle: Row(
         children: [
-          if (actualValue != null) _getSubtitle(actualValue!),
+          if (actualValue != null) _getSubtitle(context, actualValue!),
           if (actualValue != null) const Text("/"),
-          _getSubtitle(value),
+          _getSubtitle(context, value),
         ],
       ),
       trailing: (measUnits != null && measUnits!.isNotEmpty)

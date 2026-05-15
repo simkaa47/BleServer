@@ -23,7 +23,7 @@ class ComboboxParameterWidget extends StatelessWidget {
       title: Text(name),
       subtitle: (options.length > value)
           ? Text(options[value])
-          : const Text("Вне диапазона", style: TextStyle(color: Colors.red)),
+          : Text("Вне диапазона", style: TextStyle(color: Theme.of(context).colorScheme.error)),
       onTap: () {
         showModalBottomSheet(
           context: context,

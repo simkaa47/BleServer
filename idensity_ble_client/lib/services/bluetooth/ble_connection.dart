@@ -92,7 +92,9 @@ class BleConnection implements Connection {
       if (await _bleDevice.connectionState == BleConnectionState.connected) {
         await _bleDevice.disconnect();
       }
-    } catch (_) {}
+    } catch (e) {
+      log('BleConnection._connectAndSubscribe: pre-disconnect failed ($e)', name: 'BleConnection');
+    }
 
     await UniversalBle.connect(_bleDevice.deviceId, timeout: const Duration(seconds: 5));
     if (!Platform.isLinux) {
@@ -204,12 +206,24 @@ class BleConnection implements Connection {
 
   @override
   Future<void> dispose() async {
-    await _charRead?.unsubscribe();
-    await _charSpectrum?.unsubscribe();
+    try {
+      await _charRead?.unsubscribe();
+    } catch (e) {
+      log('BleConnection.dispose: unsubscribe read failed ($e)', name: 'BleConnection');
+    }
+    try {
+      await _charSpectrum?.unsubscribe();
+    } catch (e) {
+      log('BleConnection.dispose: unsubscribe spectrum failed ($e)', name: 'BleConnection');
+    }
     await _connectStateSub?.cancel();
     await _readSub?.cancel();
     await _spectrumSub?.cancel();
     await _spectrumController.close();
-    await _bleDevice.disconnect();
+    try {
+      await _bleDevice.disconnect();
+    } catch (e) {
+      log('BleConnection.dispose: disconnect failed ($e)', name: 'BleConnection');
+    }
   }
 }

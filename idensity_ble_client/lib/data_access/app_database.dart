@@ -1,3 +1,4 @@
+import 'dart:developer' as dev;
 import 'dart:io';
 import 'package:idensity_ble_client/data_access/chart_setting/chart_setting_table_rows.dart';
 import 'package:idensity_ble_client/data_access/common_settings/common_settings.dart';
@@ -24,7 +25,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -44,13 +45,13 @@ class AppDatabase extends _$AppDatabase {
           if (from < 5) {
             await m.createTable(deviceRows);
           }
-          if (from < 6) {
-            await customStatement(
-              "UPDATE data_log_cells SET device_name = REPLACE(device_name, 'BDP060301', '') WHERE device_name LIKE '%BDP060301%'",
-            );
-            await customStatement(
-              "UPDATE device_rows SET name = REPLACE(name, 'BDP060301', '') WHERE name LIKE '%BDP060301%'",
-            );
+          if (from < 7) {
+            // Column may already exist if table was created with the full schema.
+            try {
+              await m.addColumn(commonSettings, commonSettings.darkMode);
+            } catch (e) {
+              dev.log('Migration v7: dark_mode column already exists, skipping. ($e)', name: 'AppDatabase');
+            }
           }
         },
       );

@@ -58,4 +58,11 @@ class AppSettingsRepository {
       ),
     );
   }
+
+  /// Сохранить выбор тёмной / светлой темы
+  Future<void> setDarkMode(bool dark) {
+    return (_db.update(_db.commonSettings)
+          ..where((t) => t.id.equals(1)))
+        .write(CommonSettingsCompanion(darkMode: Value(dark)));
+  }
 }

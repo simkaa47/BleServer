@@ -75,16 +75,14 @@ class MainDrawerWidget extends ConsumerWidget {
                     icon: const Icon(Icons.light_mode),
                     color: !isDark ? cs.primary : cs.onSurfaceVariant,
                     onPressed: () {
-                      ref.read(themeModeProvider.notifier).state =
-                          ThemeMode.light;
+                      ref.read(themeModeProvider.notifier).setMode(ThemeMode.light);
                     },
                   ),
                   IconButton(
                     icon: const Icon(Icons.dark_mode),
                     color: isDark ? cs.primary : cs.onSurfaceVariant,
                     onPressed: () {
-                      ref.read(themeModeProvider.notifier).state =
-                          ThemeMode.dark;
+                      ref.read(themeModeProvider.notifier).setMode(ThemeMode.dark);
                     },
                   ),
                 ],

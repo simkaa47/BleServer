@@ -65,14 +65,7 @@ final _router = GoRouter(
     ),
 
     ShellRoute(
-      builder: (context, state, child) {
-        final Locale currentLocale = Localizations.localeOf(context);
-        final String currentTitle = _getTitleForName(
-          state.matchedLocation,
-          currentLocale,
-        );
-        return AppShell(title: currentTitle, child: child);
-      },
+      builder: (context, state, child) => AppShell(child: child),
       routes: [
         GoRoute(
           path: Routes.home,
@@ -177,27 +170,3 @@ final _router = GoRouter(
   errorBuilder: (context, state) => const MainPageWidget(),
 );
 
-final Map<String, Map<String, String>> _localizedTitles = {
-  'en': {
-    Routes.home: 'Главная',
-    Routes.measUnits: 'Единицы измерения',
-    Routes.deviceSettings: 'Настройки прибора',
-    Routes.communication: "Устройства",
-    Routes.archive: "История измерений",
-    Routes.diagnostic: "Диагностика",
-  },
-  'ru': {
-    Routes.home: 'Home',
-    Routes.measUnits: 'Meas Units',
-    Routes.deviceSettings: 'Device Settings',
-    Routes.communication: "Diagnostics",
-  },
-};
-
-String _getTitleForName(String name, Locale locale) {
-  final Map<String, String>? titles = _localizedTitles[locale.languageCode];
-  if (titles != null && titles.containsKey(name)) {
-    return titles[name]!;
-  }
-  return 'Приложение';
-}

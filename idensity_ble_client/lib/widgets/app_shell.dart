@@ -5,11 +5,19 @@ import 'package:idensity_ble_client/models/providers/services_registration.dart'
 import 'package:idensity_ble_client/widgets/drawer/main_drawer_widget.dart';
 import 'package:idensity_ble_client/widgets/routes.dart';
 
+const _titles = {
+  Routes.home: 'Главная',
+  Routes.measUnits: 'Единицы измерения',
+  Routes.deviceSettings: 'Настройки прибора',
+  Routes.communication: 'Устройства',
+  Routes.archive: 'История измерений',
+  Routes.diagnostic: 'Диагностика',
+};
+
 class AppShell extends ConsumerStatefulWidget {
-  const AppShell({super.key, required this.title, required this.child});
+  const AppShell({super.key, required this.child});
 
   final Widget child;
-  final String title;
 
   @override
   ConsumerState<AppShell> createState() => _AppShellState();
@@ -20,6 +28,7 @@ class _AppShellState extends ConsumerState<AppShell>
   RouterDelegate<Object>? _routerDelegate;
   late final AnimationController _pulseController;
   late final Animation<double> _pulseAnimation;
+  String _title = 'Приложение';
 
   @override
   void initState() {
@@ -39,6 +48,7 @@ class _AppShellState extends ConsumerState<AppShell>
     _routerDelegate?.removeListener(_onRouteChanged);
     _routerDelegate = GoRouter.of(context).routerDelegate;
     _routerDelegate!.addListener(_onRouteChanged);
+    _refreshTitle();
   }
 
   @override
@@ -48,8 +58,24 @@ class _AppShellState extends ConsumerState<AppShell>
     super.dispose();
   }
 
+  void _refreshTitle() {
+    if (!mounted) return;
+    final path =
+        GoRouter.of(context).routerDelegate.currentConfiguration.uri.path;
+    // longest-prefix match so sub-routes inherit parent title
+    String? bestKey;
+    for (final key in _titles.keys) {
+      if (path == key || path.startsWith('$key/')) {
+        if (bestKey == null || key.length > bestKey.length) bestKey = key;
+      }
+    }
+    final next = bestKey != null ? _titles[bestKey]! : 'Приложение';
+    if (_title != next) setState(() => _title = next);
+  }
+
   void _onRouteChanged() {
     ref.read(appBarActionsProvider.notifier).state = [];
+    _refreshTitle();
   }
 
   @override
@@ -63,7 +89,7 @@ class _AppShellState extends ConsumerState<AppShell>
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(_title),
         actions: [
           if (hasErrors) _DiagnosticWarningButton(animation: _pulseAnimation),
           ...actions,

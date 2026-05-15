@@ -51,6 +51,8 @@ class IndicationItemWidget extends StatelessWidget {
                         color: cs.onSurfaceVariant,
                       ),
                       maxLines: 2,
+                      minFontSize: 8,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   Flexible(
@@ -64,6 +66,7 @@ class IndicationItemWidget extends StatelessWidget {
                         height: 1.1,
                       ),
                       maxLines: 1,
+                      minFontSize: 10,
                     ),
                   ),
                 ],

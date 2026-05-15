@@ -58,7 +58,7 @@ class MeasResultWidget extends ConsumerWidget {
         return Card(
           margin: const EdgeInsets.all(4),
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
+            padding: const EdgeInsets.fromLTRB(16, 4, 8, 4),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -123,9 +123,13 @@ class MeasResultWidget extends ConsumerWidget {
                           ),
                         ),
                       ),
-                      Text(
-                        "Усреднённое значение",
-                        style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "Усреднённое значение",
+                          style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+                        ),
                       ),
                     ],
                   ),
@@ -152,9 +156,13 @@ class MeasResultWidget extends ConsumerWidget {
                           ),
                         ),
                       ),
-                      Text(
-                        "Мгновенное значение",
-                        style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "Мгновенное значение",
+                          style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+                        ),
                       ),
                     ],
                   ),

@@ -18,65 +18,77 @@ class MainDrawerWidget extends ConsumerWidget {
     return Drawer(
       child: Column(
         children: [
-          DrawerHeader(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  cs.primary,
-                  cs.primary.withValues(alpha: 0.8),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-            child: Center(
+          Expanded(
+            child: SingleChildScrollView(
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [Image.asset('assets/images/konvels_logo.png')],
+                children: [
+                  DrawerHeader(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          cs.primary,
+                          cs.primary.withValues(alpha: 0.8),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                    ),
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [Image.asset('assets/images/konvels_logo.png')],
+                      ),
+                    ),
+                  ),
+                  const DrawerItem(title: 'Главная', routeName: Routes.home),
+                  const DrawerItem(
+                    title: 'Настройки прибора',
+                    routeName: Routes.deviceSettings,
+                  ),
+                  const DrawerItem(
+                    title: 'Единицы измерения',
+                    routeName: Routes.measUnits,
+                  ),
+                  const DrawerItem(
+                    title: 'Устройства',
+                    routeName: Routes.communication,
+                  ),
+                  const DrawerItem(
+                    title: 'История измерений',
+                    routeName: Routes.archive,
+                  ),
+                  const DrawerItem(title: 'Диагностика', routeName: Routes.diagnostic),
+                ],
               ),
             ),
           ),
-          const DrawerItem(title: 'Главная', routeName: Routes.home),
-          const DrawerItem(
-            title: 'Настройки прибора',
-            routeName: Routes.deviceSettings,
-          ),
-          const DrawerItem(
-            title: 'Единицы измерения',
-            routeName: Routes.measUnits,
-          ),
-          const DrawerItem(
-            title: 'Устройства',
-            routeName: Routes.communication,
-          ),
-          const DrawerItem(
-            title: 'История измерений',
-            routeName: Routes.archive,
-          ),
-          const DrawerItem(title: 'Диагностика', routeName: Routes.diagnostic),
-          const Spacer(),
           const Divider(height: 1),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.light_mode),
-                  color: !isDark ? cs.primary : cs.onSurfaceVariant,
-                  onPressed: () {
-                    ref.read(themeModeProvider.notifier).state = ThemeMode.light;
-                  },
-                ),
-                IconButton(
-                  icon: const Icon(Icons.dark_mode),
-                  color: isDark ? cs.primary : cs.onSurfaceVariant,
-                  onPressed: () {
-                    ref.read(themeModeProvider.notifier).state = ThemeMode.dark;
-                  },
-                ),
-              ],
+          SafeArea(
+            top: false,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.light_mode),
+                    color: !isDark ? cs.primary : cs.onSurfaceVariant,
+                    onPressed: () {
+                      ref.read(themeModeProvider.notifier).state =
+                          ThemeMode.light;
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.dark_mode),
+                    color: isDark ? cs.primary : cs.onSurfaceVariant,
+                    onPressed: () {
+                      ref.read(themeModeProvider.notifier).state =
+                          ThemeMode.dark;
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ],
